@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "lib": [
+      "ES2023",
+      "DOM"
+    ],
+    "incremental": true,
+    "tsBuildInfoFile": "./build/.tsbuildinfo",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "build",
+    "rootDir": ".",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ESNext",
+    "module": "NodeNext",
+    "forceConsistentCasingInFileNames": true,
+    "plugins": [
+      {
+        "transform": "typia/lib/transform"
+      }
+    ],
+    "strictNullChecks": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "rollup/parseAst": [
+        "./node_modules/rollup/dist/parseAst"
+      ]
+    },
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "utils/**/*.ts"
+  ]
+}

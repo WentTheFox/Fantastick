@@ -1,0 +1,7 @@
+node_modules
+config.js
+*.env
+/build
+/coverage
+/crowdin_report.json5
+/src/generated/prisma

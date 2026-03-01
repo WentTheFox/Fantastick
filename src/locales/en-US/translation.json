@@ -1,0 +1,26 @@
+{
+  "commands": {
+    "global": {
+      "responses": {},
+      "options": {}
+    },
+    "sticker": {
+      "name": "sticker",
+      "description": "Send a sticker",
+      "responses": {
+        "invalidPack": "There is no sticker pack with the specified name",
+        "invalidName": "There is no sticker with the specified name"
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Sticker name"
+        },
+        "pack": {
+          "name": "pack",
+          "description": "Sticker pack name"
+        }
+      }
+    }
+  }
+}

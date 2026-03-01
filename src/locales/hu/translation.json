@@ -1,0 +1,26 @@
+{
+  "commands": {
+    "global": {
+      "responses": {},
+      "options": {}
+    },
+    "sticker": {
+      "name": "matrica",
+      "description": "Matrica küldése",
+      "responses": {
+        "invalidPack": "Nem található matricacsomag a megadott néven",
+        "invalidName": "Nem található matrica a megadott néven"
+      },
+      "options": {
+        "name": {
+          "name": "név",
+          "description": "Matrica neve"
+        },
+        "pack": {
+          "name": "csomag",
+          "description": "Matricacsomag neve"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model DiscordUser {
+  id              BigInt    @id
+  name            String    @db.VarChar(32)
+  displayName     String    @db.VarChar(255)
+  discriminator   String    @db.Char(4)
+  avatar          String    @db.VarChar(64)
+  packs           Pack[]    @relation("CreatedPacks")
+  deletedPacks    Pack[]    @relation("DeletedPacks")
+  stickers        Sticker[] @relation("CreatedStickers")
+  deletedStickers Sticker[] @relation("DeletedStickers")
+}
+
+model Pack {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String      @db.VarChar(255)
+  stickers  Sticker[]
+  createdBy BigInt
+  creator   DiscordUser @relation("CreatedPacks", fields: [createdBy], references: [id])
+  createdAt DateTime    @default(now()) @db.Timestamptz(0)
+  updatedAt DateTime    @updatedAt @db.Timestamptz(0)
+  deletedAt DateTime    @updatedAt @db.Timestamptz(0)
+  deletedBy BigInt
+  deleter   DiscordUser @relation("DeletedPacks", fields: [deletedBy], references: [id])
+
+  @@unique([name])
+}
+
+model Sticker {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pack      Pack        @relation(fields: [packId], references: [id])
+  packId    String      @db.Uuid
+  name      String      @db.VarChar(255)
+  url       String      @db.VarChar(255)
+  createdBy BigInt
+  creator   DiscordUser @relation("CreatedStickers", fields: [createdBy], references: [id])
+  createdAt DateTime    @default(now()) @db.Timestamptz(0)
+  updatedAt DateTime    @updatedAt @db.Timestamptz(0)
+  deletedAt DateTime    @updatedAt @db.Timestamptz(0)
+  deletedBy BigInt
+  deleter   DiscordUser @relation("DeletedStickers", fields: [deletedBy], references: [id])
+
+  @@unique([packId, name])
+}

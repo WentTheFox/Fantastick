@@ -1,13 +1,16 @@
 import {
   ApplicationCommandOptionType,
   ChannelType,
+  ChatInputCommandInteraction,
   CommandInteraction,
   CommandInteractionOption,
   Embed,
   TopLevelComponent,
   User,
 } from 'discord.js';
-import { InteractionHandlerContext } from '../types/bot-interaction.js';
+import { DiscordUser } from '../generated/prisma/client.js';
+import { DiscordUserUpdateInput } from '../generated/prisma/models/DiscordUser.js';
+import { InteractionContext, InteractionHandlerContext } from '../types/bot-interaction.js';
 
 type UserFriendCode = `@${string}` | `${string}#${string}`;
 export const getUserFriendCode = (user: User): UserFriendCode => {
@@ -108,4 +111,23 @@ export const findTextComponentContentsRecursively = (components: TopLevelCompone
 
 export const emoji = (context: Pick<InteractionHandlerContext, 'emojiIdMap'>, name: string, animated = false): string => {
   return `<${animated ? 'a' : ''}:${name}:${context.emojiIdMap[name]}>`;
+};
+
+export const updateOrCreateUser = (context: InteractionContext, interaction: Pick<ChatInputCommandInteraction, 'user'>): Promise<DiscordUser> => {
+  const { db } = context;
+
+  const id = BigInt(interaction.user.id);
+  const update = { name: interaction.user.username,
+      discriminator: interaction.user.discriminator,
+      displayName: interaction.user.globalName,
+      avatar: interaction.user.avatar,
+  } satisfies DiscordUserUpdateInput;
+  return db.discordUser.upsert({
+    where: { id },
+    create: {
+      id,
+      ...update,
+    },
+    update,
+  });
 };

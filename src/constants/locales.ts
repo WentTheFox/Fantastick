@@ -6,7 +6,7 @@ import { Locale } from 'discord-api-types/v10';
 import { NestableLogger } from '../types/logger-types.js';
 
 // Type-safe language constants
-export const SUPPORTED_LANGUAGES = Object.values(Locale) as Locale[];
+export const SUPPORTED_LANGUAGES = [Locale.Hungarian, Locale.EnglishUS] as Locale[];
 export const DEFAULT_LANGUAGE = Locale.EnglishUS;
 
 const localesPath = join('.', 'src', 'locales');

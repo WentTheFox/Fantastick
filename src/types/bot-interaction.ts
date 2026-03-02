@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client/extension';
 import {
   ApplicationCommandOptionType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -8,11 +9,13 @@ import type {
   ChatInputCommandInteraction,
 } from 'discord.js';
 import { i18n, TFunction } from 'i18next';
+import { PrismaClient } from '../generated/prisma/client.js';
 
 import { NestableLogger } from './logger-types.js';
 
 export const enum BotChatInputCommandName {
   STICKER = 'sticker',
+  CREATE_PACK = 'create-pack',
 }
 
 export interface LoggerContext {
@@ -23,6 +26,7 @@ export interface InteractionHandlerContext extends LoggerContext {
   i18next: i18n;
   emojiIdMap: Record<string, string>;
   commandIdMap: Record<string, string | undefined>;
+  db: PrismaClient;
 }
 
 export interface InteractionContext extends Omit<InteractionHandlerContext, 'i18next'> {

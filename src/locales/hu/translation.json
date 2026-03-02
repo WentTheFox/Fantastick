@@ -1,7 +1,9 @@
 {
   "commands": {
     "global": {
-      "responses": {},
+      "responses": {
+        "unexpectedError": "Váratlan hiba történt az interakció feldolgozása során"
+      },
       "options": {}
     },
     "sticker": {
@@ -19,6 +21,27 @@
         "pack": {
           "name": "csomag",
           "description": "Matricacsomag neve"
+        }
+      }
+    },
+    "create-pack": {
+      "name": "csomag-létrehozás",
+      "description": "Létrehoz egy új matricacsomagot",
+      "responses": {
+        "nameTooShort": "A megadott matricacsomag név túl rövid (minimum {{min}} karakter)",
+        "nameTooLong": "A megadott matricacsomag név túl hosszú (maximum {{max}} karakter)",
+        "invalidName": "A megadott matricacsomag név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
+        "duplicateName": "Már létezik egy ilyen nevű matricacsomag, kérlek válassz másik nevet",
+        "created": "Új matricacsomag létrehozva {{name}} néven"
+      },
+      "options": {
+        "name": {
+          "name": "név",
+          "description": "Az új matricacsomag neve"
+        },
+        "nsfw": {
+          "name": "nsfw",
+          "description": "Tartalmaz-e majd a pack NSFW matricákat?"
         }
       }
     }

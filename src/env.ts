@@ -11,6 +11,7 @@ const {
   DISABLE_SETTINGS,
   UA_STRING,
   DISCORD_INVITE_URL,
+  DATABASE_URL,
 } = process.env;
 
 /**
@@ -26,6 +27,7 @@ export const env = (() => {
     DISABLE_SETTINGS: typeof DISABLE_SETTINGS !== 'undefined' && DISABLE_SETTINGS === 'true',
     UA_STRING,
     DISCORD_INVITE_URL,
+    DATABASE_URL,
   };
 
   type Values = typeof values;

@@ -17,13 +17,26 @@ const commonCommandOptions: Pick<RESTPostAPIChatInputApplicationCommandsJSONBody
 const onlyApplicableChatInputCommands = (commandName: BotChatInputCommandName) =>
   chatInputCommandMap[commandName].registerCondition?.() ?? true;
 
+const sortCommandDefinitionOptions = (commandDefinition: RESTPostAPIChatInputApplicationCommandsJSONBody) => {
+  if (commandDefinition.options && commandDefinition.options.length > 0) {
+    commandDefinition.options.sort((a, b) => {
+      const aRequired = 'required' in a ? a.required : false;
+      const bRequired = 'required' in b ? b.required : false;
+      if (aRequired && !bRequired) return -1;
+      if (!aRequired && bRequired) return 1;
+      return 0;
+    });
+  }
+  return commandDefinition;
+};
+
 export type BotCommandItem = (ApplicationGuildCommand & ApplicationCommand);
 export type BotCommands = BotCommandItem[];
 export const getApplicationCommands = (t: TFunction): BotCommands => [
   ...chatInputCommandNames
     .filter(onlyApplicableChatInputCommands)
-    .map((commandName) => ({
+    .map((commandName): RESTPostAPIChatInputApplicationCommandsJSONBody => ({
       ...commonCommandOptions,
-      ...chatInputCommandMap[commandName].getDefinition(t),
+      ...sortCommandDefinitionOptions(chatInputCommandMap[commandName].getDefinition(t)),
     })),
 ];

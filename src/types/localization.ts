@@ -9,21 +9,35 @@ export const enum StickerCommandOptionName {
   PACK = 'pack',
 }
 
+export const enum CreatePackCommandOptionName {
+  NAME = 'name',
+  NSFW = 'nsfw',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
+  [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
+  UNEXPECTED_ERROR = 'unexpectedError'
 }
 
 export const enum StickerCommandResponse {
   INVALID_NAME = 'invalidName',
   INVALID_PACK = 'invalidPack',
 }
+export const enum CreatePackCommandResponse {
+  NAME_TOO_SHORT = 'nameTooShort',
+  NAME_TOO_LONG = 'nameTooLong',
+  INVALID_NAME = 'invalidName',
+  CREATED = 'created',
+}
 
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
+  [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandResponse,
 }
 
 export type OptionLocalization =

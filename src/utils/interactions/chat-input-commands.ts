@@ -1,9 +1,11 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
+import { createPackCommand } from '../../commands/create-pack.command.js';
 import { stickerCommand } from '../../commands/sticker.command.js';
 import { BotChatInputCommand, BotChatInputCommandName } from '../../types/bot-interaction.js';
 
 export const chatInputCommandMap: Record<BotChatInputCommandName, BotChatInputCommand> = {
   [BotChatInputCommandName.STICKER]: stickerCommand,
+  [BotChatInputCommandName.CREATE_PACK]: createPackCommand,
 };
 
 export const chatInputCommandNames = (Object.keys(chatInputCommandMap) as BotChatInputCommandName[]);

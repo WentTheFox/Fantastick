@@ -1,11 +1,13 @@
 import { createClient } from './utils/client.js';
 import { initI18next } from './constants/locales.js';
+import { createDb } from './utils/create-db.js';
 import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
 import { Logger } from './classes/logger.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
 
 (async () => {
   const logger = Logger.fromShardInfo(process.env.SHARDS);
+  const db = createDb();
   const [i18next, emojiIdMap, commandIdMap] = await Promise.all([
     initI18next(logger),
     getEmojiIdMap({ logger }),
@@ -13,5 +15,5 @@ import { getCommandIdMap } from './utils/get-command-id-map.js';
   ]);
 
   logger.log('Creating client');
-  await createClient({ i18next, emojiIdMap, commandIdMap, logger });
+  await createClient({ i18next, emojiIdMap, commandIdMap, logger, db });
 })();

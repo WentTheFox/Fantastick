@@ -1,7 +1,9 @@
 {
   "commands": {
     "global": {
-      "responses": {},
+      "responses": {
+        "unexpectedError": "There was an unexpected error while processing this interaction"
+      },
       "options": {}
     },
     "sticker": {
@@ -19,6 +21,27 @@
         "pack": {
           "name": "pack",
           "description": "Sticker pack name"
+        }
+      }
+    },
+    "create-pack": {
+      "name": "create-pack",
+      "description": "Create a new sticker pack",
+      "responses": {
+        "nameTooShort": "The provided sticker pack name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker pack name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker pack name contains the following  invalid character(s): {{chars}}",
+        "duplicateName": "A sticker pack with the same name already exists, please choose a different one",
+        "created": "New sticker pack created with name {{name}}"
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Name for the new sticker pack"
+        },
+        "nsfw": {
+          "name": "nsfw",
+          "description": "Will the pack contain NSFW stickers?"
         }
       }
     }

@@ -49,6 +49,9 @@ export const createCommandMention = (commandName: string, {
 };
 
 export const interactionReply = (context: Pick<UserInteractionContext, 't' | 'commandIdMap'>, interaction: CommandInteraction | ChatInputCommandInteraction | ContextMenuCommandInteraction | MessageComponentInteraction, options: InteractionReplyOptions) => {
+  if (options.content && (interaction.replied || interaction.deferred)) {
+    return interaction.editReply({ content: options.content });
+  }
   const upgradedOptions = upgradeToComponentsV2(options, context);
   return interaction.reply(upgradedOptions);
 };

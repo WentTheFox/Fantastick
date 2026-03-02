@@ -72,7 +72,7 @@ export const createPackCommand: BotChatInputCommand = {
     });
 
     await interactionReply(context, interaction, {
-      content: t('commands.create-pack.responses.created', { name: '`'+name+'`'  }),
+      content: t('commands.create-pack.responses.created', { name: '`'+pack.name+'`'  }),
       flags: MessageFlags.Ephemeral,
     });
   },

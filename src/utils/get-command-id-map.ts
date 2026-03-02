@@ -13,6 +13,9 @@ export const getCommandIdMap = async (context: { logger: NestableLogger }): Prom
   let commandsResponse: RESTGetAPIApplicationCommandsResult | RESTGetAPIApplicationGuildCommandResult;
   if (env.LOCAL) {
     const authorizedServers = await getAuthorizedServers({ logger });
+    if (authorizedServers.length === 0) {
+      throw new Error('No authorized servers were found');
+    }
     if (authorizedServers.length > 1) {
       throw new Error(`More than one authorized server was found: ${authorizedServers.join(', ')}`);
     }

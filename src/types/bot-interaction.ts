@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client/extension';
 import {
   ApplicationCommandOptionType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -16,6 +15,7 @@ import { NestableLogger } from './logger-types.js';
 export const enum BotChatInputCommandName {
   STICKER = 'sticker',
   CREATE_PACK = 'create-pack',
+  IMPORT = 'import',
 }
 
 export interface LoggerContext {

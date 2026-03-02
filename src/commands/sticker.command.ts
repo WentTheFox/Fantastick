@@ -9,7 +9,7 @@ export const stickerCommand: BotChatInputCommand = {
     options: getStickerOptions(t),
   }),
   async handle(interaction, context) {
-    const {t} = context;
+    const { t } = context;
     await interaction.reply(t('commands.sticker.responses.invalidPack'));
   },
 };

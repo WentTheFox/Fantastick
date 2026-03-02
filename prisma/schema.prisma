@@ -45,6 +45,7 @@ model Sticker {
   pack      Pack         @relation(fields: [packId], references: [id])
   packId    String       @db.Uuid
   name      String       @db.VarChar(255)
+  emoji     String       @db.VarChar(64)
   url       String       @db.VarChar(255)
   createdBy BigInt
   creator   DiscordUser  @relation("CreatedStickers", fields: [createdBy], references: [id])
@@ -53,6 +54,5 @@ model Sticker {
   deletedAt DateTime     @updatedAt @db.Timestamptz(0)
   deletedBy BigInt?
   deleter   DiscordUser? @relation("DeletedStickers", fields: [deletedBy], references: [id])
-
-  @@unique([packId, name])
+  order     Int          @default(0)
 }

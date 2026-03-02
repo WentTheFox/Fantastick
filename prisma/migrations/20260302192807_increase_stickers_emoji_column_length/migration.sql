@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Sticker" ALTER COLUMN "emoji" SET DATA TYPE VARCHAR(64);

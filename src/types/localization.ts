@@ -13,10 +13,15 @@ export const enum CreatePackCommandOptionName {
   NAME = 'name',
   NSFW = 'nsfw',
 }
+export const enum ImportCommandOptionName {
+  PACK = 'pack',
+  URL = 'url',
+}
 
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandOptionName,
+  [BotChatInputCommandName.IMPORT]: ImportCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -27,6 +32,7 @@ export const enum StickerCommandResponse {
   INVALID_NAME = 'invalidName',
   INVALID_PACK = 'invalidPack',
 }
+
 export const enum CreatePackCommandResponse {
   NAME_TOO_SHORT = 'nameTooShort',
   NAME_TOO_LONG = 'nameTooLong',
@@ -34,10 +40,18 @@ export const enum CreatePackCommandResponse {
   CREATED = 'created',
 }
 
+export const enum ImportCommandResponse {
+  PACK_NOT_FOUND = 'packNotFound',
+  INVALID_URL = 'invalidUrl',
+  IMPORT_FAILED = 'importFailed',
+  IMPORTED = 'imported',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandResponse,
+  [BotChatInputCommandName.IMPORT]: ImportCommandResponse,
 }
 
 export type OptionLocalization =

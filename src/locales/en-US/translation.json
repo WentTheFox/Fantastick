@@ -44,6 +44,27 @@
           "description": "Will the pack contain NSFW stickers?"
         }
       }
+    },
+    "import": {
+      "name": "import",
+      "description": "Import stickers from a Telegram pack",
+      "responses": {
+        "packNotFound": "The provided pack could not be found",
+        "invalidUrl": "The provided Telegram pack URL is invalid",
+        "importFailed": "The import failed, please try again later",
+        "importProgress": "Importing stickers… ({{current}}/{{total}})",
+        "imported": "The import completed successfully"
+      },
+      "options": {
+        "pack": {
+          "name": "pack",
+          "description": "Name of the existing sticker pack within the app"
+        },
+        "url": {
+          "name": "url",
+          "description": "URL of the Telegram sticker pack"
+        }
+      }
     }
   }
 }

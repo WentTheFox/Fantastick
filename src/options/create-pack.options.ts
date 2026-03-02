@@ -1,6 +1,6 @@
 import { APIApplicationCommandOption, ApplicationCommandOptionType } from 'discord-api-types/v10';
 import { TFunction } from 'i18next';
-import { CreatePackCommandOptionName, StickerCommandOptionName } from '../types/localization.js';
+import { CreatePackCommandOptionName } from '../types/localization.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { getGlobalOptions } from './global.options.js';
 import { packNameOptionMeta } from './metadata/pack-name.option-meta.js';

@@ -44,6 +44,27 @@
           "description": "Tartalmaz-e majd a pack NSFW matricákat?"
         }
       }
+    },
+    "import": {
+      "name": "importálás",
+      "description": "Matricák importálása egy Telegram csomagból",
+      "responses": {
+        "packNotFound": "A megadott csomag nem található",
+        "invalidUrl": "A megadott Telegram csomag URL érvénytelen",
+        "importFailed": "Az importálás nem sikerült, kérlek próbálkozz újra később",
+        "importProgress": "Matricák importálása… ({{current}}/{{total}})",
+        "imported": "Az importálás sikeresen megtörtént"
+      },
+      "options": {
+        "pack": {
+          "name": "csomag",
+          "description": "Meglevő matricacsomag neve az appban"
+        },
+        "url": {
+          "name": "url",
+          "description": "A Telegram matricacsomag URL-js"
+        }
+      }
     }
   }
 }

@@ -12,6 +12,10 @@ const {
   UA_STRING,
   DISCORD_INVITE_URL,
   DATABASE_URL,
+  TELEGRAM_BOT_TOKEN,
+  UPLOAD_API_HOST,
+  UPLOAD_KEY,
+  UPLOAD_API_DOMAIN,
 } = process.env;
 
 /**
@@ -28,6 +32,10 @@ export const env = (() => {
     UA_STRING,
     DISCORD_INVITE_URL,
     DATABASE_URL,
+    TELEGRAM_BOT_TOKEN,
+    UPLOAD_API_HOST,
+    UPLOAD_KEY,
+    UPLOAD_API_DOMAIN,
   };
 
   type Values = typeof values;

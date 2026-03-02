@@ -11,7 +11,7 @@ export const getStickerOptions = (t: TFunction): APIApplicationCommandOption[] =
     name: StickerCommandOptionName.PACK,
     ...getLocalizedObject('name', (lng) => t('commands.sticker.options.pack.name', { lng }), false),
     ...getLocalizedObject('description', (lng) => t('commands.sticker.options.pack.description', { lng })),
-    required: true,
+    required: false,
     ...packNameOptionMeta,
   },
   {

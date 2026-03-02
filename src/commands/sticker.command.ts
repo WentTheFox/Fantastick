@@ -8,8 +8,8 @@ export const stickerCommand: BotChatInputCommand = {
     ...getLocalizedObject('name', (lng) => t('commands.sticker.name', { lng })),
     options: getStickerOptions(t),
   }),
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- todo
   async handle(interaction, context) {
-    // TODO
+    const {t} = context;
+    await interaction.reply(t('commands.sticker.responses.invalidPack'));
   },
 };

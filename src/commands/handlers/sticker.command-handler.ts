@@ -12,7 +12,10 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
   const userPacks = await db.pack.findMany({
     select: { id: true },
     where: {
-      createdBy: BigInt(interaction.user.id),
+      OR: [
+        { createdBy: BigInt(interaction.user.id) },
+        { public: true },
+      ],
       id: packId,
       nsfw: nsfw ? undefined : false,
     },
@@ -80,6 +83,6 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
       serverId: replyMessage.guildId ? BigInt(replyMessage.guildId) : null,
       channelId: replyMessage.channelId ? BigInt(replyMessage.channelId) : null,
       stickerId: sticker.id,
-    }
+    },
   })));
 };

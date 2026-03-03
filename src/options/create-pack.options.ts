@@ -17,7 +17,12 @@ export const getCreatePackOptions = (t: TFunction): APIApplicationCommandOption[
     name: CreatePackCommandOptionName.NSFW,
     ...getLocalizedObject('name', (lng) => t('commands.create-pack.options.nsfw.name', { lng }), false),
     ...getLocalizedObject('description', (lng) => t('commands.create-pack.options.nsfw.description', { lng })),
-    required: true,
+    type: ApplicationCommandOptionType.Boolean,
+  },
+  {
+    name: CreatePackCommandOptionName.PUBLIC,
+    ...getLocalizedObject('name', (lng) => t('commands.create-pack.options.public.name', { lng }), false),
+    ...getLocalizedObject('description', (lng) => t('commands.create-pack.options.public.description', { lng })),
     type: ApplicationCommandOptionType.Boolean,
   },
   ...getGlobalOptions(t),

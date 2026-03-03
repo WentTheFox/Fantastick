@@ -12,6 +12,7 @@ export const enum StickerCommandOptionName {
 export const enum CreatePackCommandOptionName {
   NAME = 'name',
   NSFW = 'nsfw',
+  PUBLIC = 'public',
 }
 
 export const enum ImportCommandOptionName {
@@ -40,7 +41,8 @@ export const enum CreatePackCommandResponse {
   INVALID_NAME = 'invalidName',
   DUPLICATE_NAME = 'duplicateName',
   TOO_MANY_PACKS = 'tooManyPacks',
-  CREATED = 'created',
+  CREATED_PUBLIC = 'createdPublic',
+  CREATED_PRIVATE = 'createdPrivate',
 }
 
 export const enum CreateStickerCommandResponse {

@@ -37,6 +37,7 @@ model Pack {
   deletedBy BigInt?
   deleter   DiscordUser? @relation("DeletedPacks", fields: [deletedBy], references: [id])
   nsfw      Boolean      @default(false)
+  public    Boolean      @default(false)
 
   @@unique([name])
 }

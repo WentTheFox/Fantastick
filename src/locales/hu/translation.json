@@ -34,7 +34,8 @@
         "invalidName": "A megadott matricacsomag név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
         "duplicateName": "Már létezik egy ilyen nevű matricacsomag, kérlek válassz másik nevet",
         "tooManyPacks": "Legfeljebb {{maxPacks}} matricacsomagot hozhatsz létre. Kérlek töröld az egyik matrica csomagod mielőtt újat hoznál létre.",
-        "created": "Új matricacsomag létrehozva {{name}} néven"
+        "createdPublic": "Új **publikus** matricacsomag létrehozva {{name}} néven",
+        "createdPrivate": "Új **privát** matricacsomag létrehozva {{name}} néven"
       },
       "options": {
         "name": {
@@ -43,7 +44,11 @@
         },
         "nsfw": {
           "name": "nsfw",
-          "description": "Tartalmaz-e majd a pack NSFW matricákat?"
+          "description": "Ha True, akkor a csomag matricáit csak korhatáros csatornákban lehet majd használni"
+        },
+        "public": {
+          "name": "publikus",
+          "description": "Ha True, a csomagot bárki használhatja, nem csak az, aki létrehozta"
         }
       }
     },

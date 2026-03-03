@@ -19,7 +19,10 @@ export const handlePackNameAutocomplete = async ({
   const userPacks = await db.pack.findMany({
     select: { id: true, name: true },
     where: {
-      createdBy: BigInt(interaction.user.id),
+      OR: [
+        { createdBy: BigInt(interaction.user.id) },
+        { public: true },
+      ],
       nsfw: nsfw ? undefined : false,
     },
   });

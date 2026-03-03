@@ -5,6 +5,7 @@ import {
   packNameOptionMeta,
 } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
+import { CreatePackCommandOptionName } from '../types/localization.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -26,8 +27,9 @@ export const createPackCommand: BotChatInputCommand = {
       return;
     }
 
-    const name = interaction.options.getString('name', true);
-    const nsfw = interaction.options.getBoolean('nsfw', true);
+    const name = interaction.options.getString(CreatePackCommandOptionName.NAME, true);
+    const nsfw = interaction.options.getBoolean(CreatePackCommandOptionName.NSFW) ?? false;
+    const isPublic = interaction.options.getBoolean(CreatePackCommandOptionName.PUBLIC) ?? false;
 
     if (name.length < packNameOptionMeta.min_length) {
       await interactionReply(context, interaction, {
@@ -76,12 +78,16 @@ export const createPackCommand: BotChatInputCommand = {
       data: {
         name,
         nsfw,
+        'public': isPublic,
         createdBy: user.id,
       },
     });
 
+    const codeSpanPackName = '`' + pack.name + '`';
     await interactionReply(context, interaction, {
-      content: t('commands.create-pack.responses.created', { name: '`'+pack.name+'`'  }),
+      content: isPublic
+        ? t('commands.create-pack.responses.createdPublic', { name: codeSpanPackName })
+        : t('commands.create-pack.responses.createdPrivate', { name: codeSpanPackName }),
       flags: MessageFlags.Ephemeral,
     });
   },

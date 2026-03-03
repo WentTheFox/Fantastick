@@ -22,7 +22,10 @@ export const handleStickerAutocomplete = async ({
   const userPacks = await db.pack.findMany({
     select: { id: true, name: true },
     where: {
-      createdBy: BigInt(interaction.user.id),
+      OR: [
+        { createdBy: BigInt(interaction.user.id) },
+        { public: true },
+      ],
       id: packId,
       nsfw: nsfw ? undefined : false,
     },

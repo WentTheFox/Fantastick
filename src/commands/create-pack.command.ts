@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { getCreatePackOptions } from '../options/create-pack.options.js';
 import {
   packNameInvalidPattern,
@@ -7,6 +8,7 @@ import {
 import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { CreatePackCommandOptionName } from '../types/localization.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
+import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 
@@ -85,9 +87,13 @@ export const createPackCommand: BotChatInputCommand = {
 
     const codeSpanPackName = '`' + pack.name + '`';
     await interactionReply(context, interaction, {
-      content: isPublic
-        ? t('commands.create-pack.responses.createdPublic', { name: codeSpanPackName })
-        : t('commands.create-pack.responses.createdPrivate', { name: codeSpanPackName }),
+      content: [
+        EmojiCharacters.GREEN_CHECK,
+        getPackVisibilityEmoji(pack),
+        isPublic
+          ? t('commands.create-pack.responses.createdPublic', { name: codeSpanPackName })
+          : t('commands.create-pack.responses.createdPrivate', { name: codeSpanPackName })
+      ].join(' '),
       flags: MessageFlags.Ephemeral,
     });
   },

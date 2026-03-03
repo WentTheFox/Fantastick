@@ -39,15 +39,15 @@ export interface TelegramApiSticker extends TelegramApiImageFile {
   is_animated: boolean;
   is_video: boolean;
   type: TelegramApiStickerType;
-  thumbnail: TelegramApiImageFile;
-  thumb: TelegramApiImageFile;
+  thumbnail?: TelegramApiImageFile;
+  thumb?: TelegramApiImageFile;
 }
 
 export interface TelegramApiGetStickerSetResult {
   name: string;
   title: string;
-  thumbnail: TelegramApiImageFile;
-  thumb: TelegramApiImageFile;
+  thumbnail?: TelegramApiImageFile;
+  thumb?: TelegramApiImageFile;
   sticker_type: TelegramApiStickerType;
   contains_masks: boolean;
   stickers: TelegramApiSticker[];

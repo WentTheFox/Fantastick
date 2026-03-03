@@ -60,6 +60,8 @@
         "invalidUrl": "The provided Telegram pack URL is invalid",
         "importFailed": "The import failed, please try again later",
         "importProgress": "Importing stickers… ({{current}}/{{total}})",
+        "finalizingImport": "Finalizing import…",
+        "rollbackProgress": "Finalizing import failed. Deleting temporary files… ({{current}}/{{total}})",
         "imported": "The import completed successfully"
       },
       "options": {

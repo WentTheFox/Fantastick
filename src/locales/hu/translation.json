@@ -9,7 +9,7 @@
     },
     "nsfw-sticker": {
       "name": "nsfw-matrica",
-      "description": "Matrica küldése (akár NSFW csomagokból is)"
+      "description": "Matrica küldése (NSFW csomagokból is)"
     },
     "sticker": {
       "name": "matrica",

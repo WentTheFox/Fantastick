@@ -1,6 +1,7 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import * as fs from 'node:fs';
 import { Readable } from 'node:stream';
+import { filledBar } from 'string-progressbar';
 import typia from 'typia';
 import { ApiResponse } from '../classes/api-client.js';
 import { ApiHttpException } from '../classes/api-http-exception.class.js';
@@ -10,12 +11,14 @@ import { Sticker } from '../generated/prisma/client.js';
 import type * as Prisma from '../generated/prisma/internal/prismaNamespace.js';
 import { getImportOptions } from '../options/import.options.js';
 import { stickerUrlPrefix } from '../options/metadata/import-url.option-meta.js';
-import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
+import { ImportCommandOptionName } from '../types/localization.js';
+import { handlePackNameAutocomplete } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { saveStickerFile } from '../utils/filesystem.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
-import { updateOrCreateUser } from '../utils/messaging.js';
+import { emoji, updateOrCreateUser } from '../utils/messaging.js';
+import { postStickerToFeed } from '../utils/post-sticker-to-feed.js';
 import {
   createTelegramApiClient,
   createTelegramFileClient,
@@ -30,6 +33,22 @@ export const importCommand: BotChatInputCommand = {
     ...getLocalizedObject('name', (lng) => t('commands.import.name', { lng })),
     options: getImportOptions(t),
   }),
+  async autocomplete(interaction, context) {
+    const focusedOption = interaction.options.getFocused(true);
+
+    switch (focusedOption.name) {
+      case ImportCommandOptionName.PACK:
+        await handlePackNameAutocomplete({
+          interaction,
+          context,
+          optionName: focusedOption.name,
+          nsfw: true,
+        });
+        break;
+      default:
+        throw new Error(`Unknown autocomplete option ${focusedOption.name}`);
+    }
+  },
   async handle(interaction, context) {
     const { t, db } = context;
     const user = await updateOrCreateUser(context, interaction);
@@ -41,20 +60,12 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
-    const pack = interaction.options.getString('pack', true);
+    const packId = interaction.options.getString(ImportCommandOptionName.PACK, true);
     const url = interaction.options.getString('url', true);
 
-    if (pack.length < packNameOptionMeta.min_length || pack.length > packNameOptionMeta.max_length) {
-      await interactionReply(context, interaction, {
-        content: t('commands.import.responses.packNotFound'),
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
-    const appPack = await db.pack.findFirst({
+    const appPack = await db.pack.findUnique({
       where: {
-        name: pack,
+        id: packId,
       },
     });
 
@@ -81,7 +92,7 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const telegramClient = createTelegramApiClient();
     const telegramFileClient = createTelegramFileClient();
@@ -114,19 +125,28 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
     const completedSet = new Set<number>();
-    const getProgressString = () => t('commands.import.responses.importProgress', {
-      current: completedSet.size,
-      total,
-    });
+    const createdFiles = new Set<string>();
+    const updateProgress = async (failed = false, finalizing = false) => {
+      const current = failed ? createdFiles.size : completedSet.size;
+      const progressbar = filledBar(total, current, 18, EmojiCharacters.WHITE_SQUARE, failed ? EmojiCharacters.RED_SQUARE : EmojiCharacters.GREEN_SQUARE)[0];
+      const progressString = `${emoji(context, failed ? 'loadingerror' : 'loading', true)} ${
+        finalizing ? t('commands.import.responses.finalizingImport') : t((
+          failed
+            ? 'commands.import.responses.rollbackProgress'
+            : 'commands.import.responses.importProgress'
+        ), {
+          current: failed ? total - current : current,
+          total,
+        })}`;
+      await interactionReply(context, interaction, {
+        content: `${progressString}\n-# ${progressbar}`,
+      });
+    };
 
-    await interactionReply(context, interaction, {
-      content: getProgressString(),
-      flags: MessageFlags.Ephemeral,
-    });
+    await updateProgress();
 
     context.logger.debug(`Importing Telegram stickers from sticker set ${telegramPackName}…`);
     const createStickerRecords: Prisma.PrismaPromise<Sticker>[] = [];
-    const createdFiles = new Set<string>();
     await getStickerSetRequest.response.result.stickers.reduce((awaiter, sticker, order) => {
       return awaiter.then(async () => {
         let telegramFilePath: string;
@@ -168,28 +188,46 @@ export const importCommand: BotChatInputCommand = {
         }));
         context.logger.info(`Imported Telegram sticker ${sticker.file_id} (#${order}) as ${stickerId}`);
         completedSet.add(order);
-        await interaction.editReply({
-          content: getProgressString(),
-        });
+
+        await updateProgress();
       });
     }, Promise.resolve());
 
     context.logger.info('Creating local sticker records…');
+    await updateProgress(false, true);
+    let stickers: Sticker[] | null = null;
     try {
-      await db.$transaction(createStickerRecords);
+      stickers = await db.$transaction(createStickerRecords);
     } catch (e) {
-      context.logger.info('Creating local sticker records failed, deleting newly created files…');
+      context.logger.error('Creating local sticker records failed', e);
+
       if (createdFiles.size > 0) {
-        await Promise.all(Array.from(createdFiles).map(async (filePath) => {
+        context.logger.info('Deleting newly created files…');
+        await updateProgress(true);
+        const createdFilesList = Array.from(createdFiles);
+        await Promise.all(createdFilesList.map(async (filePath) => {
           context.logger.info(`Deleting ${filePath}…`);
           await fs.promises.unlink(filePath);
+          createdFiles.delete(filePath);
+          await updateProgress(true);
         }));
+        context.logger.info(`Successfully deleted ${createdFilesList.length} newly created files`);
       }
-      throw e;
+
+      await interactionReply(context, interaction, {
+        content: `${EmojiCharacters.OCTAGONAL_SIGN} ${t('commands.import.responses.importFailed')}`,
+      });
+      return;
     }
 
     await interactionReply(context, interaction, {
       content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.import.responses.imported')}`,
     });
+
+    if (stickers !== null) {
+      await stickers.reduce((promise, sticker) => promise.then(() => (
+        postStickerToFeed(context, interaction, sticker, appPack)
+      )), Promise.resolve());
+    }
   },
 };

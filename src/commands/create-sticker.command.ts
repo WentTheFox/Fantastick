@@ -12,9 +12,11 @@ import {
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
 import { BotChatInputCommand, BotModalIds } from '../types/bot-interaction.js';
 import { saveStickerFile } from '../utils/filesystem.js';
+import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
+import { postStickerToFeed } from '../utils/post-sticker-to-feed.js';
 
 enum ModalCustomIds {
   PACK_INPUT = 'packInput',
@@ -72,7 +74,7 @@ export const createStickerCommand: BotChatInputCommand = {
             minValues: 1,
             maxValues: 1,
             options: userPacks.map(pack => ({
-              label: pack.name + (pack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''),
+              label: getFormattedPackName(pack),
               value: pack.name,
             })),
           },
@@ -222,14 +224,14 @@ export const createStickerCommand: BotChatInputCommand = {
       where: {
         packId: userPack.id,
         name: stickerName,
-      }
+      },
     });
     if (packStickersWithSameNameCount !== 0) {
-        await interactionReply(context, interaction, {
-          content: t('commands.create-sticker.responses.duplicateName'),
-          flags: MessageFlags.Ephemeral,
-        });
-        return;
+      await interactionReply(context, interaction, {
+        content: t('commands.create-sticker.responses.duplicateName'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
     }
 
     let stickerUrl = data[ModalCustomIds.URL_INPUT];
@@ -310,10 +312,12 @@ export const createStickerCommand: BotChatInputCommand = {
     });
 
     await interactionReply(context, interaction, {
-      content: t('commands.create-sticker.responses.created', {
+      content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.create-sticker.responses.created', {
         name: sticker.name,
-      }),
+      })}`,
       flags: MessageFlags.Ephemeral,
     });
+
+    await postStickerToFeed(context, interaction, sticker, userPack);
   },
 };

@@ -6,7 +6,6 @@ export const enum GlobalCommandOptionName {
 
 export const enum StickerCommandOptionName {
   NAME = 'name',
-  PACK = 'pack',
 }
 
 export const enum CreatePackCommandOptionName {
@@ -20,48 +19,62 @@ export const enum ImportCommandOptionName {
   URL = 'url',
 }
 
+export const enum PackCommandOptionName {
+  NAME = 'name',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
+  [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandOptionName,
   [BotChatInputCommandName.IMPORT]: ImportCommandOptionName,
+  [BotChatInputCommandName.PACK]: PackCommandOptionName,
+  [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
-  UNEXPECTED_ERROR = 'unexpectedError'
+  unexpectedError = 'unexpectedError'
 }
 
 export const enum StickerCommandResponse {
-  INVALID_NAME = 'invalidName',
-  INVALID_PACK = 'invalidPack',
+  noPacks = 'noPacks',
+  invalidName = 'invalidName',
 }
 
 export const enum CreatePackCommandResponse {
-  NAME_TOO_SHORT = 'nameTooShort',
-  NAME_TOO_LONG = 'nameTooLong',
-  INVALID_NAME = 'invalidName',
-  DUPLICATE_NAME = 'duplicateName',
-  TOO_MANY_PACKS = 'tooManyPacks',
-  CREATED_PUBLIC = 'createdPublic',
-  CREATED_PRIVATE = 'createdPrivate',
+  nameTooShort = 'nameTooShort',
+  nameTooLong = 'nameTooLong',
+  invalidName = 'invalidName',
+  duplicateName = 'duplicateName',
+  tooManyPacks = 'tooManyPacks',
+  createdPublic = 'createdPublic',
+  createdPrivate = 'createdPrivate',
 }
 
 export const enum CreateStickerCommandResponse {
-  NO_PACKS = 'noPacks',
-  INVALID_PACK = 'invalidPack',
-  NAME_TOO_SHORT = 'nameTooShort',
-  NAME_TOO_LONG = 'nameTooLong',
-  INVALID_NAME = 'invalidName',
-  FILE_MISSING = 'missingFile',
-  INVALID_URL = 'invalidUrl',
-  MISSING_SOURCE = 'missingSource',
-  CREATED = 'created',
+  noPacks = 'noPacks',
+  invalidPack = 'invalidPack',
+  nameTooShort = 'nameTooShort',
+  nameTooLong = 'nameTooLong',
+  invalidName = 'invalidName',
+  missingFile = 'missingFile',
+  invalidUrl = 'invalidUrl',
+  missingSource = 'missingSource',
+  created = 'created',
 }
 
 export const enum ImportCommandResponse {
-  PACK_NOT_FOUND = 'packNotFound',
-  INVALID_URL = 'invalidUrl',
-  IMPORT_FAILED = 'importFailed',
-  IMPORTED = 'imported',
+  packNotFound = 'packNotFound',
+  invalidUrl = 'invalidUrl',
+  importFailed = 'importFailed',
+  importProgress = 'importProgress',
+  finalizingImport = 'finalizingImport',
+  rollbackProgress = 'rollbackProgress',
+  imported = 'imported',
+}
+
+export const enum PackCommandResponse {
+  invalidPack = 'invalidPack',
 }
 
 interface CommandResponsesMap {
@@ -70,6 +83,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandResponse,
   [BotChatInputCommandName.IMPORT]: ImportCommandResponse,
   [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
+  [BotChatInputCommandName.PACK]: PackCommandResponse,
 }
 
 interface ComponentsMap {
@@ -87,6 +101,10 @@ interface ComponentsMap {
     'urlLabel',
     'urlDescription',
     'urlPlaceholder',
+  ],
+  [BotChatInputCommandName.PACK]: [
+    'emptyPack',
+    'packPreview'
   ],
 }
 

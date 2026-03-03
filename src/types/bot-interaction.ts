@@ -18,6 +18,8 @@ export const enum BotChatInputCommandName {
   CREATE_PACK = 'create-pack',
   IMPORT = 'import',
   CREATE_STICKER = 'create-sticker',
+  PACK = 'pack',
+  NSFW_PACK = 'nsfw-pack',
 }
 
 export const enum BotModalIds {

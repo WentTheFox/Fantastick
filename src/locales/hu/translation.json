@@ -112,10 +112,10 @@
       "name": "csomag",
       "description": "Megjeleníti a csomag matricáit",
       "responses": {
-        "invalidPack": "Nem található matricacsomag a megadott néven",
-        "emptyPack": "Ebben a csomagban még nincs matrica"
+        "invalidPack": "Nem található matricacsomag a megadott néven"
       },
       "components": {
+        "emptyPack": "Ebben a csomagban még nincs matrica",
         "packPreview": "Alább láthatsz egy előnézetet a csomagban található matricákból"
       },
       "options": {

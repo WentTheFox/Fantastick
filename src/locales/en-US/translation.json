@@ -113,10 +113,10 @@
       "name": "pack",
       "description": "Displays stickers from a pack",
       "responses": {
-        "invalidPack": "There is no pack with the specified name",
-        "emptyPack": "There are no stickers in this pack yet"
+        "invalidPack": "There is no pack with the specified name"
       },
       "components": {
+        "emptyPack": "There are no stickers in this pack yet",
         "packPreview": "Below is a preview of the stickers in this pack"
       },
       "options": {

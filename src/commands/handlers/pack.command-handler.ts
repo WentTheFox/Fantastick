@@ -35,13 +35,6 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
     take: itemsPerPage,
     orderBy: { order: 'asc' },
   });
-  if (!stickers) {
-    await interactionReply(context, interaction, {
-      content: t('commands.pack.responses.emptyPack'),
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   const { files, items } = mapStickersToGalleryItems(stickers, pack.nsfw);
 
@@ -52,7 +45,9 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
         type: ComponentType.TextDisplay,
         content: [
           `# ${getFormattedPackName(pack)}`,
-          t('commands.pack.components.packPreview'),
+          items.length === 0
+            ? t('commands.pack.responses.emptyPack')
+            : t('commands.pack.components.packPreview'),
         ].join('\n'),
       },
       {

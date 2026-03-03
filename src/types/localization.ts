@@ -72,7 +72,6 @@ export const enum ImportCommandResponse {
 
 export const enum PackCommandResponse {
   INVALID_PACK = 'invalidPack',
-  EMPTY_PACK = 'emptyPack',
 }
 
 interface CommandResponsesMap {
@@ -101,6 +100,7 @@ interface ComponentsMap {
     'urlPlaceholder',
   ],
   [BotChatInputCommandName.PACK]: [
+    'emptyPack',
     'packPreview'
   ],
 }

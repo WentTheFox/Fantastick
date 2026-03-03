@@ -10,12 +10,13 @@ import { Sticker } from '../generated/prisma/client.js';
 import type * as Prisma from '../generated/prisma/internal/prismaNamespace.js';
 import { getImportOptions } from '../options/import.options.js';
 import { stickerUrlPrefix } from '../options/metadata/import-url.option-meta.js';
-import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
+import { ImportCommandOptionName } from '../types/localization.js';
+import { handlePackNameAutocomplete } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { saveStickerFile } from '../utils/filesystem.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
-import { updateOrCreateUser } from '../utils/messaging.js';
+import { emoji, updateOrCreateUser } from '../utils/messaging.js';
 import {
   createTelegramApiClient,
   createTelegramFileClient,
@@ -30,6 +31,22 @@ export const importCommand: BotChatInputCommand = {
     ...getLocalizedObject('name', (lng) => t('commands.import.name', { lng })),
     options: getImportOptions(t),
   }),
+  async autocomplete(interaction, context) {
+    const focusedOption = interaction.options.getFocused(true);
+
+    switch (focusedOption.name) {
+      case ImportCommandOptionName.PACK:
+        await handlePackNameAutocomplete({
+          interaction,
+          context,
+          optionName: focusedOption.name,
+          nsfw: true,
+        });
+        break;
+      default:
+        throw new Error(`Unknown autocomplete option ${focusedOption.name}`);
+    }
+  },
   async handle(interaction, context) {
     const { t, db } = context;
     const user = await updateOrCreateUser(context, interaction);
@@ -41,20 +58,12 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
-    const pack = interaction.options.getString('pack', true);
+    const packId = interaction.options.getString(ImportCommandOptionName.PACK, true);
     const url = interaction.options.getString('url', true);
 
-    if (pack.length < packNameOptionMeta.min_length || pack.length > packNameOptionMeta.max_length) {
-      await interactionReply(context, interaction, {
-        content: t('commands.import.responses.packNotFound'),
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
-    const appPack = await db.pack.findFirst({
+    const appPack = await db.pack.findUnique({
       where: {
-        name: pack,
+        id: packId,
       },
     });
 
@@ -114,10 +123,10 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
     const completedSet = new Set<number>();
-    const getProgressString = () => t('commands.import.responses.importProgress', {
+    const getProgressString = () => `${emoji(context, 'loading', true)} ${t('commands.import.responses.importProgress', {
       current: completedSet.size,
       total,
-    });
+    })}`;
 
     await interactionReply(context, interaction, {
       content: getProgressString(),

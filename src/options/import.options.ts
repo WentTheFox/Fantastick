@@ -11,6 +11,7 @@ export const getImportOptions = (t: TFunction): APIApplicationCommandOption[] =>
   {
     ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT, ImportCommandOptionName.PACK),
     required: true,
+    autocomplete: true,
     ...packNameOptionMeta,
   },
   {

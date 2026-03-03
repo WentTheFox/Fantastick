@@ -15,17 +15,13 @@
       "name": "sticker",
       "description": "Sends a sticker",
       "responses": {
-        "invalidPack": "There is no sticker pack with the specified name",
+        "noPacks": "You do not have access to any sticker packs. You can create your own using {{createCommand}}.",
         "invalidName": "There is no sticker with the specified name"
       },
       "options": {
         "name": {
           "name": "name",
           "description": "Sticker name"
-        },
-        "pack": {
-          "name": "pack",
-          "description": "Sticker pack name"
         }
       }
     },
@@ -107,6 +103,27 @@
         "urlPlaceholder": "https://example.com/sticker.png"
       },
       "options": {
+      }
+    },
+    "nsfw-pack": {
+      "name": "nsfw-pack",
+      "description": "Displays stickers from a pack (including from NSFW packs)"
+    },
+    "pack": {
+      "name": "pack",
+      "description": "Displays stickers from a pack",
+      "responses": {
+        "invalidPack": "There is no pack with the specified name",
+        "emptyPack": "There are no stickers in this pack yet"
+      },
+      "components": {
+        "packPreview": "Below is a preview of the stickers in this pack"
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Pack name"
+        }
       }
     }
   }

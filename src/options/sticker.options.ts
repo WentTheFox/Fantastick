@@ -12,6 +12,7 @@ export const getStickerOptions = (t: TFunction): APIApplicationCommandOption[] =
     ...getLocalizedObject('name', (lng) => t('commands.sticker.options.pack.name', { lng }), false),
     ...getLocalizedObject('description', (lng) => t('commands.sticker.options.pack.description', { lng })),
     required: false,
+    autocomplete: true,
     ...packNameOptionMeta,
   },
   {
@@ -19,6 +20,7 @@ export const getStickerOptions = (t: TFunction): APIApplicationCommandOption[] =
     ...getLocalizedObject('name', (lng) => t('commands.sticker.options.name.name', { lng }), false),
     ...getLocalizedObject('description', (lng) => t('commands.sticker.options.name.description', { lng })),
     required: true,
+    autocomplete: true,
     ...stickerNameOptionMeta,
   },
   ...getGlobalOptions(t),

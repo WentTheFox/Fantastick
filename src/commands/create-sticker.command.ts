@@ -337,14 +337,14 @@ export const createStickerCommand: BotChatInputCommand = {
             '**Description:**',
             `> ${sticker.description?.replace(/\n/g, '\n> ')}`,
           ] : [
-            '**Description:** _(empty)_'
+            '**Description:** _(empty)_',
           ]),
           `**Created at:** ${time(sticker.createdAt, TimestampStyles.FullDateShortTime)} (${time(sticker.createdAt, TimestampStyles.RelativeTime)})`,
           `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
           `**Pack:** \`${userPack.name}\` (\`${userPack.id}\`)${userPack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''}`,
-          `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => item.media.url).join(' ')}`,
+          `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => userPack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,
         ].join('\n'),
-        files,
+        files: userPack.nsfw ? files.map(file => file.setSpoiler(true)) : files,
       });
 
       await recordStickerMessages(context, [sticker], reply);

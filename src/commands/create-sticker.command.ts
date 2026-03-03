@@ -8,7 +8,6 @@ import {
   WebhookClient,
 } from 'discord.js';
 import { Readable } from 'node:stream';
-import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { env } from '../env.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
@@ -19,7 +18,10 @@ import {
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
 import { BotChatInputCommand, BotModalIds } from '../types/bot-interaction.js';
 import { saveStickerFile } from '../utils/filesystem.js';
+import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
+import { getPackNsfwEmoji } from '../utils/get-pack-nsfw-emoji.js';
+import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-items.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -81,7 +83,7 @@ export const createStickerCommand: BotChatInputCommand = {
             minValues: 1,
             maxValues: 1,
             options: userPacks.map(pack => ({
-              label: pack.name + (pack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''),
+              label: getFormattedPackName(pack),
               value: pack.name,
             })),
           },
@@ -341,7 +343,7 @@ export const createStickerCommand: BotChatInputCommand = {
           ]),
           `**Created at:** ${time(sticker.createdAt, TimestampStyles.FullDateShortTime)} (${time(sticker.createdAt, TimestampStyles.RelativeTime)})`,
           `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
-          `**Pack:** \`${userPack.name}\` (\`${userPack.id}\`)${userPack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''}`,
+          `**Pack:** \`${userPack.name}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
           `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => userPack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,
         ].join('\n'),
         files,

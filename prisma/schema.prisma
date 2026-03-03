@@ -63,10 +63,13 @@ model Sticker {
 }
 
 model StickerMessage {
-  messageId BigInt   @id
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  messageId BigInt
   serverId  BigInt?
   channelId BigInt?
   stickerId String   @db.Uuid
   sticker   Sticker  @relation(fields: [stickerId], references: [id])
   createdAt DateTime @default(now()) @db.Timestamptz(0)
+
+  @@unique([messageId, stickerId])
 }

@@ -1,6 +1,7 @@
 import { AutocompleteInteraction } from 'discord.js';
 import { InteractionContext } from '../../types/bot-interaction.js';
 import { findAvailableStickerPacks } from '../find-available-sticker-packs.js';
+import { getFormattedPackName } from '../get-formatted-pack-name.js';
 
 interface HandlePackNameAutocompleteParams {
   interaction: AutocompleteInteraction;
@@ -22,7 +23,8 @@ export const handlePackNameAutocomplete = async ({
     return;
   }
 
-  await interaction.respond(availablePacks.filter(pack => pack.name.toLowerCase().includes(value)).map(pack => {
-    return ({ name: pack.name, value: pack.id });
-  }));
+  await interaction.respond(availablePacks.filter(pack => pack.name.toLowerCase().includes(value)).map(pack => ({
+    name: getFormattedPackName(pack),
+    value: pack.id,
+  })));
 };

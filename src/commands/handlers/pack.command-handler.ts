@@ -1,8 +1,8 @@
 import { ComponentType, MessageFlags } from 'discord-api-types/v10';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { InteractionHandler } from '../../types/bot-interaction.js';
 import { PackCommandOptionName } from '../../types/localization.js';
+import { getFormattedPackName } from '../../utils/get-formatted-pack-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
 import { recordStickerMessages } from '../../utils/record-sticker-messages.js';
@@ -49,7 +49,7 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
       {
         type: ComponentType.TextDisplay,
         content: [
-          `# ${pack.name}${pack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''}`,
+          `# ${getFormattedPackName(pack)}`,
           t('commands.pack.components.packPreview'),
         ].join('\n'),
       },

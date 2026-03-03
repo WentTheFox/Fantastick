@@ -8,7 +8,7 @@
       "options": {}
     },
     "nsfw-sticker": {
-      "name": "nsfw-sticker",
+      "name": "nsfw-matrica",
       "description": "Matrica küldése (NSFW csomagokból is)"
     },
     "sticker": {
@@ -88,7 +88,7 @@
         "missingFile": "Fel kell töltened egy fájlt a matricához",
         "invalidUrl": "A megadott URL érvénytelen",
         "missingSource": "A matrica bemeneti forrása hiányzik",
-        "created": "New sticker created with name {{name}}"
+        "created": "Új matrica létrehozva {{name}} néven"
       },
       "components": {
         "createStickerModalTitle": "Sticker részletei",

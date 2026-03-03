@@ -34,7 +34,7 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
         in: availablePacks.map(pack => pack.id),
       },
     },
-    take: 10,
+    take: 1,
   });
   if (!stickers) {
     await interactionReply(context, interaction, {

@@ -7,6 +7,8 @@ import { interactionReply } from '../../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
 import { recordStickerMessages } from '../../utils/record-sticker-messages.js';
 
+const itemsPerPage = 9;
+
 export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputCommandInteraction> => async function handle(interaction, context) {
   const { t, db } = context;
   const packId = interaction.options.getString(PackCommandOptionName.NAME) ?? undefined;
@@ -30,7 +32,7 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
     where: {
       packId: pack.id,
     },
-    take: 10,
+    take: itemsPerPage,
     orderBy: { order: 'asc' },
   });
   if (!stickers) {

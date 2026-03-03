@@ -5,8 +5,7 @@ on: [ push, pull_request ]
 env:
   DISCORD_BOT_TOKEN: MOCK_DISCORD_BOT_TOKEN
   DISCORD_CLIENT_ID: MOCK_DISCORD_CLIENT_ID
-  UA_STRING: MOCK_UA_STRING
-  DISCORD_INVITE_URL: MOCK_DISCORD_INVITE_URL
+  TELEGRAM_BOT_TOKEN: MOCK_TELEGRAM_BOT_TOKEN
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -17,30 +16,44 @@ jobs:
     name: 'Building, Linting and Unit Tests'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Node.js v24
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
-
-      - name: Cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: node_modules-${{ hashFiles('./package-lock.json') }}
+          node-version: 24
+          cache: 'npm'
 
       - name: Upgrade NPM
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install -g npm
 
       - name: Install npm dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci --ignore-scripts
 
-      - run: npm run lint
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
 
-      - run: npm run test
+      - name: Generate Prisma client
+        run: npx prisma generate
 
-      - run: npm run build
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build project
+        run: npm run build
+
+      - name: Start built-in PostgreSQL
+        run: |
+          sudo systemctl start postgresql.service
+          sudo systemctl status postgresql.service
+          sudo -u postgres psql -c "CREATE DATABASE fantastick;"
+          sudo -u postgres psql -c "CREATE DATABASE fantastick_shadow;"
+          sudo -u postgres psql -c "CREATE USER username PASSWORD 'password' SUPERUSER;"
+
+      - name: Run Prisma migrations
+        run: npx prisma migrate deploy
+
+      - name: Run tests
+        run: npm run test

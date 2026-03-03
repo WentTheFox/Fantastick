@@ -7,6 +7,10 @@
       },
       "options": {}
     },
+    "nsfw-sticker": {
+      "name": "nsfw-sticker",
+      "description": "Sends a sticker (including from NSFW packs)"
+    },
     "sticker": {
       "name": "matrica",
       "description": "Matrica küldése",
@@ -102,8 +106,7 @@
         "urlDescription": "Add meg az URL-t a matricához. Hagyd üresen, ha fájlt szeretnél feltölteni.",
         "urlPlaceholder": "https://example.com/matrica.png"
       },
-      "options": {
-      }
+      "options": {}
     }
   }
 }

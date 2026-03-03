@@ -58,7 +58,7 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
     ];
   }, [] as AttachmentBuilder[]);
 
-  await interactionReply(context, interaction, {
+  const reply = await interactionReply(context, interaction, {
     flags: MessageFlags.IsComponentsV2,
     components: [
       {
@@ -71,4 +71,15 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
     ],
     files,
   });
+
+  // Store sticker ID for reply (for "update" context menu command later)
+  const replyMessage = await reply.fetch(true);
+  db.$transaction(stickers.map(sticker => db.stickerMessage.create({
+    data: {
+      messageId: BigInt(replyMessage.id),
+      serverId: replyMessage.guildId ? BigInt(replyMessage.guildId) : null,
+      channelId: replyMessage.channelId ? BigInt(replyMessage.channelId) : null,
+      stickerId: sticker.id,
+    }
+  })));
 };

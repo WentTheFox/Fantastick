@@ -20,9 +20,9 @@ model DiscordUser {
   avatar          String?   @db.VarChar(64)
   readOnly        Boolean   @default(true)
   packs           Pack[]    @relation("CreatedPacks")
-  deletedPacks    Pack[]    @relation("DeletedPacks")
+  deletedPacks    Pack[]    @relation("DeletedPacks") @ignore
   stickers        Sticker[] @relation("CreatedStickers")
-  deletedStickers Sticker[] @relation("DeletedStickers")
+  deletedStickers Sticker[] @relation("DeletedStickers") @ignore
 }
 
 model Pack {
@@ -42,20 +42,30 @@ model Pack {
 }
 
 model Sticker {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  pack        Pack         @relation(fields: [packId], references: [id])
-  packId      String       @db.Uuid
-  name        String       @db.VarChar(255)
-  description String?      @db.VarChar(255)
-  url         String       @db.VarChar(255)
-  createdBy   BigInt
-  creator     DiscordUser  @relation("CreatedStickers", fields: [createdBy], references: [id])
-  createdAt   DateTime     @default(now()) @db.Timestamptz(0)
-  updatedAt   DateTime     @updatedAt @db.Timestamptz(0)
-  deletedAt   DateTime     @updatedAt @db.Timestamptz(0)
-  deletedBy   BigInt?
-  deleter     DiscordUser? @relation("DeletedStickers", fields: [deletedBy], references: [id])
-  order       Int          @default(0)
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pack            Pack             @relation(fields: [packId], references: [id])
+  packId          String           @db.Uuid
+  name            String           @db.VarChar(255)
+  description     String?          @db.VarChar(255)
+  url             String           @db.VarChar(255)
+  createdBy       BigInt
+  creator         DiscordUser      @relation("CreatedStickers", fields: [createdBy], references: [id])
+  createdAt       DateTime         @default(now()) @db.Timestamptz(0)
+  updatedAt       DateTime         @updatedAt @db.Timestamptz(0)
+  deletedAt       DateTime         @updatedAt @db.Timestamptz(0)
+  deletedBy       BigInt?
+  deleter         DiscordUser?     @relation("DeletedStickers", fields: [deletedBy], references: [id])
+  order           Int              @default(0)
+  stickerMessages StickerMessage[] @ignore
 
   @@unique([packId, name])
+}
+
+model StickerMessage {
+  messageId BigInt   @id
+  serverId  BigInt?
+  channelId BigInt?
+  stickerId String   @db.Uuid
+  sticker   Sticker  @relation(fields: [stickerId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamptz(0)
 }

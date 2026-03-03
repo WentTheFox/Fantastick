@@ -90,7 +90,7 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const telegramClient = createTelegramApiClient();
     const telegramFileClient = createTelegramFileClient();
@@ -130,7 +130,6 @@ export const importCommand: BotChatInputCommand = {
 
     await interactionReply(context, interaction, {
       content: getProgressString(),
-      flags: MessageFlags.Ephemeral,
     });
 
     context.logger.debug(`Importing Telegram stickers from sticker set ${telegramPackName}…`);

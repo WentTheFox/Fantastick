@@ -20,15 +20,19 @@ export const handleStickerAutocomplete = async ({
   const packId = (packIdOptionName && interaction.options.getString(packIdOptionName)) || undefined;
   const { db } = context;
   const userPacks = await db.pack.findMany({
-    select: { id: true },
+    select: { id: true, name: true },
     where: {
       createdBy: BigInt(interaction.user.id),
       id: packId,
       nsfw: nsfw ? undefined : false,
     },
   });
+  const packNameIndex = userPacks.reduce((acc, pack) => ({
+    ...acc,
+    [pack.id]: pack.name,
+  }), {} as Record<string, string>);
   const userStickers = await db.sticker.findMany({
-    select: { id: true, name: true },
+    select: { id: true, name: true, packId: true },
     where: {
       packId: {
         in: userPacks.map(pack => pack.id),
@@ -37,6 +41,10 @@ export const handleStickerAutocomplete = async ({
   });
 
   await interaction.respond(userStickers.filter(sticker => sticker.name.toLowerCase().includes(value)).slice(0, 25).map(sticker => {
-    return ({ name: sticker.name, value: sticker.id });
+    let name = sticker.name;
+    if (!packId) {
+      name += ` (${packNameIndex[sticker.packId]})`.replace(/^(.{99}).+$/, '$1…');
+    }
+    return ({ name, value: sticker.id });
   }));
 };

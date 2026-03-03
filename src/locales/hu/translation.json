@@ -60,6 +60,8 @@
         "invalidUrl": "A megadott Telegram csomag URL érvénytelen",
         "importFailed": "Az importálás nem sikerült, kérlek próbálkozz újra később",
         "importProgress": "Matricák importálása… ({{current}}/{{total}})",
+        "finalizingImport": "Importálás véglegesítése…",
+        "rollbackProgress": "Az importálás véglegesítése nem sikerült. Ideiglenes fájlok törlése… ({{current}}/{{total}})",
         "imported": "Az importálás sikeresen megtörtént"
       },
       "options": {

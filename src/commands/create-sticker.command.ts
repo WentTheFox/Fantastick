@@ -1,5 +1,12 @@
+import { time } from '@discordjs/formatters';
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
-import { Attachment, TextInputComponentData } from 'discord.js';
+import {
+  Attachment,
+  TextInputComponentData,
+  TimestampStyles,
+  userMention,
+  WebhookClient,
+} from 'discord.js';
 import { Readable } from 'node:stream';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { env } from '../env.js';
@@ -14,7 +21,9 @@ import { BotChatInputCommand, BotModalIds } from '../types/bot-interaction.js';
 import { saveStickerFile } from '../utils/filesystem.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
+import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-items.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
+import { recordStickerMessages } from '../utils/record-sticker-messages.js';
 
 enum ModalCustomIds {
   PACK_INPUT = 'packInput',
@@ -222,14 +231,14 @@ export const createStickerCommand: BotChatInputCommand = {
       where: {
         packId: userPack.id,
         name: stickerName,
-      }
+      },
     });
     if (packStickersWithSameNameCount !== 0) {
-        await interactionReply(context, interaction, {
-          content: t('commands.create-sticker.responses.duplicateName'),
-          flags: MessageFlags.Ephemeral,
-        });
-        return;
+      await interactionReply(context, interaction, {
+        content: t('commands.create-sticker.responses.duplicateName'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
     }
 
     let stickerUrl = data[ModalCustomIds.URL_INPUT];
@@ -315,5 +324,30 @@ export const createStickerCommand: BotChatInputCommand = {
       }),
       flags: MessageFlags.Ephemeral,
     });
+
+    if (env.DISCORD_FEED_WEBHOOK_URL !== null) {
+      const webhookClient = new WebhookClient({ url: env.DISCORD_FEED_WEBHOOK_URL });
+      const { items, files } = mapStickersToGalleryItems([sticker]);
+      const reply = await webhookClient.send({
+        flags: MessageFlags.SuppressNotifications,
+        content: [
+          '# New sticker created',
+          `**Name:** \`${sticker.name}\` (\`${sticker.id}\`)`,
+          ...(sticker.description ? [
+            '**Description:**',
+            `> ${sticker.description?.replace(/\n/g, '\n> ')}`,
+          ] : [
+            '**Description:** _(empty)_'
+          ]),
+          `**Created at:** ${time(sticker.createdAt, TimestampStyles.FullDateShortTime)} (${time(sticker.createdAt, TimestampStyles.RelativeTime)})`,
+          `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
+          `**Pack:** \`${userPack.name}\` (\`${userPack.id}\`)${userPack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''}`,
+          `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => item.media.url).join(' ')}`,
+        ].join('\n'),
+        files,
+      });
+
+      await recordStickerMessages(context, [sticker], reply);
+    }
   },
 };

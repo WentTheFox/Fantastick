@@ -5,6 +5,7 @@ config({ quiet: true });
 const {
   DISCORD_BOT_TOKEN,
   DISCORD_CLIENT_ID,
+  DISCORD_FEED_WEBHOOK_URL,
   CROWDIN_PROJECT_IDENTIFIER,
   LOCAL,
   DEBUG_I18N,
@@ -25,6 +26,7 @@ export const env = (() => {
   const values = {
     DISCORD_BOT_TOKEN,
     DISCORD_CLIENT_ID,
+    DISCORD_FEED_WEBHOOK_URL: DISCORD_FEED_WEBHOOK_URL ?? null,
     CROWDIN_PROJECT_IDENTIFIER: CROWDIN_PROJECT_IDENTIFIER ?? '',
     LOCAL: typeof LOCAL !== 'undefined' && LOCAL === 'true',
     DEBUG_I18N: typeof DEBUG_I18N !== 'undefined' && DEBUG_I18N === 'true',

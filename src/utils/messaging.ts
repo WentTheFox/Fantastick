@@ -21,7 +21,7 @@ export const getUserIdentifier = (user: User): `${UserFriendCode} (${string})` =
   return `${getUserFriendCode(user)} (${user.id})`;
 };
 
-export const stringifyChannelName = (channelId: string, channel?: CommandInteraction['channel']): string => {
+export const stringifyChannelName = (channelId: string | null, channel?: CommandInteraction['channel']): string => {
   if (channel) {
     let stringName: string;
     if (channel.type === ChannelType.GuildText && 'name' in channel) {
@@ -33,7 +33,10 @@ export const stringifyChannelName = (channelId: string, channel?: CommandInterac
     return `${stringName} (${channel.id})`;
   }
 
-  return `Channel#${channelId}`;
+  if (channelId) {
+    return `Channel#${channelId}`;
+  }
+  return '(unknown channel)';
 };
 
 export const stringifyGuildName = (guildId: string | null, guild: CommandInteraction['guild']): string => {
@@ -117,10 +120,11 @@ export const updateOrCreateUser = (context: InteractionContext, interaction: Pic
   const { db } = context;
 
   const id = BigInt(interaction.user.id);
-  const update = { name: interaction.user.username,
-      discriminator: interaction.user.discriminator,
-      displayName: interaction.user.globalName,
-      avatar: interaction.user.avatar,
+  const update = {
+    name: interaction.user.username,
+    discriminator: interaction.user.discriminator,
+    displayName: interaction.user.globalName,
+    avatar: interaction.user.avatar,
   } satisfies DiscordUserUpdateInput;
   return db.discordUser.upsert({
     where: { id },

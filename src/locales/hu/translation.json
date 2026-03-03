@@ -2,7 +2,8 @@
   "commands": {
     "global": {
       "responses": {
-        "unexpectedError": "Váratlan hiba történt az interakció feldolgozása során"
+        "unexpectedError": "Váratlan hiba történt az interakció feldolgozása során",
+        "noPermission": "Nincs jogosultságod ezt a parancsot használni"
       },
       "options": {}
     },
@@ -32,6 +33,7 @@
         "nameTooLong": "A megadott matricacsomag név túl hosszú (maximum {{max}} karakter)",
         "invalidName": "A megadott matricacsomag név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
         "duplicateName": "Már létezik egy ilyen nevű matricacsomag, kérlek válassz másik nevet",
+        "tooManyPacks": "Legfeljebb {{maxPacks}} matricacsomagot hozhatsz létre. Kérlek töröld az egyik matrica csomagod mielőtt újat hoznál létre.",
         "created": "Új matricacsomag létrehozva {{name}} néven"
       },
       "options": {
@@ -64,6 +66,37 @@
           "name": "url",
           "description": "A Telegram matricacsomag URL-js"
         }
+      }
+    },
+    "create-sticker": {
+      "name": "matrica-létrehozás",
+      "description": "Új matrica létrehozása",
+      "responses": {
+        "noPacks": "Új matrica létrehozásához először létre kell hoznod legalább egy matricacsomagot",
+        "invalidPack": "Nem található matricacsomag a megadott néven",
+        "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker name contains the following  invalid character(s): {{chars}}",
+        "missingFile": "You must upload a file for the sticker",
+        "invalidUrl": "A megadott URL érvénytelen",
+        "missingSource": "A matrica bemeneti forrása hiányzik",
+        "created": "New sticker created with name {{name}}"
+      },
+      "components": {
+        "createStickerModalTitle": "Sticker részletei",
+        "packLabel": "Matricacsomag kiválasztása",
+        "packDescription": "Válaszd ki a matricacsomagot amibe a matrica kerüljön",
+        "nameLabel": "Matrica neve",
+        "nameDescription": "Adj meg egy nevet a matricának, hogy később könnyen tudd használni",
+        "altLabel": "Matrica leírása",
+        "altDescription": "Megadhatsz egy hosszabb leírást a matricának, ami leírja, mi látható a képen",
+        "fileLabel": "Matrica fájl",
+        "fileDescription": "Töltsd fel a képet a matricához. Vagy ez, vagy az URL kötelező.",
+        "urlLabel": "Matrica URL",
+        "urlDescription": "Add meg az URL-t a matricához. Hagyd üresen, ha fájlt szeretnél feltölteni.",
+        "urlPlaceholder": "https://example.com/matrica.png"
+      },
+      "options": {
       }
     }
   }

@@ -1,6 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import * as fs from 'node:fs';
-import path from 'node:path';
 import { Readable } from 'node:stream';
 import typia from 'typia';
 import { ApiResponse } from '../classes/api-client.js';
@@ -13,6 +12,7 @@ import { getImportOptions } from '../options/import.options.js';
 import { stickerUrlPrefix } from '../options/metadata/import-url.option-meta.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
+import { saveStickerFile } from '../utils/filesystem.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -32,6 +32,15 @@ export const importCommand: BotChatInputCommand = {
   }),
   async handle(interaction, context) {
     const { t, db } = context;
+    const user = await updateOrCreateUser(context, interaction);
+    if (user.readOnly) {
+      await interactionReply(context, interaction, {
+        content: t('commands.global.responses.noPermission'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     const pack = interaction.options.getString('pack', true);
     const url = interaction.options.getString('url', true);
 
@@ -56,8 +65,6 @@ export const importCommand: BotChatInputCommand = {
       });
       return;
     }
-
-    const user = await updateOrCreateUser(context, interaction);
 
     let telegramPackName: string | undefined = undefined;
     if (url.startsWith(stickerUrlPrefix)) {
@@ -99,7 +106,7 @@ export const importCommand: BotChatInputCommand = {
 
     const total = getStickerSetRequest.response.result?.stickers.length ?? 0;
     if (!getStickerSetRequest.response.result || total === 0) {
-      console.error(`Failed to import Telegram sticker set ${telegramPackName}, no stickers found`, getStickerSetRequest);
+      context.logger.error(`Failed to import Telegram sticker set ${telegramPackName}, no stickers found`, getStickerSetRequest);
       await interactionReply(context, interaction, {
         content: t('commands.import.responses.importFailed'),
         flags: MessageFlags.Ephemeral,
@@ -117,56 +124,49 @@ export const importCommand: BotChatInputCommand = {
       flags: MessageFlags.Ephemeral,
     });
 
-    console.debug(`Importing Telegram stickers from sticker set ${telegramPackName}…`);
+    context.logger.debug(`Importing Telegram stickers from sticker set ${telegramPackName}…`);
     const createStickerRecords: Prisma.PrismaPromise<Sticker>[] = [];
     const createdFiles = new Set<string>();
     await getStickerSetRequest.response.result.stickers.reduce((awaiter, sticker, order) => {
       return awaiter.then(async () => {
-        let filePath: string;
+        let telegramFilePath: string;
         try {
           const getFileRequest = await telegramClient.request({
             path: '/getFile',
             query: { file_id: sticker.file_id },
             validator: typia.createValidate<TelegramApiGetFileResponse>(),
           });
-          filePath = getFileRequest.response.result!.file_path;
+          telegramFilePath = getFileRequest.response.result!.file_path;
         } catch (e) {
-          console.error(`Failed to import Telegram sticker ${sticker.file_id} (#${order}), no file path found`, e);
+          context.logger.error(`Failed to import Telegram sticker ${sticker.file_id} (#${order}), no file path found`, e);
           completedSet.add(order);
           return;
         }
 
         const getFileRequest = await telegramFileClient.request({
-          path: `/${filePath}`,
+          path: `/${telegramFilePath}`,
           raw: true,
           validator: typia.createValidate<Readable>(),
         });
-        const stickerId = crypto.randomUUID();
-        console.info(`Saving sticker ${stickerId}: ID generated for file ${sticker.file_id} (#${order})`);
-        const stickerFileName = `${stickerId}.webp`;
-        const fsFolderPath = path.join(process.cwd(), 'fs', stickerFileName[0], stickerFileName.substring(1, 3));
-
-        console.info(`Saving sticker ${stickerId}: creating output directory ${fsFolderPath}`);
-        await fs.promises.mkdir(fsFolderPath, { recursive: true });
-
-        const outputPath = path.join(fsFolderPath, stickerFileName);
-        console.info(`Saving sticker ${stickerId}: writing file to ${outputPath}`);
-        await fs.promises.writeFile(outputPath, getFileRequest.response);
-        createdFiles.add(outputPath);
+        const { stickerId, filePath, stickerUrl } = await saveStickerFile(context, {
+          fileId: sticker.file_id,
+          fileName: 'sticker.webp',
+          data: getFileRequest.response,
+        });
+        createdFiles.add(filePath);
 
         createStickerRecords.push(db.sticker.create({
           data: {
             id: stickerId,
             name: stickerId,
-            emoji: sticker.emoji,
+            description: sticker.emoji,
             packId: appPack.id,
             createdBy: user.id,
             order,
-            // TODO Use upload service once it supports webp
-            url: `fs://${stickerFileName}`,
+            url: stickerUrl,
           },
         }));
-        console.info(`Imported Telegram sticker ${sticker.file_id} (#${order}) as ${stickerId}`);
+        context.logger.info(`Imported Telegram sticker ${sticker.file_id} (#${order}) as ${stickerId}`);
         completedSet.add(order);
         await interaction.editReply({
           content: getProgressString(),
@@ -174,14 +174,14 @@ export const importCommand: BotChatInputCommand = {
       });
     }, Promise.resolve());
 
-    console.info('Creating local sticker records…');
+    context.logger.info('Creating local sticker records…');
     try {
       await db.$transaction(createStickerRecords);
     } catch (e) {
-      console.info('Creating local sticker records failed, deleting newly created files…');
+      context.logger.info('Creating local sticker records failed, deleting newly created files…');
       if (createdFiles.size > 0) {
         await Promise.all(Array.from(createdFiles).map(async (filePath) => {
-          console.info(`Deleting ${filePath}…`);
+          context.logger.info(`Deleting ${filePath}…`);
           await fs.promises.unlink(filePath);
         }));
       }

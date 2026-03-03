@@ -2,7 +2,8 @@
   "commands": {
     "global": {
       "responses": {
-        "unexpectedError": "There was an unexpected error while processing this interaction"
+        "unexpectedError": "There was an unexpected error while processing this interaction",
+        "noPermission": "You do not have permission to use this command"
       },
       "options": {}
     },
@@ -32,6 +33,7 @@
         "nameTooLong": "The provided sticker pack name is too long (maximum {{max}} characters)",
         "invalidName": "The provided sticker pack name contains the following  invalid character(s): {{chars}}",
         "duplicateName": "A sticker pack with the same name already exists, please choose a different one",
+        "tooManyPacks": "You can only create up to {{maxPacks}} sticker packs. Please delete an existing pack before creating a new one.",
         "created": "New sticker pack created with name {{name}}"
       },
       "options": {
@@ -64,6 +66,37 @@
           "name": "url",
           "description": "URL of the Telegram sticker pack"
         }
+      }
+    },
+    "create-sticker": {
+      "name": "create-sticker",
+      "description": "Create new sticker",
+      "responses": {
+        "noPacks": "You must first create at least one sticker pack before creating a new sticker",
+        "invalidPack": "The selected pack could not be found",
+        "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker name contains the following  invalid character(s): {{chars}}",
+        "missingFile": "You must upload a file for the sticker",
+        "invalidUrl": "The provided URL is invalid",
+        "missingSource": "Sticker input source selection is missing",
+        "created": "New sticker created with name {{name}}"
+      },
+      "components": {
+        "createStickerModalTitle": "Sticker details",
+        "packLabel": "Choose sticker pack",
+        "packDescription": "Select the sticker pack where this sticker will be added",
+        "nameLabel": "Sticker name",
+        "nameDescription": "Enter a name for the sticker to make it easier to use later",
+        "altLabel": "Sticker description",
+        "altDescription": "Enter an optional, longer description for the sticker which describes what is on the image",
+        "fileLabel": "Sticker file",
+        "fileDescription": "Upload the image file for the sticker. Either this or the URL is required.",
+        "urlLabel": "Sticker URL",
+        "urlDescription": "Specify the URL for the sticker. Leave blank if you would like to upload a file.",
+        "urlPlaceholder": "https://example.com/sticker.png"
+      },
+      "options": {
       }
     }
   }

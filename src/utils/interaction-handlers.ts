@@ -9,7 +9,7 @@ import {
   DiscordjsError,
   DiscordjsErrorCodes,
   InteractionType,
-  MessageComponentInteraction,
+  MessageComponentInteraction, ModalSubmitInteraction,
 } from 'discord.js';
 import { TFunction } from 'i18next';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
@@ -20,6 +20,7 @@ import {
   chatInputCommandMap,
   isKnownChatInputCommandInteraction,
 } from './interactions/chat-input-commands.js';
+import { isKnownModalSubmitInteraction, modalSubmitMap } from './interactions/modal-submits.js';
 import {
   getUserIdentifier,
   stringifyChannelName,
@@ -31,7 +32,7 @@ const ellipsis = '…';
 
 const processingErrorMessageFactory = (t: TFunction): string => `${EmojiCharacters.OCTAGONAL_SIGN} ${t('commands.global.responses.unexpectedError')}`;
 
-const handleInteractionError = async (interaction: ChatInputCommandInteraction | ButtonInteraction | AutocompleteInteraction | ContextMenuCommandInteraction | MessageComponentInteraction, context: UserInteractionContext) => {
+const handleInteractionError = async (interaction: ChatInputCommandInteraction | ButtonInteraction | AutocompleteInteraction | ContextMenuCommandInteraction | MessageComponentInteraction |ModalSubmitInteraction, context: UserInteractionContext) => {
   if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
     await interaction.respond([
       {
@@ -188,6 +189,44 @@ export const handleCommandAutocomplete = async (interaction: AutocompleteInterac
     await command.autocomplete?.(interaction, userInteractionContext);
   } catch (e) {
     logger.error(`Error while responding to command autocomplete (commandName=${commandName})`, e);
+    await handleInteractionError(interaction, userInteractionContext);
+  }
+};
+
+export const handleModalInteraction = async (interaction: ModalSubmitInteraction, context: InteractionHandlerContext): Promise<void> => {
+  const t = createTFunction({
+    i18next: context.i18next,
+    ephemeral: true,
+    locale: interaction.locale,
+    guild: interaction.guild,
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { i18next, ...restContext } = context;
+  const logger = context.logger.nest(`Interaction#${interaction.id}`);
+  const userInteractionContext: UserInteractionContext = {
+    ...restContext,
+    logger,
+    t,
+  };
+
+  if (!isKnownModalSubmitInteraction(interaction)) {
+    await interactionReply(userInteractionContext, interaction, { content: `Unknown modal ID ${interaction.customId}` });
+    return;
+  }
+
+  const { user, channel, channelId, guild, guildId, customId } = interaction;
+  const command = modalSubmitMap[customId];
+
+  logger.log(`${getUserIdentifier(user)} interacted with modal ${customId} in ${stringifyChannelName(channelId, channel)} of ${stringifyGuildName(guildId, guild)}`);
+
+  try {
+    if (!command.modal) {
+      // noinspection ExceptionCaughtLocallyJS
+      throw new Error(`Modal ${customId} has no handler`);
+    }
+    await command.modal(interaction, userInteractionContext);
+  } catch (e) {
+    logger.error(`Error while responding to modal submit interaction (customId=${customId})`, e);
     await handleInteractionError(interaction, userInteractionContext);
   }
 };

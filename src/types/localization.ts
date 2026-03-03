@@ -13,6 +13,7 @@ export const enum CreatePackCommandOptionName {
   NAME = 'name',
   NSFW = 'nsfw',
 }
+
 export const enum ImportCommandOptionName {
   PACK = 'pack',
   URL = 'url',
@@ -37,6 +38,20 @@ export const enum CreatePackCommandResponse {
   NAME_TOO_SHORT = 'nameTooShort',
   NAME_TOO_LONG = 'nameTooLong',
   INVALID_NAME = 'invalidName',
+  DUPLICATE_NAME = 'duplicateName',
+  TOO_MANY_PACKS = 'tooManyPacks',
+  CREATED = 'created',
+}
+
+export const enum CreateStickerCommandResponse {
+  NO_PACKS = 'noPacks',
+  INVALID_PACK = 'invalidPack',
+  NAME_TOO_SHORT = 'nameTooShort',
+  NAME_TOO_LONG = 'nameTooLong',
+  INVALID_NAME = 'invalidName',
+  FILE_MISSING = 'missingFile',
+  INVALID_URL = 'invalidUrl',
+  MISSING_SOURCE = 'missingSource',
   CREATED = 'created',
 }
 
@@ -52,6 +67,25 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandResponse,
   [BotChatInputCommandName.IMPORT]: ImportCommandResponse,
+  [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
+}
+
+interface ComponentsMap {
+  global: [],
+  [BotChatInputCommandName.CREATE_STICKER]: [
+    'createStickerModalTitle',
+    'packLabel',
+    'packDescription',
+    'nameLabel',
+    'nameDescription',
+    'altLabel',
+    'altDescription',
+    'fileLabel',
+    'fileDescription',
+    'urlLabel',
+    'urlDescription',
+    'urlPlaceholder',
+  ],
 }
 
 export type OptionLocalization =
@@ -67,7 +101,12 @@ export type CommandLocalization<CommandKey extends keyof CommandOptionsMap & key
   & (
   ({
     options: { [l in CommandOptionsMap[CommandKey]]: OptionLocalization };
-  } & ResponsesLocalization<CommandKey>));
+  } & ResponsesLocalization<CommandKey>))
+  & (
+  CommandKey extends keyof ComponentsMap
+    ? { components: Record<ComponentsMap[CommandKey][number], string> }
+    : { components?: undefined }
+  );
 
 export type Localization = {
   commands: {

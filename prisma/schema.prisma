@@ -18,6 +18,7 @@ model DiscordUser {
   displayName     String?   @db.VarChar(255)
   discriminator   String    @db.Char(4)
   avatar          String?   @db.VarChar(64)
+  readOnly        Boolean   @default(true)
   packs           Pack[]    @relation("CreatedPacks")
   deletedPacks    Pack[]    @relation("DeletedPacks")
   stickers        Sticker[] @relation("CreatedStickers")
@@ -41,18 +42,18 @@ model Pack {
 }
 
 model Sticker {
-  id        String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  pack      Pack         @relation(fields: [packId], references: [id])
-  packId    String       @db.Uuid
-  name      String       @db.VarChar(255)
-  emoji     String       @db.VarChar(64)
-  url       String       @db.VarChar(255)
-  createdBy BigInt
-  creator   DiscordUser  @relation("CreatedStickers", fields: [createdBy], references: [id])
-  createdAt DateTime     @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime     @updatedAt @db.Timestamptz(0)
-  deletedAt DateTime     @updatedAt @db.Timestamptz(0)
-  deletedBy BigInt?
-  deleter   DiscordUser? @relation("DeletedStickers", fields: [deletedBy], references: [id])
-  order     Int          @default(0)
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pack        Pack         @relation(fields: [packId], references: [id])
+  packId      String       @db.Uuid
+  name        String       @db.VarChar(255)
+  description String?      @db.VarChar(255)
+  url         String       @db.VarChar(255)
+  createdBy   BigInt
+  creator     DiscordUser  @relation("CreatedStickers", fields: [createdBy], references: [id])
+  createdAt   DateTime     @default(now()) @db.Timestamptz(0)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(0)
+  deletedAt   DateTime     @updatedAt @db.Timestamptz(0)
+  deletedBy   BigInt?
+  deleter     DiscordUser? @relation("DeletedStickers", fields: [deletedBy], references: [id])
+  order       Int          @default(0)
 }

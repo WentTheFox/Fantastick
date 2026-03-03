@@ -5,7 +5,7 @@ import {
 import type {
   AutocompleteInteraction,
   BaseInteraction,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, ModalSubmitInteraction,
 } from 'discord.js';
 import { i18n, TFunction } from 'i18next';
 import { PrismaClient } from '../generated/prisma/client.js';
@@ -16,6 +16,11 @@ export const enum BotChatInputCommandName {
   STICKER = 'sticker',
   CREATE_PACK = 'create-pack',
   IMPORT = 'import',
+  CREATE_STICKER = 'create-sticker',
+}
+
+export const enum BotModalIds {
+  CREATE_STICKER = 'createStickerModal',
 }
 
 export interface LoggerContext {
@@ -48,6 +53,9 @@ export interface BotChatInputCommand {
   }>;
   autocomplete?: InteractionHandler<AutocompleteInteraction & {
     commandName: BotChatInputCommandName
+  }>;
+  modal?: InteractionHandler<ModalSubmitInteraction & {
+    customId: BotModalIds
   }>;
 }
 

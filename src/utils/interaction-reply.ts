@@ -5,7 +5,7 @@ import {
   ContextMenuCommandInteraction,
   InteractionReplyOptions,
   MessageComponentInteraction,
-  MessageFlags,
+  MessageFlags, ModalSubmitInteraction,
 } from 'discord.js';
 import { InteractionContext, UserInteractionContext } from '../types/bot-interaction.js';
 
@@ -48,7 +48,7 @@ export const createCommandMention = (commandName: string, {
   return `\`/${translatedCommandName === tKey ? commandName : translatedCommandName}\``;
 };
 
-export const interactionReply = (context: Pick<UserInteractionContext, 't' | 'commandIdMap'>, interaction: CommandInteraction | ChatInputCommandInteraction | ContextMenuCommandInteraction | MessageComponentInteraction, options: InteractionReplyOptions) => {
+export const interactionReply = (context: Pick<UserInteractionContext, 't' | 'commandIdMap'>, interaction: CommandInteraction | ChatInputCommandInteraction | ContextMenuCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction, options: InteractionReplyOptions) => {
   if (options.content && (interaction.replied || interaction.deferred)) {
     return interaction.editReply({ content: options.content });
   }

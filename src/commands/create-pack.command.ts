@@ -14,6 +14,15 @@ export const createPackCommand: BotChatInputCommand = {
   }),
   async handle(interaction, context) {
     const { t, db } = context;
+    const user = await updateOrCreateUser(context, interaction);
+    if (user.readOnly) {
+      await interactionReply(context, interaction, {
+        content: t('commands.global.responses.noPermission'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     const name = interaction.options.getString('name', true);
     const nsfw = interaction.options.getBoolean('nsfw', true);
 
@@ -60,8 +69,6 @@ export const createPackCommand: BotChatInputCommand = {
       });
       return;
     }
-
-    const user = await updateOrCreateUser(context, interaction);
 
     const pack = await db.pack.create({
       data: {

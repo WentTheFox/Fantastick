@@ -130,6 +130,7 @@ export class ApiClient {
 
     try {
       const requestHeaders: Record<string, string> = {
+        'User-Agent': env.UA_STRING,
         ...this.options.fixedHeaders,
       };
       if (!raw) {

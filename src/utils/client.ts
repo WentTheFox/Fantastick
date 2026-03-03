@@ -3,7 +3,7 @@ import { env } from '../env.js';
 import { getGitData } from './get-git-data.js';
 import {
   handleCommandAutocomplete,
-  handleCommandInteraction,
+  handleCommandInteraction, handleModalInteraction,
 } from './interaction-handlers.js';
 import { InteractionHandlerContext } from '../types/bot-interaction.js';
 
@@ -31,6 +31,9 @@ export const createClient = async (context: InteractionHandlerContext): Promise<
         return;
       case InteractionType.ApplicationCommandAutocomplete:
         await handleCommandAutocomplete(interaction, context);
+        return;
+      case InteractionType.ModalSubmit:
+        await handleModalInteraction(interaction, context);
         return;
       default:
         throw new Error(`Unhandled interaction of type ${interaction.type}`);

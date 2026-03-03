@@ -1,13 +1,7 @@
-import { time } from '@discordjs/formatters';
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
-import {
-  Attachment,
-  TextInputComponentData,
-  TimestampStyles,
-  userMention,
-  WebhookClient,
-} from 'discord.js';
+import { Attachment, TextInputComponentData } from 'discord.js';
 import { Readable } from 'node:stream';
+import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { env } from '../env.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
@@ -20,12 +14,9 @@ import { BotChatInputCommand, BotModalIds } from '../types/bot-interaction.js';
 import { saveStickerFile } from '../utils/filesystem.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
-import { getPackNsfwEmoji } from '../utils/get-pack-nsfw-emoji.js';
-import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../utils/interaction-reply.js';
-import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-items.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
-import { recordStickerMessages } from '../utils/record-sticker-messages.js';
+import { postStickerToFeed } from '../utils/post-sticker-to-feed.js';
 
 enum ModalCustomIds {
   PACK_INPUT = 'packInput',
@@ -321,35 +312,12 @@ export const createStickerCommand: BotChatInputCommand = {
     });
 
     await interactionReply(context, interaction, {
-      content: t('commands.create-sticker.responses.created', {
+      content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.create-sticker.responses.created', {
         name: sticker.name,
-      }),
+      })}`,
       flags: MessageFlags.Ephemeral,
     });
 
-    if (env.DISCORD_FEED_WEBHOOK_URL !== null) {
-      const webhookClient = new WebhookClient({ url: env.DISCORD_FEED_WEBHOOK_URL });
-      const { items, files } = mapStickersToGalleryItems([sticker], userPack.nsfw);
-      const reply = await webhookClient.send({
-        flags: MessageFlags.SuppressNotifications,
-        content: [
-          '# New sticker created',
-          `**Name:** \`${sticker.name}\` (\`${sticker.id}\`)`,
-          ...(sticker.description ? [
-            '**Description:**',
-            `> ${sticker.description?.replace(/\n/g, '\n> ')}`,
-          ] : [
-            '**Description:** _(empty)_',
-          ]),
-          `**Created at:** ${time(sticker.createdAt, TimestampStyles.FullDateShortTime)} (${time(sticker.createdAt, TimestampStyles.RelativeTime)})`,
-          `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
-          `**Pack:** \`${userPack.name}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
-          `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => userPack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,
-        ].join('\n'),
-        files,
-      });
-
-      await recordStickerMessages(context, [sticker], reply);
-    }
+    await postStickerToFeed(context, interaction, sticker, userPack);
   },
 };

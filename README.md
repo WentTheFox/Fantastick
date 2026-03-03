@@ -9,5 +9,12 @@ $ cp .env.example .env
 $ nano .env # Fill in the neccessary environment variables
 $ npx prisma generate
 $ npm build
+$ npx prisma migrate deploy
 $ pm2 start pm2.json
 ```
+
+## Translation
+
+New language contributions are not currently accepted.
+
+English and Hungarian translations have been included, so no translators will be needed for these two languages.

@@ -8,17 +8,20 @@ export interface StickerGalleryItems {
   items: APIMediaGalleryItem[];
 }
 
-export const mapStickersToGalleryItems = (stickers: Sticker[]): StickerGalleryItems => {
+export const mapStickersToGalleryItems = (stickers: Sticker[], spoiler = false): StickerGalleryItems => {
   const { files, galleryStickers } = stickers.reduce((acc, sticker) => {
     const paths = getStickerFilePathFromUrl(sticker.url);
     if (paths === null) {
-      return acc;
+      return {
+        ...acc,
+        galleryStickers: [...acc.galleryStickers, sticker],
+      };
     }
 
     const attachmentUrl = `attachment://${paths.stickerFileName}`;
     const newFile = new AttachmentBuilder(paths.filePath, {
       name: paths.stickerFileName,
-    });
+    }).setSpoiler(spoiler);
     return {
       galleryStickers: [...acc.galleryStickers, { ...sticker, url: attachmentUrl }],
       files: [
@@ -26,13 +29,17 @@ export const mapStickersToGalleryItems = (stickers: Sticker[]): StickerGalleryIt
         newFile,
       ],
     };
-  }, { files: [] as AttachmentBuilder[], galleryStickers: [] as Sticker[] });
+  }, {
+    files: [] as AttachmentBuilder[],
+    galleryStickers: [] as Pick<Sticker, 'description' | 'url'>[],
+  });
 
   return {
     files,
     items: galleryStickers.map(sticker => ({
       media: { url: sticker.url },
-      description: sticker.description ? sticker.description : undefined,
+      description: sticker.description ?? undefined,
+      spoiler,
     })),
   };
 };

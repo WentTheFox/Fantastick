@@ -6,7 +6,6 @@ export const enum GlobalCommandOptionName {
 
 export const enum StickerCommandOptionName {
   NAME = 'name',
-  PACK = 'pack',
 }
 
 export const enum CreatePackCommandOptionName {
@@ -20,10 +19,17 @@ export const enum ImportCommandOptionName {
   URL = 'url',
 }
 
+export const enum PackCommandOptionName {
+  NAME = 'name',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
+  [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandOptionName,
   [BotChatInputCommandName.IMPORT]: ImportCommandOptionName,
+  [BotChatInputCommandName.PACK]: PackCommandOptionName,
+  [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -31,8 +37,8 @@ export const enum GlobalCommandResponse {
 }
 
 export const enum StickerCommandResponse {
+  NO_PACKS = 'noPacks',
   INVALID_NAME = 'invalidName',
-  INVALID_PACK = 'invalidPack',
 }
 
 export const enum CreatePackCommandResponse {
@@ -64,12 +70,18 @@ export const enum ImportCommandResponse {
   IMPORTED = 'imported',
 }
 
+export const enum PackCommandResponse {
+  INVALID_PACK = 'invalidPack',
+  EMPTY_PACK = 'emptyPack',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandResponse,
   [BotChatInputCommandName.IMPORT]: ImportCommandResponse,
   [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
+  [BotChatInputCommandName.PACK]: PackCommandResponse,
 }
 
 interface ComponentsMap {
@@ -87,6 +99,9 @@ interface ComponentsMap {
     'urlLabel',
     'urlDescription',
     'urlPlaceholder',
+  ],
+  [BotChatInputCommandName.PACK]: [
+    'packPreview'
   ],
 }
 

@@ -1,11 +1,12 @@
 import { AutocompleteInteraction } from 'discord.js';
 import { InteractionContext } from '../../types/bot-interaction.js';
+import { findAvailableStickerPacks } from '../find-available-sticker-packs.js';
+import { truncateToMaximumLength } from '../messaging.js';
 
 interface HandleStickerAutocompleteParams {
   interaction: AutocompleteInteraction;
   context: InteractionContext;
   optionName: string;
-  packIdOptionName: string;
   nsfw?: boolean;
 }
 
@@ -13,24 +14,17 @@ export const handleStickerAutocomplete = async ({
   interaction,
   context,
   optionName,
-  packIdOptionName,
   nsfw = false,
 }: HandleStickerAutocompleteParams) => {
-  const value = interaction.options.getString(optionName)?.trim().toLowerCase() ?? '';
-  const packId = (packIdOptionName && interaction.options.getString(packIdOptionName)) || undefined;
+  const value = interaction.options.getString(optionName, true).trim().toLowerCase();
   const { db } = context;
-  const userPacks = await db.pack.findMany({
-    select: { id: true, name: true },
-    where: {
-      OR: [
-        { createdBy: BigInt(interaction.user.id) },
-        { public: true },
-      ],
-      id: packId,
-      nsfw: nsfw ? undefined : false,
-    },
-  });
-  const packNameIndex = userPacks.reduce((acc, pack) => ({
+  const availablePacks = await findAvailableStickerPacks(context, interaction, nsfw);
+  if (availablePacks.length === 0) {
+    await interaction.respond([]);
+    return;
+  }
+
+  const packNameIndex = availablePacks.reduce((acc, pack) => ({
     ...acc,
     [pack.id]: pack.name,
   }), {} as Record<string, string>);
@@ -38,16 +32,13 @@ export const handleStickerAutocomplete = async ({
     select: { id: true, name: true, packId: true },
     where: {
       packId: {
-        in: userPacks.map(pack => pack.id),
+        in: availablePacks.map(pack => pack.id),
       },
     },
   });
 
   await interaction.respond(userStickers.filter(sticker => sticker.name.toLowerCase().includes(value)).slice(0, 25).map(sticker => {
-    let name = sticker.name;
-    if (!packId) {
-      name += ` (${packNameIndex[sticker.packId]})`.replace(/^(.{99}).+$/, '$1…');
-    }
+    const name = truncateToMaximumLength(`${sticker.name} (${packNameIndex[sticker.packId]})`, 100);
     return ({ name, value: sticker.id });
   }));
 };

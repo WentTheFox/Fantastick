@@ -327,7 +327,7 @@ export const createStickerCommand: BotChatInputCommand = {
 
     if (env.DISCORD_FEED_WEBHOOK_URL !== null) {
       const webhookClient = new WebhookClient({ url: env.DISCORD_FEED_WEBHOOK_URL });
-      const { items, files } = mapStickersToGalleryItems([sticker]);
+      const { items, files } = mapStickersToGalleryItems([sticker], userPack.nsfw);
       const reply = await webhookClient.send({
         flags: MessageFlags.SuppressNotifications,
         content: [
@@ -344,7 +344,7 @@ export const createStickerCommand: BotChatInputCommand = {
           `**Pack:** \`${userPack.name}\` (\`${userPack.id}\`)${userPack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''}`,
           `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => userPack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,
         ].join('\n'),
-        files: userPack.nsfw ? files.map(file => file.setSpoiler(true)) : files,
+        files,
       });
 
       await recordStickerMessages(context, [sticker], reply);

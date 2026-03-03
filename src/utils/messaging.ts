@@ -135,3 +135,5 @@ export const updateOrCreateUser = (context: InteractionContext, interaction: Pic
     update,
   });
 };
+
+export const truncateToMaximumLength = (str: string, maxLength: number) => str.length > maxLength ? `${str.substring(0, maxLength)}…` : str;

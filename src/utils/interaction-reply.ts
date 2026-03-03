@@ -5,7 +5,8 @@ import {
   ContextMenuCommandInteraction,
   InteractionReplyOptions,
   MessageComponentInteraction,
-  MessageFlags, ModalSubmitInteraction,
+  MessageFlags,
+  ModalSubmitInteraction,
 } from 'discord.js';
 import { InteractionContext, UserInteractionContext } from '../types/bot-interaction.js';
 
@@ -15,7 +16,7 @@ type InteractionReplyOptionsWithComponents = InteractionReplyOptions & {
 
 const isInteractionReplyOptionsWithComponents = (options: InteractionReplyOptions): options is InteractionReplyOptionsWithComponents => Boolean(options.components);
 
-const upgradeToComponentsV2 = (options: InteractionReplyOptions, context: Pick<InteractionContext, 't' | 'commandIdMap'>): InteractionReplyOptionsWithComponents => {
+const upgradeToComponentsV2 = (options: InteractionReplyOptions): InteractionReplyOptionsWithComponents => {
   if (isInteractionReplyOptionsWithComponents(options)) {
     return options;
   }
@@ -27,7 +28,7 @@ const upgradeToComponentsV2 = (options: InteractionReplyOptions, context: Pick<I
     components: [
       {
         type: ComponentType.TextDisplay,
-        content: reformatCommandNamesInContent(content, context),
+        content,
       },
     ],
   };
@@ -52,6 +53,5 @@ export const interactionReply = (context: Pick<UserInteractionContext, 't' | 'co
   if (options.content && (interaction.replied || interaction.deferred)) {
     return interaction.editReply({ content: options.content });
   }
-  const upgradedOptions = upgradeToComponentsV2(options, context);
-  return interaction.reply(upgradedOptions);
+  return interaction.reply(upgradeToComponentsV2(options));
 };

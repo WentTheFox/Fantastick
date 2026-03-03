@@ -9,23 +9,19 @@
     },
     "nsfw-sticker": {
       "name": "nsfw-sticker",
-      "description": "Sends a sticker (including from NSFW packs)"
+      "description": "Matrica küldése (NSFW csomagokból is)"
     },
     "sticker": {
       "name": "matrica",
       "description": "Matrica küldése",
       "responses": {
-        "invalidPack": "Nem található matricacsomag a megadott néven",
+        "noPacks": "Nincs hozzáférésed egyetlen matricacsomaghoz sem. Létrehozhatsz sajátot a {{createCommand}} paranccsal.",
         "invalidName": "Nem található matrica a megadott néven"
       },
       "options": {
         "name": {
           "name": "név",
           "description": "Matrica neve"
-        },
-        "pack": {
-          "name": "csomag",
-          "description": "Matricacsomag neve"
         }
       }
     },
@@ -107,6 +103,27 @@
         "urlPlaceholder": "https://example.com/matrica.png"
       },
       "options": {}
+    },
+    "nsfw-pack": {
+      "name": "nsfw-csomag",
+      "description": "Megjeleníti a csomag matricáit (NSFW csomagokból is)"
+    },
+    "pack": {
+      "name": "csomag",
+      "description": "Megjeleníti a csomag matricáit",
+      "responses": {
+        "invalidPack": "Nem található matricacsomag a megadott néven",
+        "emptyPack": "Ebben a csomagban még nincs matrica"
+      },
+      "components": {
+        "packPreview": "Alább láthatsz egy előnézetet a csomagban található matricákból"
+      },
+      "options": {
+        "name": {
+          "name": "név",
+          "description": "Csomag neve"
+        }
+      }
     }
   }
 }

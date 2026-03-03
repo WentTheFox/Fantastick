@@ -1,4 +1,4 @@
-# Fantastick [![Build](https://github.com/WentTheFox/Fantastick/actions/workflows/node.yml/badge.svg)](https://github.com/WentTheFox/Fantastick/actions/workflows/node.yml) <a href="https://top.gg/bot/1478013755286880368"><img src="https://top.gg/api/widget/servers/1478013755286880368.svg" alt=""></a></h1>
+# Fantastick [![Build](https://github.com/WentTheFox/Fantastick/actions/workflows/node.yml/badge.svg)](https://github.com/WentTheFox/Fantastick/actions/workflows/node.yml) [![Crowdin](https://badges.crowdin.net/fantastick/localized.svg)](https://crowdin.com/project/fantastick) [![](https://top.gg/api/widget/servers/1478013755286880368.svg)](https://top.gg/bot/1478013755286880368)
 
 Discord app written in Node.js (using [discord.js](https://www.npmjs.com/package/discord.js)) for managing and sending custom stickers.
 

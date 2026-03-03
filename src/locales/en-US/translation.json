@@ -38,8 +38,7 @@
         "invalidName": "The provided sticker pack name contains the following  invalid character(s): {{chars}}",
         "duplicateName": "A sticker pack with the same name already exists, please choose a different one",
         "tooManyPacks": "You can only create up to {{maxPacks}} sticker packs. Please delete an existing pack before creating a new one.",
-        "createdPublic": "New **public** sticker pack created with name {{name}}",
-        "createdPrivate": "New **private** sticker pack created with name {{name}}"
+        "created": "New sticker pack created with name {{name}}"
       },
       "options": {
         "name": {
@@ -48,11 +47,7 @@
         },
         "nsfw": {
           "name": "nsfw",
-          "description": "If True, stickers from this pack will only be usable in age-restricted channels"
-        },
-        "public": {
-          "name": "public",
-          "description": "If True, the pack will be usable by everyone, not only whoever created it"
+          "description": "Will the pack contain NSFW stickers?"
         }
       }
     },

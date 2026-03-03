@@ -74,10 +74,11 @@
       "responses": {
         "noPacks": "Új matrica létrehozásához először létre kell hoznod legalább egy matricacsomagot",
         "invalidPack": "Nem található matricacsomag a megadott néven",
-        "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
-        "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
-        "invalidName": "The provided sticker name contains the following  invalid character(s): {{chars}}",
-        "missingFile": "You must upload a file for the sticker",
+        "nameTooShort": "A megadott matrica név túl rövid (minimum {{min}} karakter)",
+        "nameTooLong": "A megadott matrica név túl hosszú (maximum {{max}} karakter)",
+        "invalidName": "A megadott matrica név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
+        "duplicateName": "Már létezik egy ilyen nevű matrica ebben a matricacsomagban, kérlek válassz másik nevet",
+        "missingFile": "Fel kell töltened egy fájlt a matricához",
         "invalidUrl": "A megadott URL érvénytelen",
         "missingSource": "A matrica bemeneti forrása hiányzik",
         "created": "New sticker created with name {{name}}"

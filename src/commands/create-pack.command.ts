@@ -59,13 +59,12 @@ export const createPackCommand: BotChatInputCommand = {
       return;
     }
 
-    const existingPack = await db.pack.findFirst({
+    const packsWithSameNameCount = await db.pack.count({
       where: {
         name,
       },
     });
-
-    if (existingPack) {
+    if (packsWithSameNameCount !== 0) {
       await interactionReply(context, interaction, {
         content: t('commands.create-pack.responses.duplicateName'),
         flags: MessageFlags.Ephemeral,

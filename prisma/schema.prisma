@@ -56,4 +56,6 @@ model Sticker {
   deletedBy   BigInt?
   deleter     DiscordUser? @relation("DeletedStickers", fields: [deletedBy], references: [id])
   order       Int          @default(0)
+
+  @@unique([packId, name])
 }

@@ -218,6 +218,19 @@ export const createStickerCommand: BotChatInputCommand = {
       });
       return;
     }
+    const packStickersWithSameNameCount = await db.sticker.count({
+      where: {
+        packId: userPack.id,
+        name: stickerName,
+      }
+    });
+    if (packStickersWithSameNameCount !== 0) {
+        await interactionReply(context, interaction, {
+          content: t('commands.create-sticker.responses.duplicateName'),
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+    }
 
     let stickerUrl = data[ModalCustomIds.URL_INPUT];
     let stickerId: string | undefined = undefined;

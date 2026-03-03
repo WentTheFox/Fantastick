@@ -81,6 +81,7 @@
         "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
         "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
         "invalidName": "The provided sticker name contains the following  invalid character(s): {{chars}}",
+        "duplicateName": "A sticker with the same name already exists in this pack, please choose a different one",
         "missingFile": "You must upload a file for the sticker",
         "invalidUrl": "The provided URL is invalid",
         "missingSource": "Sticker input source selection is missing",

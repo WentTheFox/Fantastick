@@ -7,9 +7,13 @@
       },
       "options": {}
     },
+    "nsfw-sticker": {
+      "name": "nsfw-sticker",
+      "description": "Sends a sticker (including from NSFW packs)"
+    },
     "sticker": {
       "name": "sticker",
-      "description": "Send a sticker",
+      "description": "Sends a sticker",
       "responses": {
         "invalidPack": "There is no sticker pack with the specified name",
         "invalidName": "There is no sticker with the specified name"

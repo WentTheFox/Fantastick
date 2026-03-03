@@ -1,10 +1,14 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { Attachment, TextInputComponentData } from 'discord.js';
 import { Readable } from 'node:stream';
+import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { env } from '../env.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
-import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
+import {
+  stickerNameInvalidPattern,
+  stickerNameOptionMeta,
+} from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
 import { BotChatInputCommand, BotModalIds } from '../types/bot-interaction.js';
 import { saveStickerFile } from '../utils/filesystem.js';
@@ -68,7 +72,7 @@ export const createStickerCommand: BotChatInputCommand = {
             minValues: 1,
             maxValues: 1,
             options: userPacks.map(pack => ({
-              label: pack.name,
+              label: pack.name + (pack.nsfw ? ` ${EmojiCharacters.NO_ONE_UNDER_18}` : ''),
               value: pack.name,
             })),
           },
@@ -204,10 +208,10 @@ export const createStickerCommand: BotChatInputCommand = {
       });
       return;
     }
-    const invalidChars = new Set(stickerName.match(/\W/g));
+    const invalidChars = new Set(stickerName.match(stickerNameInvalidPattern));
     if (invalidChars.size > 0) {
       await interactionReply(context, interaction, {
-        content: t('commands.create-sticker.responses.invalidChars', {
+        content: t('commands.create-sticker.responses.invalidName', {
           chars: '```\n' + Array.from(invalidChars).join('') + '\n```',
         }),
         flags: MessageFlags.Ephemeral,

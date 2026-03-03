@@ -35,4 +35,5 @@ export enum EmojiCharacters {
   BAR_CHART = '📊',
   BALLOT_BOX = '🗳️',
   INFO = 'ℹ️',
+  NO_ONE_UNDER_18 = '🔞',
 }

@@ -14,6 +14,7 @@ import { NestableLogger } from './logger-types.js';
 
 export const enum BotChatInputCommandName {
   STICKER = 'sticker',
+  NSFW_STICKER = 'nsfw-sticker',
   CREATE_PACK = 'create-pack',
   IMPORT = 'import',
   CREATE_STICKER = 'create-sticker',

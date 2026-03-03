@@ -1,6 +1,9 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { getCreatePackOptions } from '../options/create-pack.options.js';
-import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
+import {
+  packNameInvalidPattern,
+  packNameOptionMeta,
+} from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -45,10 +48,10 @@ export const createPackCommand: BotChatInputCommand = {
       return;
     }
 
-    const invalidChars = new Set(name.match(/\W/g));
+    const invalidChars = new Set(name.match(packNameInvalidPattern));
     if (invalidChars.size > 0) {
       await interactionReply(context, interaction, {
-        content: t('commands.create-pack.responses.invalidChars', {
+        content: t('commands.create-pack.responses.invalidName', {
           chars: '```\n' + Array.from(invalidChars).join('') + '\n```',
         }),
         flags: MessageFlags.Ephemeral,

@@ -37,10 +37,15 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
   await startupCommandsUpdate(logger);
 
   const currentFolder = dirname(fileURLToPath(import.meta.url));
-  const botScriptPath = `${currentFolder}/bot.js`;
+  const botScriptPath = process.env.npm_lifecycle_script?.includes('.ts')
+    ? `${currentFolder}/bot.ts`
+    : `${currentFolder}/bot.js`;
 
   logger.log(`Starting recommended number of shards with path ${botScriptPath}`);
-  const manager = new ShardingManager(botScriptPath, { token: env.DISCORD_BOT_TOKEN });
+  const manager = new ShardingManager(botScriptPath, {
+    mode: process.env.npm_lifecycle_script?.includes('.ts') ? 'worker' : 'process',
+    token: env.DISCORD_BOT_TOKEN,
+  });
 
   manager.on('shardCreate', shard => {
     logger.log(`Shard ${shard.id} created`);

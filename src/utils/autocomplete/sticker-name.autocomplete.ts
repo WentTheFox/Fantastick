@@ -1,21 +1,8 @@
-import { AutocompleteInteraction } from 'discord.js';
-import { InteractionContext } from '../../types/bot-interaction.js';
+import { AutocompleteHandler } from '../../types/bot-interaction.js';
 import { findAvailableStickerPacks } from '../find-available-sticker-packs.js';
 import { truncateToMaximumLength } from '../messaging.js';
 
-interface HandleStickerAutocompleteParams {
-  interaction: AutocompleteInteraction;
-  context: InteractionContext;
-  optionName: string;
-  nsfw?: boolean;
-}
-
-export const handleStickerAutocomplete = async ({
-  interaction,
-  context,
-  optionName,
-  nsfw = false,
-}: HandleStickerAutocompleteParams) => {
+export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHandler => async (interaction, context, optionName) => {
   const value = interaction.options.getString(optionName, true).trim().toLowerCase();
   const { db } = context;
   const availablePacks = await findAvailableStickerPacks(context, interaction, nsfw);

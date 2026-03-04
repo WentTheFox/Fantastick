@@ -13,7 +13,7 @@ import { getImportOptions } from '../options/import.options.js';
 import { stickerUrlPrefix } from '../options/metadata/import-url.option-meta.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { ImportCommandOptionName } from '../types/localization.js';
-import { handlePackNameAutocomplete } from '../utils/autocomplete/pack-name.autocomplete.js';
+import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { saveStickerFile } from '../utils/filesystem.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -33,21 +33,8 @@ export const importCommand: BotChatInputCommand = {
     ...getLocalizedObject('name', (lng) => t('commands.import.name', { lng })),
     options: getImportOptions(t),
   }),
-  async autocomplete(interaction, context) {
-    const focusedOption = interaction.options.getFocused(true);
-
-    switch (focusedOption.name) {
-      case ImportCommandOptionName.PACK:
-        await handlePackNameAutocomplete({
-          interaction,
-          context,
-          optionName: focusedOption.name,
-          nsfw: true,
-        });
-        break;
-      default:
-        throw new Error(`Unknown autocomplete option ${focusedOption.name}`);
-    }
+  autocomplete: {
+    [ImportCommandOptionName.PACK]: getPackNameAutocompleteHandler(true),
   },
   async handle(interaction, context) {
     const { t, db } = context;
@@ -147,8 +134,8 @@ export const importCommand: BotChatInputCommand = {
 
     context.logger.debug(`Importing Telegram stickers from sticker set ${telegramPackName}…`);
     const createStickerRecords: Prisma.PrismaPromise<Sticker>[] = [];
-    await getStickerSetRequest.response.result.stickers.reduce((awaiter, sticker, order) => {
-      return awaiter.then(async () => {
+    await getStickerSetRequest.response.result.stickers.reduce((awaiter, sticker, order) =>
+      awaiter.then(async () => {
         let telegramFilePath: string;
         try {
           const getFileRequest = await telegramClient.request({
@@ -168,7 +155,7 @@ export const importCommand: BotChatInputCommand = {
           raw: true,
           validator: typia.createValidate<Readable>(),
         });
-        const { stickerId, filePath, stickerUrl } = await saveStickerFile(context, {
+        const { stickerFileId: stickerId, filePath, stickerUrl } = await saveStickerFile(context, {
           fileId: sticker.file_id,
           fileName: 'sticker.webp',
           data: getFileRequest.response,
@@ -178,8 +165,8 @@ export const importCommand: BotChatInputCommand = {
         createStickerRecords.push(db.sticker.create({
           data: {
             id: stickerId,
-            name: stickerId,
-            description: sticker.emoji,
+            name: `${sticker.emoji}#${order + 1}`,
+            description: null,
             packId: appPack.id,
             createdBy: user.id,
             order,
@@ -190,8 +177,7 @@ export const importCommand: BotChatInputCommand = {
         completedSet.add(order);
 
         await updateProgress();
-      });
-    }, Promise.resolve());
+      }), Promise.resolve());
 
     context.logger.info('Creating local sticker records…');
     await updateProgress(false, true);
@@ -226,7 +212,7 @@ export const importCommand: BotChatInputCommand = {
 
     if (stickers !== null) {
       await stickers.reduce((promise, sticker) => promise.then(() => (
-        postStickerToFeed(context, interaction, sticker, appPack)
+        postStickerToFeed({ context, interaction, sticker, userPack: appPack, action: 'import' })
       )), Promise.resolve());
     }
   },

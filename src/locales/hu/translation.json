@@ -126,6 +126,28 @@
           "description": "Csomag neve"
         }
       }
+    },
+    "edit-sticker": {
+      "name": "matrica-szerkesztés",
+      "description": "Létező matrica szerkesztése",
+      "responses": {
+        "stickerNotFound": "A megadott matrica nem található",
+        "updated": "A(z) {{name}} nevű matrica sikeresen szerkesztve"
+      },
+      "components": {
+        "editStickerModalTitle": "A(z) {{name}} matrica szerkesztése",
+        "editingText": "A(z) {{name}} matricát szerkeszted a(z) {{pack}} matricacsomagból. ha nem szeretnéd megváltoztatni a matrica képét, akkor ne adj meg URL-t és ne tölts fel fájlt.",
+        "newFileLabel": "Matricafájl frissítése",
+        "newFileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
+        "newUrlLabel": "Matrica URL frissítése",
+        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen."
+      },
+      "options": {
+        "name": {
+          "name": "név",
+          "description": "A szerkeszteni kívánt matrica neve"
+        }
+      }
     }
   }
 }

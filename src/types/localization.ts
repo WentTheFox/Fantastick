@@ -22,6 +22,9 @@ export const enum ImportCommandOptionName {
 export const enum PackCommandOptionName {
   NAME = 'name',
 }
+export const enum EditStickerCommandOptionName {
+  NAME = 'name',
+}
 
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
@@ -30,6 +33,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.IMPORT]: ImportCommandOptionName,
   [BotChatInputCommandName.PACK]: PackCommandOptionName,
   [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
+  [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -77,6 +81,10 @@ export const enum PackCommandResponse {
   invalidPack = 'invalidPack',
 }
 
+export const enum EditStickerCommandResponse {
+  stickerNotFound = 'stickerNotFound',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
@@ -84,6 +92,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.IMPORT]: ImportCommandResponse,
   [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
   [BotChatInputCommandName.PACK]: PackCommandResponse,
+  [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandResponse,
 }
 
 interface ComponentsMap {
@@ -105,6 +114,10 @@ interface ComponentsMap {
   [BotChatInputCommandName.PACK]: [
     'emptyPack',
     'packPreview'
+  ],
+  [BotChatInputCommandName.EDIT_STICKER]: [
+    'editStickerModalTitle',
+    'editingText'
   ],
 }
 

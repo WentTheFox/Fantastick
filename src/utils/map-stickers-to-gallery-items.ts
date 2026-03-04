@@ -8,7 +8,7 @@ export interface StickerGalleryItems {
   items: APIMediaGalleryItem[];
 }
 
-export const mapStickersToGalleryItems = (stickers: Sticker[], spoiler = false): StickerGalleryItems => {
+export const mapStickersToGalleryItems = (stickers: Pick<Sticker, 'url' | 'description'>[], spoiler = false): StickerGalleryItems => {
   const { files, galleryStickers } = stickers.reduce((acc, sticker) => {
     const paths = getStickerFilePathFromUrl(sticker.url);
     if (paths === null) {

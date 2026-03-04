@@ -1,6 +1,7 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 import { createPackCommand } from '../../commands/create-pack.command.js';
 import { createStickerCommand } from '../../commands/create-sticker.command.js';
+import { editStickerCommand } from '../../commands/edit-sticker.command.js';
 import { importCommand } from '../../commands/import.command.js';
 import { nsfwPackCommand } from '../../commands/nsfw-pack.command.js';
 import { nsfwStickerCommand } from '../../commands/nsfw-sticker.command.js';
@@ -16,6 +17,7 @@ export const chatInputCommandMap: Record<BotChatInputCommandName, BotChatInputCo
   [BotChatInputCommandName.CREATE_STICKER]: createStickerCommand,
   [BotChatInputCommandName.PACK]: packCommand,
   [BotChatInputCommandName.NSFW_PACK]: nsfwPackCommand,
+  [BotChatInputCommandName.EDIT_STICKER]: editStickerCommand,
 };
 
 export const chatInputCommandNames = (Object.keys(chatInputCommandMap) as BotChatInputCommandName[]);

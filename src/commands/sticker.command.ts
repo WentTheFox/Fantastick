@@ -2,7 +2,7 @@ import { getStickerOptions } from '../options/sticker.options.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { stickerCommandAutocomplete } from './autocomplete/sticker.command-autocomplete.js';
-import { stickerCommandHandler } from './handlers/sticker.command-handler.js';
+import { stickerCommandHandler } from './command-handlers/sticker.command-handler.js';
 
 const nsfw = false;
 

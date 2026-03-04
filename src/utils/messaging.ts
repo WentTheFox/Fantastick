@@ -1,10 +1,13 @@
+import { ComponentType } from 'discord-api-types/v10';
 import {
   ApplicationCommandOptionType,
+  Attachment,
   ChannelType,
   ChatInputCommandInteraction,
   CommandInteraction,
   CommandInteractionOption,
   Embed,
+  ModalSubmitInteraction,
   TopLevelComponent,
   User,
 } from 'discord.js';
@@ -137,3 +140,52 @@ export const updateOrCreateUser = (context: InteractionContext, interaction: Pic
 };
 
 export const truncateToMaximumLength = (str: string, maxLength: number) => str.length > maxLength ? `${str.substring(0, maxLength)}…` : str;
+
+interface ModalCustomIdSegments {
+  modalId: string,
+  resourceId: string | undefined
+}
+
+export const getModalCustomIdSegments = (customId: string): ModalCustomIdSegments => {
+  const [modalId, resourceId] = customId.split(/:/);
+  return { modalId, resourceId };
+};
+
+export interface ModalSubmittedData<CustomIds extends string> {
+  data: Record<CustomIds, string>;
+  indexedAttachments: Record<string, Attachment>;
+}
+
+export const collectModalSubmittedData = <CustomIds extends string>(interaction: ModalSubmitInteraction, customIds: Record<string, CustomIds>): ModalSubmittedData<CustomIds> => {
+  const customIdsSet = new Set(Object.values(customIds));
+  const isValidCustomId = (customId: string): customId is CustomIds => customIdsSet.has(customId as never);
+
+  const indexedAttachments: Record<string, Attachment> = {};
+  const data = interaction.components.reduce((acc, component) => {
+    switch (component.type) {
+      case ComponentType.Label: {
+        const customId = component.component.customId;
+
+        if (isValidCustomId(customId)) {
+          switch (component.component.type) {
+            case ComponentType.TextInput:
+              acc[customId] = component.component.value;
+              break;
+            case ComponentType.StringSelect:
+              acc[customId] = component.component.values[0];
+              break;
+            case ComponentType.FileUpload:
+              acc[customId] = component.component.values[0];
+              component.component.attachments?.forEach(attachment => {
+                indexedAttachments[attachment.id] = attachment;
+              });
+              break;
+          }
+        }
+      }
+        break;
+    }
+    return acc;
+  }, {} as Record<CustomIds, string>);
+  return { data, indexedAttachments };
+};

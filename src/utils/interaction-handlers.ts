@@ -9,12 +9,18 @@ import {
   DiscordjsError,
   DiscordjsErrorCodes,
   InteractionType,
-  MessageComponentInteraction, ModalSubmitInteraction,
+  MessageComponentInteraction,
+  ModalSubmitInteraction,
 } from 'discord.js';
 import { TFunction } from 'i18next';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { DEFAULT_LANGUAGE } from '../constants/locales.js';
-import { InteractionHandlerContext, UserInteractionContext } from '../types/bot-interaction.js';
+import {
+  AutocompleteHandler,
+  BotModalId,
+  InteractionHandlerContext,
+  UserInteractionContext,
+} from '../types/bot-interaction.js';
 import { interactionReply } from './interaction-reply.js';
 import {
   chatInputCommandMap,
@@ -22,6 +28,7 @@ import {
 } from './interactions/chat-input-commands.js';
 import { isKnownModalSubmitInteraction, modalSubmitMap } from './interactions/modal-submits.js';
 import {
+  getModalCustomIdSegments,
   getUserIdentifier,
   stringifyChannelName,
   stringifyGuildName,
@@ -32,7 +39,7 @@ const ellipsis = '…';
 
 const processingErrorMessageFactory = (t: TFunction): string => `${EmojiCharacters.OCTAGONAL_SIGN} ${t('commands.global.responses.unexpectedError')}`;
 
-const handleInteractionError = async (interaction: ChatInputCommandInteraction | ButtonInteraction | AutocompleteInteraction | ContextMenuCommandInteraction | MessageComponentInteraction |ModalSubmitInteraction, context: UserInteractionContext) => {
+const handleInteractionError = async (interaction: ChatInputCommandInteraction | ButtonInteraction | AutocompleteInteraction | ContextMenuCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction, context: UserInteractionContext) => {
   if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
     await interaction.respond([
       {
@@ -186,7 +193,15 @@ export const handleCommandAutocomplete = async (interaction: AutocompleteInterac
   };
 
   try {
-    await command.autocomplete?.(interaction, userInteractionContext);
+    const focusedOption = interaction.options.getFocused(true);
+    let handler: AutocompleteHandler | undefined = undefined;
+    if (command.autocomplete && (focusedOption.name in command.autocomplete) && typeof command.autocomplete[focusedOption.name] === 'function') {
+      handler = command.autocomplete[focusedOption.name];
+    }
+    if (!handler) {
+      throw new Error(`Unknown autocomplete option ${focusedOption.name}`);
+    }
+    await handler(interaction, userInteractionContext, focusedOption.name);
   } catch (e) {
     logger.error(`Error while responding to command autocomplete (commandName=${commandName})`, e);
     await handleInteractionError(interaction, userInteractionContext);
@@ -210,21 +225,27 @@ export const handleModalInteraction = async (interaction: ModalSubmitInteraction
   };
 
   if (!isKnownModalSubmitInteraction(interaction)) {
-    await interactionReply(userInteractionContext, interaction, { content: `Unknown modal ID ${interaction.customId}` });
+    await interactionReply(userInteractionContext, interaction, {
+      content: `Unknown modal ID ${interaction.customId}`,
+      flags: MessageFlags.Ephemeral,
+    });
     return;
   }
 
   const { user, channel, channelId, guild, guildId, customId } = interaction;
-  const command = modalSubmitMap[customId];
+  const { modalId, resourceId } = getModalCustomIdSegments(customId);
+  const command = modalSubmitMap[modalId as BotModalId];
 
-  logger.log(`${getUserIdentifier(user)} interacted with modal ${customId} in ${stringifyChannelName(channelId, channel)} of ${stringifyGuildName(guildId, guild)}`);
+  logger.log(`${getUserIdentifier(user)} interacted with modal ${modalId} in ${stringifyChannelName(channelId, channel)} of ${stringifyGuildName(guildId, guild)}`);
+  if (!command || !command.modal) {
+    // noinspection ExceptionCaughtLocallyJS
+    logger.error(`Modal ${modalId} has no handler`);
+    await handleInteractionError(interaction, userInteractionContext);
+    return;
+  }
 
   try {
-    if (!command.modal) {
-      // noinspection ExceptionCaughtLocallyJS
-      throw new Error(`Modal ${customId} has no handler`);
-    }
-    await command.modal(interaction, userInteractionContext);
+    await command.modal[modalId](interaction, userInteractionContext, resourceId);
   } catch (e) {
     logger.error(`Error while responding to modal submit interaction (customId=${customId})`, e);
     await handleInteractionError(interaction, userInteractionContext);

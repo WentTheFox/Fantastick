@@ -9,7 +9,7 @@
     "lint": "eslint \"{src,utils}/**/*.ts\"",
     "build": "tsc",
     "build:clean": "rimraf build",
-    "start": "node ./build/src/index.js",
+    "start": "node --enable-source-maps ./build/src/index.js",
     "start:dev": "npm run build:clean && npm run build && npm run start",
     "test": "vitest",
     "test:watch": "vitest --watch",

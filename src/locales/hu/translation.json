@@ -22,6 +22,10 @@
         "name": {
           "name": "név",
           "description": "Matrica neve"
+        },
+        "preview": {
+          "name": "előnézet",
+          "description": "Ha True, akkor a matrica csak számodra lesz látható"
         }
       }
     },

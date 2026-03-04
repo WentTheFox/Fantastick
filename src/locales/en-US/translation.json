@@ -127,28 +127,6 @@
           "description": "Pack name"
         }
       }
-    },
-    "edit-sticker": {
-      "name": "edit-sticker",
-      "description": "Edit an existing sticker",
-      "responses": {
-        "stickerNotFound": "The specified sticker could not be found",
-        "updated": "The sticker {{name}} has been updated successfully"
-      },
-      "components": {
-        "editStickerModalTitle": "Edit sticker {{name}}",
-        "editingText": "You are editing sticker {{name}} from pack {{pack}}. If you do not want to change the sticker image, do not enter an URL or upload a file.",
-        "newFileLabel": "Update sticker file",
-        "newFileDescription": "Upload a new file to change the sticker image. Leave blank to keep the image unchanged.",
-        "newUrlLabel": "Update sticker URL",
-        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged."
-      },
-      "options": {
-        "name": {
-          "name": "name",
-          "description": "Name of the sticker you want to edit"
-        }
-      }
     }
   }
 }

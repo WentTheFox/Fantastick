@@ -22,6 +22,10 @@
         "name": {
           "name": "name",
           "description": "Sticker name"
+        },
+        "preview": {
+          "name": "preview",
+          "description": "If True, the sticker will only be visible to you"
         }
       }
     },

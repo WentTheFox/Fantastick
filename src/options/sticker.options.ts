@@ -1,4 +1,4 @@
-import { APIApplicationCommandOption } from 'discord-api-types/v10';
+import { APIApplicationCommandOption, ApplicationCommandOptionType } from 'discord-api-types/v10';
 import { TFunction } from 'i18next';
 import { BotChatInputCommandName } from '../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../types/localization.js';
@@ -12,6 +12,11 @@ export const getStickerOptions = (t: TFunction): APIApplicationCommandOption[] =
     required: true,
     autocomplete: true,
     ...stickerNameOptionMeta,
+  },
+  {
+    ...getCommonOptionMeta(t, BotChatInputCommandName.STICKER, StickerCommandOptionName.PREVIEW),
+    required: false,
+    type: ApplicationCommandOptionType.Boolean,
   },
   ...getGlobalOptions(t),
 ];

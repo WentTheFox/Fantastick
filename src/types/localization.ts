@@ -6,6 +6,7 @@ export const enum GlobalCommandOptionName {
 
 export const enum StickerCommandOptionName {
   NAME = 'name',
+  PREVIEW = 'preview',
 }
 
 export const enum CreatePackCommandOptionName {

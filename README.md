@@ -26,7 +26,9 @@ Once a pack is created, stickers can be added via `/create-sticker` from either 
 
 ### 2) Why don't I have permission to use any of Fantastick's create commands?
 
-This is by design, the app is brand new and I have no clue how I'm going to handle moderation of user-submitted content, so I am enlisting the help of a read-only mode for the general public for the time being. If you are an artist and want to be able to create sticker packs via the app, please reach out to me (@WentTheFox) directly.
+This is by design, the app is brand new and I have no clue how I'm going to handle moderation of user-submitted content, so I am enlisting the help of a read-only mode for the general public for the time being. If you are an artist and want to be able to create sticker packs via the app, please reach out to me ([WentTheFox]) directly.
+
+[WentTheFox]: https://went.tf
 
 If you are self-hosting your own instance, you will need to grant yourself (and anyone else you trust) write access by setting the `readOnly` column to `false` for the specific user(s) in the `DiscordUsers` table.
 

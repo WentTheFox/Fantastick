@@ -35,11 +35,15 @@ A project like this, that directly serves to undermine Discord's bottom line by 
 
 The only resilient option is to host your own instance of the project, either from your own machine or a dedicated server. If you self-host, you have full control over the database and can give anyone you trust write access on your own instance. To facilitate this, and to make the app easily auditable, the bot is completely open-source (MIT licensed), but since you are already looking at the repository, this should be self-evident.
 
-**Please note:** If you make your own app based on this codebase I would ask that you refrain from reusing the same name/assets that I use for my instance. The logo is intentionally left out of the project repository. I encourage  you to come up with your own name and icon for your instances, at the very least for when registering it within Discord's developer dashboard. I used [3dgifmaker.com/FidgetSpinner](https://www.3dgifmaker.com/FidgetSpinner) and [ezgif.com/reverse](https://ezgif.com/reverse) to create the import loading animations for the emojis.
+**Please note:** If you make your own app based on this codebase I would ask that you refrain from reusing the same name/assets that I use for my instance. The logo is intentionally left out of the project repository. I encourage  you to come up with your own name and icon for your instances, at the very least for when registering it within Discord's developer dashboard. I used [3dgifmaker.com] and [ezgif.com's reverser] to create the import loading animations for the emojis used by the app.
 
-Forking and modifying the code to fit your needs is highly encouraged. If you need assistance with setting up your own server, feel free to [join the Discord server] ask in ⁠help-and-suggestions for guidance. If there is sufficient demand, I will make a more in-depth guide. 
+[3dgifmaker.com]: https://www.3dgifmaker.com/FidgetSpinner
+[ezgif.com's reverser]: https://ezgif.com/reverse
+
+Forking and modifying the code to fit your needs is highly encouraged. If you need assistance with setting up your own server, feel free to [join the Discord server] ask in ⁠the [#help-and-suggestions channel](https://discord.com/channels/1477776813777490223/1477777007680163860) for guidance. If there is sufficient demand, I will make a more in-depth guide. 
 
 [join the Discord server]: https://discord.gg/6KMUDvPpVu
+[#help-and-suggestions channel]: https://discord.com/channels/1477776813777490223/1477777007680163860
 
 ## Translation
 

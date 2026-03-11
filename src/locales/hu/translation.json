@@ -41,6 +41,23 @@
         "createdPublic": "Új **publikus** matricacsomag létrehozva {{name}} néven",
         "createdPrivate": "Új **privát** matricacsomag létrehozva {{name}} néven"
       },
+      "components": {
+        "createPackModalTitle": "Create new sticker pack",
+        "nameLabel": "Pack name",
+        "nameDescription": "Enter a unique name for the new sticker pack. Two packs cannot have the same name within the app.",
+        "publicChoiceLabel": "Pack visibility",
+        "publicChoiceDescription": "Determines who will be able to see and use the stickers in the pack.",
+        "publicTrueLabel": "Public",
+        "publicTrueDescription": "The pack will be visible usable by everyone",
+        "publicFalseLabel": "Private",
+        "publicFalseDescription": "The pack will only be visible to and usable by you",
+        "nsfwChoiceLabel": "Pack content rating",
+        "nsfwChoiceDescription": "Determines where and how the stickers in this pack will be usable.",
+        "nsfwTrueLabel": "Age-restricted (NSFW)",
+        "nsfwTrueDescription": "Stickers will only be usable in age-restricted channels and DMs via {{command}}",
+        "nsfwFalseLabel": "Safe for all audiences",
+        "nsfwFalseDescription": "Stickers will be usable in any channel and DMs via {{command}}"
+      },
       "options": {
         "name": {
           "name": "név",
@@ -150,6 +167,32 @@
         "name": {
           "name": "név",
           "description": "A szerkeszteni kívánt matrica neve"
+        }
+      }
+    },
+    "delete-sticker": {
+      "name": "delete-sticker",
+      "description": "Delete an existing sticker",
+      "responses": {
+        "stickerNotFound": "The specified sticker could not be found",
+        "deleteFailed": "Could not delete the sticker due to an unexpected error, please try again later",
+        "unsupportedMethod": "The provided deletion method ({{method}}) is not (yet) supported",
+        "deleted": "The sticker {{name}} has been deleted successfully"
+      },
+      "components": {
+        "deleteStickerModalTitle": "Delete sticker {{name}}",
+        "deletingText": "You are about to delete sticker {{name}} from pack {{pack}}.",
+        "deletionMethodLabel": "Choose deletion method",
+        "deletionMethodDescription": "Select how the sticker should be deleted",
+        "stickerOnlyMethodLabel": "Delete sticker only",
+        "stickerOnlyMethodDescription": "The default method, which deletes the sticker and does not change previously sent messages",
+        "deleteMessagesMethodLabel": "Delete sticker and existing messages",
+        "deleteMessagesMethodDescription": "In addition to deleting the sticker, all messages sent by the app that contain it will be deleted"
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Name of the sticker you want to delete"
         }
       }
     }

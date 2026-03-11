@@ -30,6 +30,7 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
   }
   const stickers = await db.sticker.findMany({
     where: {
+      deletedAt: null,
       packId: pack.id,
     },
     take: itemsPerPage,

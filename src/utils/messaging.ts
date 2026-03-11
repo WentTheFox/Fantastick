@@ -168,6 +168,8 @@ export const collectModalSubmittedData = <CustomIds extends string>(interaction:
 
         if (isValidCustomId(customId)) {
           switch (component.component.type) {
+            // @ts-expect-error they types are wrong, trust me bro
+            case ComponentType.RadioGroup:
             case ComponentType.TextInput:
               acc[customId] = component.component.value;
               break;

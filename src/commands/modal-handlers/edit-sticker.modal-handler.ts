@@ -34,7 +34,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
   }
 
   let sticker = resourceId ? await db.sticker.findUnique({
-    where: { id: resourceId, createdBy: user.id },
+    where: { id: resourceId, deletedAt: null, createdBy: user.id },
     include: { pack: true },
   }) : null;
 
@@ -167,7 +167,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.edit-sticker.responses.updated', {
-      name: sticker.name,
+      name: `\`${sticker.name}\``,
     })}`,
     flags: MessageFlags.Ephemeral,
   });

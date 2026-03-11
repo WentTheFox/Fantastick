@@ -50,19 +50,19 @@ const fsUrlPrefix = 'fs://';
 
 export const getStickerFileFsUrl = (stickerFileName: string): string => fsUrlPrefix + stickerFileName;
 
-export interface StickerFilePath {
+export interface StickerFileLocation {
   stickerFileName: string;
   folderPath: string;
   filePath: string;
 }
 
-export const getStickerFilePathFromFileName = (stickerFileName: string): StickerFilePath => {
+export const getStickerFilePathFromFileName = (stickerFileName: string): StickerFileLocation => {
   const folderPath = path.join(process.cwd(), 'fs', stickerFileName[0], stickerFileName.substring(1, 3));
   const filePath = path.join(folderPath, stickerFileName);
   return { folderPath, filePath, stickerFileName };
 };
 
-export const getStickerFilePathFromUrl = (url: string): StickerFilePath | null => {
+export const getStickerFilePathFromUrl = (url: string): StickerFileLocation | null => {
   if (!url.startsWith(fsUrlPrefix)) {
     return null;
   }

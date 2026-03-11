@@ -40,6 +40,7 @@ model Pack {
   public    Boolean      @default(false)
 
   @@unique([name])
+  @@index([deletedAt])
 }
 
 model Sticker {
@@ -59,7 +60,7 @@ model Sticker {
   order           Int              @default(0)
   stickerMessages StickerMessage[] @ignore
 
-  @@unique([packId, name])
+  @@index([deletedAt])
 }
 
 model StickerMessage {
@@ -68,7 +69,7 @@ model StickerMessage {
   serverId  BigInt?
   channelId BigInt?
   stickerId String   @db.Uuid
-  sticker   Sticker  @relation(fields: [stickerId], references: [id])
+  sticker   Sticker  @relation(fields: [stickerId], references: [id], onDelete: NoAction, onUpdate: Cascade)
   createdAt DateTime @default(now()) @db.Timestamptz(0)
 
   @@unique([messageId, stickerId])

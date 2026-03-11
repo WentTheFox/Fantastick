@@ -91,6 +91,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     where: {
       packId: userPack.id,
       name: stickerName,
+      deletedAt: null,
     },
   });
   if (packStickersWithSameNameCount !== 0) {
@@ -177,7 +178,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
 
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.create-sticker.responses.created', {
-      name: sticker.name,
+      name: `\`${sticker.name}\``,
     })}`,
     flags: MessageFlags.Ephemeral,
   });

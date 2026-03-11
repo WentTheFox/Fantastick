@@ -18,6 +18,7 @@ export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHan
   const userStickers = await db.sticker.findMany({
     select: { id: true, name: true, packId: true },
     where: {
+      deletedAt: null,
       packId: {
         in: availablePacks.map(pack => pack.id),
       },

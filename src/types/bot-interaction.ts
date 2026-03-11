@@ -22,11 +22,13 @@ export const enum BotChatInputCommandName {
   PACK = 'pack',
   NSFW_PACK = 'nsfw-pack',
   EDIT_STICKER = 'edit-sticker',
+  DELETE_STICKER = 'delete-sticker',
 }
 
 export const enum BotModalId {
   CREATE_STICKER = 'createStickerModal',
   EDIT_STICKER = 'editStickerModal',
+  DELETE_STICKER = 'deleteStickerModal',
 }
 
 export interface LoggerContext {

@@ -38,7 +38,7 @@ interface PostStickerToFeedParams {
   interaction: ChatInputCommandInteraction | ModalSubmitInteraction;
   sticker: Sticker;
   userPack: Pack;
-  action: 'create' | 'edit' | 'import';
+  action: 'create' | 'edit' | 'import' | 'delete';
   snapshot?: StickerSnapshot;
 }
 
@@ -63,14 +63,16 @@ export const postStickerToFeed = async ({
   const reply = await webhookClient.send({
     flags: MessageFlags.SuppressNotifications,
     content: [
-      `# Sticker ${action}ed`,
+      `# Sticker ${action.replace(/e?$/, 'ed')}`,
       ...(nameChanged ? [`**Old name:** \`${snapshot.name}\``] : []),
       `**${nameChanged ? 'New name' : 'Name'}:** \`${sticker.name}\` (\`${sticker.id}\`)`,
       ...(descriptionChanged ? mapDescription(snapshot.description, 'Old description') : []),
       ...(mapDescription(sticker.description, descriptionChanged ? 'New description' : 'Description')),
       `**Created at:** ${time(sticker.createdAt, TimestampStyles.FullDateShortTime)} (${time(sticker.createdAt, TimestampStyles.RelativeTime)})`,
       ...(sticker.updatedAt ? [`**Updated at:** ${time(sticker.updatedAt, TimestampStyles.FullDateShortTime)} (${time(sticker.updatedAt, TimestampStyles.RelativeTime)})`] : []),
+      ...(sticker.deletedAt ? [`**Deleted at:** ${time(sticker.deletedAt, TimestampStyles.FullDateShortTime)} (${time(sticker.deletedAt, TimestampStyles.RelativeTime)})`] : []),
       `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
+      ...(sticker.deletedBy ? [`**Deleted by:** ${userMention(String(sticker.deletedBy))} (\`${sticker.deletedBy}\`)`] : []),
       `**Pack:** \`${userPack.name}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
       ...(urlChanged ? [`**Old URL:** ${wrapUrlInSpoiler(userPack, snapshot.url)}`, `**New URL:** \`${sticker.url}\``] : []),
       `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => wrapUrlInSpoiler(userPack, item.media.url)).join(' ')}`,

@@ -24,6 +24,7 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
 
   const stickers = await db.sticker.findMany({
     where: {
+      deletedAt: null,
       OR: [
         { id: stickerId },
         { name: stickerId },

@@ -40,7 +40,7 @@ export const editStickerCommand: BotChatInputCommand = {
 
     const id = interaction.options.getString(EditStickerCommandOptionName.NAME, true);
     const sticker = await db.sticker.findUnique({
-      where: { id },
+      where: { id, deletedAt: null },
       include: { pack: true },
     });
 

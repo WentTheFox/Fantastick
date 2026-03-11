@@ -23,7 +23,12 @@ export const enum ImportCommandOptionName {
 export const enum PackCommandOptionName {
   NAME = 'name',
 }
+
 export const enum EditStickerCommandOptionName {
+  NAME = 'name',
+}
+
+export const enum DeleteStickerCommandOptionName {
   NAME = 'name',
 }
 
@@ -35,6 +40,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.PACK]: PackCommandOptionName,
   [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandOptionName,
+  [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {

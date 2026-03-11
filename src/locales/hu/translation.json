@@ -152,6 +152,32 @@
           "description": "A szerkeszteni kívánt matrica neve"
         }
       }
+    },
+    "delete-sticker": {
+      "name": "delete-sticker",
+      "description": "Delete an existing sticker",
+      "responses": {
+        "stickerNotFound": "The specified sticker could not be found",
+        "deleteFailed": "Could not delete the sticker due to an unexpected error, please try again later",
+        "unsupportedMethod": "The provided deletion method ({{method}}) is not (yet) supported",
+        "deleted": "The sticker {{name}} has been deleted successfully"
+      },
+      "components": {
+        "deleteStickerModalTitle": "Delete sticker {{name}}",
+        "deletingText": "You are about to delete sticker {{name}} from pack {{pack}}.",
+        "deletionMethodLabel": "Choose deletion method",
+        "deletionMethodDescription": "Select how the sticker should be deleted",
+        "stickerOnlyMethodLabel": "Delete sticker only",
+        "stickerOnlyMethodDescription": "The default method, which deletes the sticker and does not change previously sent messages",
+        "deleteMessagesMethodLabel": "Delete sticker and existing messages",
+        "deleteMessagesMethodDescription": "In addition to deleting the sticker, all messages sent by the app that contain it will be deleted"
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Name of the sticker you want to delete"
+        }
+      }
     }
   }
 }

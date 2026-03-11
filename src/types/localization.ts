@@ -92,6 +92,13 @@ export const enum EditStickerCommandResponse {
   stickerNotFound = 'stickerNotFound',
 }
 
+export const enum DeleteStickerCommandResponse {
+  stickerNotFound = 'stickerNotFound',
+  deleteFailed = 'deleteFailed',
+  unsupportedMethod = 'unsupportedMethod',
+  deleted = 'deleted',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
@@ -100,6 +107,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
   [BotChatInputCommandName.PACK]: PackCommandResponse,
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandResponse,
+  [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandResponse,
 }
 
 interface ComponentsMap {
@@ -125,6 +133,33 @@ interface ComponentsMap {
   [BotChatInputCommandName.EDIT_STICKER]: [
     'editStickerModalTitle',
     'editingText'
+  ],
+  [BotChatInputCommandName.DELETE_STICKER]: [
+    'deleteStickerModalTitle',
+    'deletingText',
+    'deletionMethodLabel',
+    'deletionMethodDescription',
+    'stickerOnlyMethodLabel',
+    'stickerOnlyMethodDescription',
+    'deleteMessagesMethodLabel',
+    'deleteMessagesMethodDescription',
+  ],
+  [BotChatInputCommandName.CREATE_PACK]: [
+    'createPackModalTitle',
+    'nameLabel',
+    'nameDescription',
+    'publicChoiceLabel',
+    'publicChoiceDescription',
+    'publicTrueLabel',
+    'publicTrueDescription',
+    'publicFalseLabel',
+    'publicFalseDescription',
+    'nsfwChoiceLabel',
+    'nsfwChoiceDescription',
+    'nsfwTrueLabel',
+    'nsfwTrueDescription',
+    'nsfwFalseLabel',
+    'nsfwFalseDescription',
   ],
 }
 

@@ -29,6 +29,7 @@ export const enum BotModalId {
   CREATE_STICKER = 'createStickerModal',
   EDIT_STICKER = 'editStickerModal',
   DELETE_STICKER = 'deleteStickerModal',
+  CREATE_PACK = 'createPackModal',
 }
 
 export interface LoggerContext {

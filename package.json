@@ -30,7 +30,7 @@
     "i18next": "^25.8.6",
     "i18next-fs-backend": "^2.6.1",
     "js-levenshtein": "^1.1.6",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pm2": "^6.0.13",
     "rimraf": "^6.0.1",
     "shell-escape": "^0.2.0",

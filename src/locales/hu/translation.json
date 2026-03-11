@@ -41,6 +41,23 @@
         "createdPublic": "Új **publikus** matricacsomag létrehozva {{name}} néven",
         "createdPrivate": "Új **privát** matricacsomag létrehozva {{name}} néven"
       },
+      "components": {
+        "createPackModalTitle": "Create new sticker pack",
+        "nameLabel": "Pack name",
+        "nameDescription": "Enter a unique name for the new sticker pack. Two packs cannot have the same name within the app.",
+        "publicChoiceLabel": "Pack visibility",
+        "publicChoiceDescription": "Determines who will be able to see and use the stickers in the pack.",
+        "publicTrueLabel": "Public",
+        "publicTrueDescription": "The pack will be visible usable by everyone",
+        "publicFalseLabel": "Private",
+        "publicFalseDescription": "The pack will only be visible to and usable by you",
+        "nsfwChoiceLabel": "Pack content rating",
+        "nsfwChoiceDescription": "Determines where and how the stickers in this pack will be usable.",
+        "nsfwTrueLabel": "Age-restricted (NSFW)",
+        "nsfwTrueDescription": "Stickers will only be usable in age-restricted channels and DMs via {{command}}",
+        "nsfwFalseLabel": "Safe for all audiences",
+        "nsfwFalseDescription": "Stickers will be usable in any channel and DMs via {{command}}"
+      },
       "options": {
         "name": {
           "name": "név",

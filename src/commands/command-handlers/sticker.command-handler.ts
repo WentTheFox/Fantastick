@@ -1,15 +1,17 @@
 import { ComponentType, MessageFlags } from 'discord-api-types/v10';
 import { ChatInputCommandInteraction } from 'discord.js';
+import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
 import { BotChatInputCommandName, InteractionHandler } from '../../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../../types/localization.js';
 import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
 import { createCommandMention, interactionReply } from '../../utils/interaction-reply.js';
+import { isUuidV4 } from '../../utils/is-uuid-v4.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
 import { recordStickerMessages } from '../../utils/record-sticker-messages.js';
 
 export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputCommandInteraction> => async function handle(interaction, context) {
   const { t, db } = context;
-  const stickerId = interaction.options.getString(StickerCommandOptionName.NAME, true);
+  const stickerQuery = interaction.options.getString(StickerCommandOptionName.NAME, true);
   const preview = interaction.options.getBoolean(StickerCommandOptionName.PREVIEW) ?? false;
   const availablePacks = await findAvailableStickerPacks(context, interaction, nsfw);
   if (availablePacks.length === 0) {
@@ -22,13 +24,17 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
     return;
   }
 
+  const searchConditions: StickerWhereInput[] = [
+    { name: stickerQuery }
+  ];
+  if (isUuidV4(stickerQuery)) {
+    searchConditions.push({ id: stickerQuery });
+  }
+
   const stickers = await db.sticker.findMany({
     where: {
       deletedAt: null,
-      OR: [
-        { id: stickerId },
-        { name: stickerId },
-      ],
+      OR: searchConditions,
       packId: {
         in: availablePacks.map(pack => pack.id),
       },

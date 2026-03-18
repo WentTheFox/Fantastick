@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { QueueType } from '../../classes/queue-manager.js';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
@@ -48,9 +49,32 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
   } = collectModalSubmittedData(interaction, DeleteStickerModalCustomIds);
 
   const deletionMethod = data[DeleteStickerModalCustomIds.DELETION_METHOD_INPUT];
+  const postDeleteActions: (() => Promise<void>)[] = [];
   switch (deletionMethod) {
     case StickerDeletionMethods.STICKER_ONLY:
       // noop, just delete the sticker
+      break;
+    case StickerDeletionMethods.DELETE_MESSAGES: {
+      const stickerId = sticker.id;
+      const stickerMessages = await db.stickerMessage.findMany({
+        where: {
+          stickerId,
+          deletedAt: null,
+          isFeed: false,
+        },
+        select: { interactionId: true, interactionToken: true, channelId: true, messageId: true },
+      });
+      stickerMessages.forEach((message) => {
+        postDeleteActions.push(() => context.qm.send(QueueType.UpdateMessage, {
+          stickerId,
+          channelId: String(message.channelId),
+          messageId: String(message.messageId),
+          interactionId: message.interactionId,
+          interactionToken: message.interactionToken,
+          action: 'delete',
+        }));
+      });
+    }
       break;
     default: {
       await interactionReply(context, interaction, {
@@ -96,4 +120,6 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
     action: 'delete',
     snapshot: stickerSnapshot,
   });
+
+  await Promise.all(postDeleteActions.map(action => action()));
 };

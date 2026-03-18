@@ -61,5 +61,5 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
   });
 
   const replyMessage = await reply.fetch(true);
-  await recordStickerMessages(context, stickers, replyMessage);
+  await recordStickerMessages({ context, interaction, stickers, replyMessage });
 };

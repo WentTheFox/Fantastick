@@ -9,6 +9,7 @@ import type {
   ModalSubmitInteraction,
 } from 'discord.js';
 import { i18n, TFunction } from 'i18next';
+import { QueueManager } from '../classes/queue-manager.js';
 import { PrismaClient } from '../generated/prisma/client.js';
 
 import { NestableLogger } from './logger-types.js';
@@ -41,6 +42,7 @@ export interface InteractionHandlerContext extends LoggerContext {
   emojiIdMap: Record<string, string>;
   commandIdMap: Record<string, string | undefined>;
   db: PrismaClient;
+  qm: QueueManager;
 }
 
 export interface InteractionContext extends Omit<InteractionHandlerContext, 'i18next'> {

@@ -1,19 +1,21 @@
-import { createClient } from './utils/client.js';
-import { initI18next } from './constants/locales.js';
-import { createDb } from './utils/create-db.js';
-import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
 import { Logger } from './classes/logger.js';
+import { initI18next } from './constants/locales.js';
+import { createClient } from './utils/client.js';
+import { createDb } from './utils/create-db.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
+import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
+import { initQueueManager } from './utils/init-queue-manager.js';
 
 (async () => {
   const logger = Logger.fromShardInfo(process.env.SHARDS);
   const db = createDb();
-  const [i18next, emojiIdMap, commandIdMap] = await Promise.all([
+  const [i18next, emojiIdMap, commandIdMap, qm] = await Promise.all([
     initI18next(logger),
     getEmojiIdMap({ logger }),
     getCommandIdMap({ logger }),
+    initQueueManager(logger),
   ]);
 
   logger.log('Creating client');
-  await createClient({ i18next, emojiIdMap, commandIdMap, logger, db });
+  await createClient({ i18next, emojiIdMap, commandIdMap, logger, db, qm });
 })();

@@ -65,13 +65,20 @@ model Sticker {
 }
 
 model StickerMessage {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  messageId BigInt
-  serverId  BigInt?
-  channelId BigInt?
-  stickerId String   @db.Uuid
-  sticker   Sticker  @relation(fields: [stickerId], references: [id], onDelete: NoAction, onUpdate: Cascade)
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  messageId        BigInt
+  serverId         BigInt?
+  channelId        BigInt?
+  stickerId        String    @db.Uuid
+  sticker          Sticker   @relation(fields: [stickerId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  createdAt        DateTime  @default(now()) @db.Timestamptz(0)
+  deletedAt        DateTime? @db.Timestamptz(0)
+  isFeed           Boolean   @default(false)
+  interactionId    String?   @db.VarChar(255)
+  interactionToken String?   @db.VarChar(255)
 
   @@unique([messageId, stickerId])
+  @@unique([interactionId, interactionToken])
+  @@index([deletedAt])
+  @@index([isFeed])
 }

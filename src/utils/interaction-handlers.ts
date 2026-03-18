@@ -14,13 +14,13 @@ import {
 } from 'discord.js';
 import { TFunction } from 'i18next';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
-import { DEFAULT_LANGUAGE } from '../constants/locales.js';
 import {
   AutocompleteHandler,
   BotModalId,
   InteractionHandlerContext,
   UserInteractionContext,
 } from '../types/bot-interaction.js';
+import { createTFunction } from './create-t-function.js';
 import { interactionReply } from './interaction-reply.js';
 import {
   chatInputCommandMap,
@@ -98,26 +98,6 @@ const handleInteractionError = async (interaction: ChatInputCommandInteraction |
 
 const isChatInputCommandInteraction = (interaction: CommandInteraction): interaction is ChatInputCommandInteraction => {
   return interaction.commandType === ApplicationCommandType.ChatInput;
-};
-
-interface CreateTFunctionOptions {
-  i18next: InteractionHandlerContext['i18next'];
-  ephemeral: boolean | null;
-  locale: string;
-  guild: { preferredLocale?: string } | undefined | null;
-}
-
-export const createTFunction = ({ i18next, ephemeral, locale, guild }: CreateTFunctionOptions) => {
-  return i18next.getFixedT(
-    // Always use user's locale for ephemeral responses, otherwise use server's preferred locale when available
-    ephemeral
-      ? [locale, DEFAULT_LANGUAGE] :
-      (
-        guild?.preferredLocale
-          ? [guild.preferredLocale, DEFAULT_LANGUAGE]
-          : DEFAULT_LANGUAGE
-      ),
-  );
 };
 
 export const handleCommandInteraction = async (interaction: CommandInteraction, context: InteractionHandlerContext): Promise<void> => {

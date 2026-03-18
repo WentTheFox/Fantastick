@@ -9,6 +9,7 @@ import { NestableLogger } from './types/logger-types.js';
 import { createDb } from './utils/create-db.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
 import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
+import { initQueueManager } from './utils/init-queue-manager.js';
 import { updateCommands } from './utils/update-commands.js';
 
 // This file is the main entry point that starts the bot
@@ -23,6 +24,7 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
     emojiIdMap: await getEmojiIdMap({ logger }),
     i18next,
     db: createDb(),
+    qm: await initQueueManager(logger),
   };
 
   await Promise.all([
@@ -37,9 +39,7 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
   await startupCommandsUpdate(logger);
 
   const currentFolder = dirname(fileURLToPath(import.meta.url));
-  const botScriptPath = process.env.npm_lifecycle_script?.includes('.ts')
-    ? `${currentFolder}/bot.ts`
-    : `${currentFolder}/bot.js`;
+  const botScriptPath = `${currentFolder}/bot.js`;
 
   logger.log(`Starting recommended number of shards with path ${botScriptPath}`);
   const manager = new ShardingManager(botScriptPath, {

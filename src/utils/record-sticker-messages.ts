@@ -1,5 +1,5 @@
 import { APIMessage } from 'discord-api-types/v9';
-import { Message } from 'discord.js';
+import { ChatInputCommandInteraction, Message, ModalSubmitInteraction } from 'discord.js';
 import { Sticker } from '../generated/prisma/client.js';
 import { InteractionContext } from '../types/bot-interaction.js';
 
@@ -7,10 +7,25 @@ type MessageType =
   | Pick<Message, 'id' | 'channelId' | 'guildId'>
   | Pick<APIMessage, 'id' | 'channel_id'>;
 
+interface RecordStickerMessagesParams {
+  context: Pick<InteractionContext, 'db'>;
+  interaction: ChatInputCommandInteraction | ModalSubmitInteraction;
+  stickers: Sticker[];
+  replyMessage: MessageType;
+  isFeed?: boolean;
+}
+
 /**
  * Store sticker ID for app replies (for "update" context menu command later)
  */
-export const recordStickerMessages = ({ db }: Pick<InteractionContext, 'db'>, stickers: Sticker[], replyMessage: MessageType) => {
+export const recordStickerMessages = ({
+  context,
+  interaction,
+  stickers,
+  replyMessage,
+  isFeed = false,
+}: RecordStickerMessagesParams) => {
+  const { db } = context;
   const messageChannelId = 'channelId' in replyMessage ? replyMessage.channelId : replyMessage.channel_id;
   const messageGuildId = 'guildId' in replyMessage ? replyMessage.guildId : null;
   return db.$transaction(stickers.map(sticker => db.stickerMessage.create({
@@ -18,7 +33,10 @@ export const recordStickerMessages = ({ db }: Pick<InteractionContext, 'db'>, st
       messageId: BigInt(replyMessage.id),
       serverId: messageGuildId ? BigInt(messageGuildId) : null,
       channelId: messageChannelId ? BigInt(messageChannelId) : null,
+      interactionToken: interaction.token,
+      interactionId: interaction.id,
       stickerId: sticker.id,
+      isFeed,
     },
   })));
 };

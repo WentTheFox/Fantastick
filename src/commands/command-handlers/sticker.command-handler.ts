@@ -25,7 +25,7 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
   }
 
   const searchConditions: StickerWhereInput[] = [
-    { name: stickerQuery }
+    { name: stickerQuery },
   ];
   if (isUuidV4(stickerQuery)) {
     searchConditions.push({ id: stickerQuery });
@@ -63,5 +63,5 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
   });
 
   const replyMessage = await reply.fetch(true);
-  await recordStickerMessages(context, stickers, replyMessage);
+  await recordStickerMessages({ context, interaction, stickers, replyMessage });
 };

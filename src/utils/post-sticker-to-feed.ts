@@ -56,11 +56,14 @@ export const postStickerToFeed = async ({
 
   const webhookClient = new WebhookClient({ url: env.DISCORD_FEED_WEBHOOK_URL });
   const urlChanged = snapshot && snapshot.url !== sticker.url;
-  const { items, files } = mapStickersToGalleryItems(urlChanged ? [snapshot, sticker] : [sticker], userPack.nsfw);
+  const {
+    items,
+    files,
+  } = mapStickersToGalleryItems(urlChanged ? [snapshot, sticker] : [sticker], userPack.nsfw);
 
   const nameChanged = snapshot && snapshot.name !== sticker.name;
   const descriptionChanged = snapshot && snapshot.description !== sticker.description;
-  const reply = await webhookClient.send({
+  const replyMessage = await webhookClient.send({
     flags: MessageFlags.SuppressNotifications,
     content: [
       `# Sticker ${action.replace(/e?$/, 'ed')}`,
@@ -80,5 +83,11 @@ export const postStickerToFeed = async ({
     files,
   });
 
-  await recordStickerMessages(context, [sticker], reply);
+  await recordStickerMessages({
+    context,
+    interaction,
+    stickers: [sticker],
+    replyMessage,
+    isFeed: true,
+  });
 };

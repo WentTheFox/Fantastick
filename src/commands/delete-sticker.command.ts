@@ -83,6 +83,10 @@ export const deleteStickerCommand: BotChatInputCommand = {
             ],
           } as unknown as ComponentInLabelData,
         },
+        {
+          type: ComponentType.TextDisplay,
+          content: t('commands.delete-sticker.components.limitationsText'),
+        },
       ],
     });
   },

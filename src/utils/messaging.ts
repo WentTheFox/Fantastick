@@ -13,7 +13,9 @@ import {
 } from 'discord.js';
 import { DiscordUser } from '../generated/prisma/client.js';
 import { DiscordUserUpdateInput } from '../generated/prisma/models/DiscordUser.js';
-import { InteractionContext, InteractionHandlerContext } from '../types/bot-interaction.js';
+
+import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
+import { InteractionContext } from '../types/contexts/interaction.context.js';
 
 type UserFriendCode = `@${string}` | `${string}#${string}`;
 export const getUserFriendCode = (user: User): UserFriendCode => {

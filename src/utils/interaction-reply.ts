@@ -9,7 +9,9 @@ import {
   MessageFlags,
   ModalSubmitInteraction,
 } from 'discord.js';
-import { InteractionContext, UserInteractionContext } from '../types/bot-interaction.js';
+
+import { InteractionContext } from '../types/contexts/interaction.context.js';
+import { UserInteractionContext } from '../types/contexts/user-interaction.context.js';
 
 type InteractionReplyOptionsWithComponents = InteractionReplyOptions & {
   components: Required<InteractionReplyOptions>['components']

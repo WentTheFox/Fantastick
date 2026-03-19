@@ -1,7 +1,7 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { QueueType } from '../../classes/queue-manager.js';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
+import { QueueType } from '../../types/queue.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed, StickerSnapshot } from '../../utils/post-sticker-to-feed.js';

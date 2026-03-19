@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { Logger } from './classes/logger.js';
 import { initI18next } from './constants/locales.js';
 import { env } from './env.js';
-import { InteractionHandlerContext } from './types/bot-interaction.js';
+import { InteractionHandlerContext } from './types/contexts/interaction-handler.context.js';
 import { NestableLogger } from './types/logger-types.js';
 import { createDb } from './utils/create-db.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';

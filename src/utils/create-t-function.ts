@@ -1,5 +1,5 @@
 import { DEFAULT_LANGUAGE } from '../constants/locales.js';
-import { InteractionHandlerContext } from '../types/bot-interaction.js';
+import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
 
 interface CreateTFunctionOptions {
   i18next: InteractionHandlerContext['i18next'];

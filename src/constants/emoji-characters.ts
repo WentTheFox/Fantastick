@@ -10,4 +10,5 @@ export enum EmojiCharacters {
   NO_ONE_UNDER_18 = '🔞',
   LOCKED = '🔒',
   TRASH_CAN = '🗑️',
+  RELOAD = '🔄',
 }

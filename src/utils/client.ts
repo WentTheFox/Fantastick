@@ -1,12 +1,11 @@
 import { Client, Events, InteractionType, Partials } from 'discord.js';
 import { env } from '../env.js';
-import { InteractionHandlerContext } from '../types/bot-interaction.js';
+import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
 import { getGitData } from './get-git-data.js';
-import {
-  handleCommandAutocomplete,
-  handleCommandInteraction,
-  handleModalInteraction,
-} from './interaction-handlers.js';
+import { handleComponentInteraction } from './interaction-handlers/handle-component-interaction.js';
+import { handleModalInteraction } from './interaction-handlers/handle-modal-interaction.js';
+import { handleCommandAutocomplete } from './interaction-handlers/handle-command-autocomplete.js';
+import { handleCommandInteraction } from './interaction-handlers/handle-command-interaction.js';
 
 const handleReady = (context: InteractionHandlerContext) => async (client: Client<true>) => {
   const { logger } = context;
@@ -39,7 +38,11 @@ export const createClient = async (context: InteractionHandlerContext): Promise<
       case InteractionType.ModalSubmit:
         await handleModalInteraction(interaction, context);
         return;
+      case InteractionType.MessageComponent:
+        await handleComponentInteraction(interaction, context);
+        return;
       default:
+        // @ts-expect-error All types are handled currently but new ones might be added later
         throw new Error(`Unhandled interaction of type ${interaction.type}`);
     }
 

@@ -5,7 +5,7 @@ import {
   ModalSubmitInteraction,
 } from 'discord.js';
 import { Sticker } from '../generated/prisma/client.js';
-import { InteractionContext } from '../types/bot-interaction.js';
+import { InteractionContext } from '../types/contexts/interaction.context.js';
 
 type MessageType =
   | Pick<Message, 'id' | 'channelId' | 'guildId'>

@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, CommandInteraction } from 'discord.js';
 import { Pack } from '../generated/prisma/client.js';
-import { InteractionContext } from '../types/bot-interaction.js';
+import { InteractionContext } from '../types/contexts/interaction.context.js';
 
 export const findAvailableStickerPacks = async (context: Pick<InteractionContext, 'db'>, interaction: CommandInteraction | AutocompleteInteraction, nsfw: boolean): Promise<Pick<Pack, 'id' | 'name' | 'public' | 'nsfw'>[]> => {
   const { db } = context;

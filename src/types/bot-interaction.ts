@@ -1,19 +1,21 @@
 import {
-  ApplicationCommandOptionType, ApplicationCommandType,
+  APIMessageComponent,
+  ApplicationCommandOptionType,
+  ApplicationCommandType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   RESTPostAPIContextMenuApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 import type {
   AutocompleteInteraction,
   BaseInteraction,
-  ChatInputCommandInteraction, MessageContextMenuCommandInteraction,
+  ChatInputCommandInteraction,
+  MessageComponentInteraction,
+  MessageContextMenuCommandInteraction,
   ModalSubmitInteraction,
 } from 'discord.js';
-import { i18n, TFunction } from 'i18next';
-import { QueueManager } from '../classes/queue-manager.js';
-import { PrismaClient } from '../generated/prisma/client.js';
+import { TFunction } from 'i18next';
 
-import { NestableLogger } from './logger-types.js';
+import { UserInteractionContext } from './contexts/user-interaction.context.js';
 
 export const enum BotChatInputCommandName {
   STICKER = 'sticker',
@@ -38,23 +40,10 @@ export const enum BotModalId {
   CREATE_PACK = 'createPackModal',
 }
 
-export interface LoggerContext {
-  logger: NestableLogger;
+export const enum BotMessageComponentCustomId {
+  UPDATE_MESSAGE = 'update-message',
+  DELETE_MESSAGE = 'delete-message',
 }
-
-export interface InteractionHandlerContext extends LoggerContext {
-  i18next: i18n;
-  emojiIdMap: Record<string, string>;
-  commandIdMap: Record<string, string | undefined>;
-  db: PrismaClient;
-  qm: QueueManager;
-}
-
-export interface InteractionContext extends Omit<InteractionHandlerContext, 'i18next'> {
-  t: TFunction;
-}
-
-export type UserInteractionContext = InteractionContext;
 
 export type InteractionHandler<T extends BaseInteraction> = (
   interaction: T,
@@ -76,6 +65,11 @@ export type ModalHandler = (
 ) => void | Promise<void>;
 export type ModalHandlers = Record<string, ModalHandler>;
 
+export type BotMessageComponentHandler = InteractionHandler<MessageComponentInteraction & {
+  customId: BotMessageComponentCustomId
+}>;
+export type BotMessageComponentDefinitionGetter = (t: TFunction, emojiIdMap: Record<string, string>) => APIMessageComponent;
+
 export interface BotChatInputCommand {
   registerCondition?: () => boolean;
   getDefinition: (t: TFunction) => RESTPostAPIChatInputApplicationCommandsJSONBody;
@@ -90,7 +84,14 @@ export interface BotMessageContextMenuCommand {
   getDefinition: (t: TFunction) => Omit<RESTPostAPIContextMenuApplicationCommandsJSONBody, 'type'> & {
     type: ApplicationCommandType.Message
   };
-  handle: InteractionHandler<MessageContextMenuCommandInteraction & { commandName: BotMessageContextMenuCommandName }>;
+  handle: InteractionHandler<MessageContextMenuCommandInteraction & {
+    commandName: BotMessageContextMenuCommandName
+  }>;
+}
+
+export interface BotMessageComponent {
+  getDefinition: BotMessageComponentDefinitionGetter;
+  handle: BotMessageComponentHandler;
 }
 
 export interface StringOptionMetadata {

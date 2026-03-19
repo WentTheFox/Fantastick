@@ -68,6 +68,7 @@ export default defineConfig([{
         "import/extensions": ["off", "ignorePackages"],
         "no-console": "off",
         "import/no-duplicates": "error",
+        "import/no-cycle": "error",
 
         quotes: ["error", "single", {
             avoidEscape: true,

@@ -1,14 +1,15 @@
 import { filledBar } from 'string-progressbar';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { env } from '../env.js';
-import { InteractionContext, InteractionHandlerContext } from '../types/bot-interaction.js';
+
+import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
+import { InteractionContext } from '../types/contexts/interaction.context.js';
 import {
   cleanGlobalCommands,
   getAuthorizedServers,
   updateGlobalCommands,
   updateGuildCommands,
 } from './update-guild-commands.js';
-
 
 export type BasicCommandData = Array<{ id: string, name: string }>;
 

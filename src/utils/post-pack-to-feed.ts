@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { env } from '../env.js';
 import { Pack } from '../generated/prisma/client.js';
-import { InteractionContext } from '../types/bot-interaction.js';
+import { InteractionContext } from '../types/contexts/interaction.context.js';
 
 export interface PackSnapshot {
   name: string;

@@ -10,5 +10,4 @@ export interface LanguageConfigV1 {
   creditOverrides?: Record<string | number, TranslationCreditOverride | null>;
 }
 
-
 export type LatestLanguageConfigType = LanguageConfigV1;

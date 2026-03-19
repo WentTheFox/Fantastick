@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import shellEscape from 'shell-escape';
-import { LoggerContext } from '../types/bot-interaction.js';
+import { LoggerContext } from '../types/contexts/logger.context.js';
 
 export function getGitData({ logger }: LoggerContext): Promise<{ hash: string; timeAgo: string }> {
   return new Promise((res, rej) => {

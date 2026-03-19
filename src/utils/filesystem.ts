@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { Stream } from 'node:stream';
-import { InteractionContext } from '../types/bot-interaction.js';
+import { LoggerContext } from '../types/contexts/logger.context.js';
 
 export interface SaveStickerInput {
   stickerId?: string;
@@ -23,7 +23,7 @@ export interface SaveStickerResult {
 
 const allowedFileExtensions = new Set<string>(['png', 'jpg', 'jpeg', 'webp', 'gif']);
 
-export const saveStickerFile = async (context: Pick<InteractionContext, 'logger'>, input: SaveStickerInput): Promise<SaveStickerResult> => {
+export const saveStickerFile = async (context: LoggerContext, input: SaveStickerInput): Promise<SaveStickerResult> => {
   const stickerFileId = crypto.randomUUID();
   context.logger.info(`[StickerFile#${stickerFileId}] ID generated for file ${input.fileId}`);
   const fileExtension = input.fileName.split('.').pop();

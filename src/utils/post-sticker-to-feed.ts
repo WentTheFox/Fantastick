@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { env } from '../env.js';
 import { Pack, Sticker } from '../generated/prisma/client.js';
-import { InteractionContext } from '../types/bot-interaction.js';
+import { InteractionContext } from '../types/contexts/interaction.context.js';
 import { getPackNsfwEmoji } from './get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from './get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';

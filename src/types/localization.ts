@@ -11,8 +11,6 @@ export const enum StickerCommandOptionName {
 
 export const enum CreatePackCommandOptionName {
   NAME = 'name',
-  NSFW = 'nsfw',
-  PUBLIC = 'public',
 }
 
 export const enum ImportCommandOptionName {
@@ -111,7 +109,10 @@ interface CommandResponsesMap {
 }
 
 interface ComponentsMap {
-  global: [],
+  [BotChatInputCommandName.STICKER]: [
+    'updateMessageButton',
+    'deleteMessageButton',
+  ],
   [BotChatInputCommandName.CREATE_STICKER]: [
     'createStickerModalTitle',
     'packLabel',

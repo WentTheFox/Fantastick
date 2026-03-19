@@ -6,9 +6,10 @@ import {
 } from 'discord-api-types/v10';
 import { Snowflake } from 'discord-api-types/globals';
 import { env } from '../env.js';
+import { InteractionContext } from '../types/contexts/interaction.context.js';
+import { LoggerContext } from '../types/contexts/logger.context.js';
 import { BotCommands, getApplicationCommands } from './get-application-commands.js';
 import { rest } from './rest.js';
-import { InteractionContext, LoggerContext } from '../types/bot-interaction.js';
 
 export const getAuthorizedServers = async (context: LoggerContext): Promise<string[]> => {
   const logger = context.logger.nest('getAuthorizedServers');

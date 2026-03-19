@@ -16,7 +16,15 @@
       "description": "Sends a sticker",
       "responses": {
         "noPacks": "You do not have access to any sticker packs. You can create your own using {{createCommand}}.",
-        "invalidName": "There is no sticker with the specified name"
+        "invalidName": "There is no sticker with the specified name",
+        "onlyExecutorCanDelete": "Only {{user}} (who sent the sticker) can delete it using this button",
+        "recentlyUpdated": "This message has already been updated recently. Please trying again {{ts}}.",
+        "updated": "The message has been updated successfully",
+        "deleted": "The message has been deleted successfully"
+      },
+      "components": {
+        "updateMessageButton": "Update",
+        "deleteMessageButton": "Delete"
       },
       "options": {
         "name": {
@@ -62,14 +70,6 @@
         "name": {
           "name": "name",
           "description": "Name for the new sticker pack"
-        },
-        "nsfw": {
-          "name": "nsfw",
-          "description": "If True, stickers from this pack will only be usable in age-restricted channels"
-        },
-        "public": {
-          "name": "public",
-          "description": "If True, the pack will be usable by everyone, not only whoever created it"
         }
       }
     },
@@ -201,9 +201,7 @@
     "Update Message": {
       "name": "Update Message",
       "responses": {
-        "messageNotFound": "This message does not seem to contain any stickers from this app",
-        "recentlyUpdated": "This message has already been updated recently. Please trying again {{ts}}.",
-        "updated": "The message has been updated successfully"
+        "messageNotFound": "This message does not seem to contain any stickers from this app"
       }
     }
   }

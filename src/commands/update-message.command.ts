@@ -56,7 +56,7 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
     } else {
       await interaction.targetMessage.edit({
         flags: MessageFlags.IsComponentsV2,
-        ...getStickerMessageContent(stickers),
+        ...getStickerMessageContent({ context, stickers }),
       });
       updateData.updatedAt = new Date();
     }
@@ -71,7 +71,11 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
     });
 
     await interactionReply(context, interaction, {
-      content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.Update Message.responses.updated')}`,
+      content: `${EmojiCharacters.GREEN_CHECK} ${t(
+        updateData.deletedAt
+          ? 'commands.sticker.responses.deleted'
+          : 'commands.sticker.responses.updated',
+      )}`,
       flags: MessageFlags.Ephemeral,
     });
   },

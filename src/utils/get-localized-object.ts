@@ -2,6 +2,7 @@ import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from '../constants/locales.js';
 import { LocaleString } from 'discord-api-types/v10';
 
 type LocalizedKey = 'description' | 'name';
+
 type LocalizationsKey<Key extends LocalizedKey> = `${Key}_localizations`;
 export type SupportedLocalizations = Record<LocaleString, string>;
 export type SupportedLocalizationMap<Key extends LocalizedKey> = Record<LocalizationsKey<Key>, SupportedLocalizations>;

@@ -53,7 +53,7 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
 
   await interactionReply(context, interaction, {
     flags: preview ? [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] : MessageFlags.IsComponentsV2,
-    ...getStickerMessageContent({ context, stickers, preview }),
+    ...getStickerMessageContent({ stickers }),
   });
 
   if (!preview) {

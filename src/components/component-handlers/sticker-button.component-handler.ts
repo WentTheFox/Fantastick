@@ -86,7 +86,7 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
   } else {
     await interaction.message.edit({
       flags: MessageFlags.IsComponentsV2,
-      ...getStickerMessageContent({ context, stickers }),
+      ...getStickerMessageContent({ stickers }),
     });
     updateData.updatedAt = new Date();
   }

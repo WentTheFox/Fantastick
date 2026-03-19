@@ -56,7 +56,7 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
     } else {
       await interaction.targetMessage.edit({
         flags: MessageFlags.IsComponentsV2,
-        ...getStickerMessageContent({ context, stickers }),
+        ...getStickerMessageContent({ stickers }),
       });
       updateData.updatedAt = new Date();
     }

@@ -23,6 +23,14 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
       return;
     }
 
+    if (interaction.targetMessage.channel.isDMBased()) {
+      await interactionReply(context, interaction, {
+        content: t('commands.global.responses.dmsUnsupported'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const stickerMessages = await db.stickerMessage.findMany({

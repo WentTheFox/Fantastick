@@ -3,7 +3,8 @@
     "global": {
       "responses": {
         "unexpectedError": "There was an unexpected error while processing this interaction",
-        "noPermission": "You do not have permission to use this command"
+        "noPermission": "You do not have permission to use this command",
+        "dmsUnsupported": "This command does not work in DM channels due to Discord API limitations"
       },
       "options": {}
     },
@@ -190,7 +191,7 @@
         "stickerOnlyMethodDescription": "The default method, which deletes the sticker and does not change previously sent messages",
         "deleteMessagesMethodLabel": "Delete sticker and existing messages",
         "deleteMessagesMethodDescription": "In addition to deleting the sticker, messages sent by the app that contain it will be deleted",
-        "limitationsText": "Due to Discord API limitations, messages older than 15 minutes cannot always be edited/updated automatically. Use the \"{{updateMessageCommandName}}\" context menu command to delete messages that were not deleted automatically after deletion."
+        "limitationsText": "Due to Discord API limitations, messages older than 15 minutes cannot always be edited/updated automatically. Use the \"{{updateMessageCommandName}}\" context menu command in server to delete messages that were not deleted automatically after deletion. Using this command in DMs is not supported due to Discord API limitations."
       },
       "options": {
         "name": {

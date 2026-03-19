@@ -17,10 +17,17 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
   }
 
   const { t, db } = context;
-  const appUser = await updateOrCreateUser(context, interaction);
-  if (appUser.readOnly) {
+  const user = await updateOrCreateUser(context, interaction);
+  if (user.readOnly) {
     await interactionReply(context, interaction, {
       content: t('commands.global.responses.noPermission'),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+  if (interaction.message.channel.isDMBased()) {
+    await interactionReply(context, interaction, {
+      content: t('commands.global.responses.dmsUnsupported'),
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -104,7 +111,7 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
     content: `${EmojiCharacters.GREEN_CHECK} ${t(
       updateData.deletedAt
         ? 'commands.sticker.responses.deleted'
-        : 'commands.sticker.responses.updated'
+        : 'commands.sticker.responses.updated',
     )}`,
     flags: MessageFlags.Ephemeral,
   });

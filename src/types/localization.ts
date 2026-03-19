@@ -42,7 +42,9 @@ interface CommandOptionsMap {
 }
 
 export const enum GlobalCommandResponse {
-  unexpectedError = 'unexpectedError'
+  unexpectedError = 'unexpectedError',
+  noPermission = 'noPermission',
+  dmsUnsupported = 'dmsUnsupported',
 }
 
 export const enum StickerCommandResponse {

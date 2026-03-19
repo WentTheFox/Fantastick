@@ -5,7 +5,6 @@ import { PackCommandOptionName } from '../../types/localization.js';
 import { getFormattedPackName } from '../../utils/get-formatted-pack-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
-import { recordStickerMessages } from '../../utils/record-sticker-messages.js';
 
 const itemsPerPage = 9;
 
@@ -39,7 +38,7 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
 
   const { files, items } = mapStickersToGalleryItems(stickers, pack.nsfw);
 
-  const reply = await interactionReply(context, interaction, {
+  await interactionReply(context, interaction, {
     flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
     components: [
       {
@@ -59,7 +58,4 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
     ],
     files,
   });
-
-  const replyMessage = await reply.fetch(true);
-  await recordStickerMessages({ context, interaction, stickers, replyMessage });
 };

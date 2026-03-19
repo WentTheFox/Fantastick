@@ -1,11 +1,12 @@
-import { Client, Events, InteractionType } from 'discord.js';
+import { Client, Events, InteractionType, Partials } from 'discord.js';
 import { env } from '../env.js';
+import { InteractionHandlerContext } from '../types/bot-interaction.js';
 import { getGitData } from './get-git-data.js';
 import {
   handleCommandAutocomplete,
-  handleCommandInteraction, handleModalInteraction,
+  handleCommandInteraction,
+  handleModalInteraction,
 } from './interaction-handlers.js';
-import { InteractionHandlerContext } from '../types/bot-interaction.js';
 
 const handleReady = (context: InteractionHandlerContext) => async (client: Client<true>) => {
   const { logger } = context;
@@ -20,7 +21,10 @@ const handleReady = (context: InteractionHandlerContext) => async (client: Clien
 };
 
 export const createClient = async (context: InteractionHandlerContext): Promise<void> => {
-  const client = new Client({ intents: [] });
+  const client = new Client({
+    intents: [],
+    partials: [Partials.Message, Partials.Channel],
+  });
 
   client.on(Events.ClientReady, handleReady(context));
 

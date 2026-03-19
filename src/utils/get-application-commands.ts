@@ -8,6 +8,10 @@ import {
 import { TFunction } from 'i18next';
 import { BotChatInputCommandName } from '../types/bot-interaction.js';
 import { chatInputCommandMap, chatInputCommandNames } from './interactions/chat-input-commands.js';
+import {
+  messageContextMenuCommandMap,
+  messageContextMenuCommands,
+} from './interactions/message-context-menu-commands.js';
 
 const commonCommandOptions: Pick<RESTPostAPIChatInputApplicationCommandsJSONBody, 'integration_types' | 'contexts'> = {
   integration_types: [ApplicationIntegrationType.UserInstall, ApplicationIntegrationType.GuildInstall],
@@ -38,5 +42,10 @@ export const getApplicationCommands = (t: TFunction): BotCommands => [
     .map((commandName): RESTPostAPIChatInputApplicationCommandsJSONBody => ({
       ...commonCommandOptions,
       ...sortCommandDefinitionOptions(chatInputCommandMap[commandName].getDefinition(t)),
+    })),
+  ...messageContextMenuCommands
+    .map((commandName) => ({
+      ...messageContextMenuCommandMap[commandName].getDefinition(t),
+      ...commonCommandOptions,
     })),
 ];

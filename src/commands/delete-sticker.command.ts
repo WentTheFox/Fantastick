@@ -85,7 +85,9 @@ export const deleteStickerCommand: BotChatInputCommand = {
         },
         {
           type: ComponentType.TextDisplay,
-          content: t('commands.delete-sticker.components.limitationsText'),
+          content: t('commands.delete-sticker.components.limitationsText', {
+            updateMessageCommandName: t('commands.Update Message.name'),
+          }),
         },
       ],
     });

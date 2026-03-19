@@ -1,5 +1,9 @@
 import { APIMessage } from 'discord-api-types/v9';
-import { ChatInputCommandInteraction, Message, ModalSubmitInteraction } from 'discord.js';
+import {
+  ChatInputCommandInteraction,
+  Message,
+  ModalSubmitInteraction,
+} from 'discord.js';
 import { Sticker } from '../generated/prisma/client.js';
 import { InteractionContext } from '../types/bot-interaction.js';
 

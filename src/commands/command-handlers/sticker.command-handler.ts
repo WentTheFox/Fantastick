@@ -1,12 +1,12 @@
-import { ComponentType, MessageFlags } from 'discord-api-types/v10';
+import { MessageFlags } from 'discord-api-types/v10';
 import { ChatInputCommandInteraction } from 'discord.js';
 import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
 import { BotChatInputCommandName, InteractionHandler } from '../../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../../types/localization.js';
 import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
+import { getStickerMessageContent } from '../../utils/get-sticker-message-content.js';
 import { createCommandMention, interactionReply } from '../../utils/interaction-reply.js';
 import { isUuidV4 } from '../../utils/is-uuid-v4.js';
-import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
 import { recordStickerMessages } from '../../utils/record-sticker-messages.js';
 
 export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputCommandInteraction> => async function handle(interaction, context) {
@@ -23,6 +23,8 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
     });
     return;
   }
+
+  const reply = await interaction.deferReply();
 
   const searchConditions: StickerWhereInput[] = [
     { name: stickerQuery },
@@ -49,19 +51,13 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
     return;
   }
 
-  const { files, items } = mapStickersToGalleryItems(stickers);
-
-  const reply = await interactionReply(context, interaction, {
+  await interactionReply(context, interaction, {
     flags: preview ? [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] : MessageFlags.IsComponentsV2,
-    components: [
-      {
-        type: ComponentType.MediaGallery,
-        items,
-      },
-    ],
-    files,
+    ...getStickerMessageContent(stickers),
   });
 
-  const replyMessage = await reply.fetch(true);
-  await recordStickerMessages({ context, interaction, stickers, replyMessage });
+  if (!preview) {
+    const replyMessage = await reply.fetch();
+    await recordStickerMessages({ context, interaction, stickers, replyMessage });
+  }
 };

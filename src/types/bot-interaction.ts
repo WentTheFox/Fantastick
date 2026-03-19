@@ -1,11 +1,12 @@
 import {
-  ApplicationCommandOptionType,
+  ApplicationCommandOptionType, ApplicationCommandType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
+  RESTPostAPIContextMenuApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 import type {
   AutocompleteInteraction,
   BaseInteraction,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction, MessageContextMenuCommandInteraction,
   ModalSubmitInteraction,
 } from 'discord.js';
 import { i18n, TFunction } from 'i18next';
@@ -24,6 +25,10 @@ export const enum BotChatInputCommandName {
   NSFW_PACK = 'nsfw-pack',
   EDIT_STICKER = 'edit-sticker',
   DELETE_STICKER = 'delete-sticker',
+}
+
+export const enum BotMessageContextMenuCommandName {
+  UPDATE_MESSAGE = 'Update Message',
 }
 
 export const enum BotModalId {
@@ -79,6 +84,13 @@ export interface BotChatInputCommand {
   }>;
   autocomplete?: AutocompleteHandlers;
   modal?: ModalHandlers;
+}
+
+export interface BotMessageContextMenuCommand {
+  getDefinition: (t: TFunction) => Omit<RESTPostAPIContextMenuApplicationCommandsJSONBody, 'type'> & {
+    type: ApplicationCommandType.Message
+  };
+  handle: InteractionHandler<MessageContextMenuCommandInteraction & { commandName: BotMessageContextMenuCommandName }>;
 }
 
 export interface StringOptionMetadata {

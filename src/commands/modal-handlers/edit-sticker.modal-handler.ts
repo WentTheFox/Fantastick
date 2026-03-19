@@ -57,44 +57,46 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
   } = collectModalSubmittedData(interaction, EditStickerModalCustomIds);
 
   const stickerName = data[EditStickerModalCustomIds.NEW_NAME_INPUT];
-  if (stickerName.length < stickerNameOptionMeta.min_length) {
-    await interactionReply(context, interaction, {
-      content: t('commands.create-sticker.responses.nameTooShot'),
-      flags: MessageFlags.Ephemeral,
+  if (stickerName !== sticker.name) {
+    if (stickerName.length < stickerNameOptionMeta.min_length) {
+      await interactionReply(context, interaction, {
+        content: t('commands.create-sticker.responses.nameTooShot'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    if (stickerName.length > stickerNameOptionMeta.max_length) {
+      await interactionReply(context, interaction, {
+        content: t('commands.create-sticker.responses.nameTooLong'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    const invalidChars = new Set(stickerName.match(stickerNameInvalidPattern));
+    if (invalidChars.size > 0) {
+      await interactionReply(context, interaction, {
+        content: t('commands.create-sticker.responses.invalidName', {
+          chars: '```\n' + Array.from(invalidChars).join('') + '\n```',
+        }),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    const otherStickersWithSameNameInPackCount = await db.sticker.count({
+      where: {
+        AND: [
+          { packId: sticker.packId, name: stickerName },
+          { NOT: { id: sticker.id } },
+        ],
+      },
     });
-    return;
-  }
-  if (stickerName.length > stickerNameOptionMeta.max_length) {
-    await interactionReply(context, interaction, {
-      content: t('commands.create-sticker.responses.nameTooLong'),
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-  const invalidChars = new Set(stickerName.match(stickerNameInvalidPattern));
-  if (invalidChars.size > 0) {
-    await interactionReply(context, interaction, {
-      content: t('commands.create-sticker.responses.invalidName', {
-        chars: '```\n' + Array.from(invalidChars).join('') + '\n```',
-      }),
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-  const otherStickersWithSameNameInPackCount = await db.sticker.count({
-    where: {
-      AND: [
-        { packId: sticker.packId, name: stickerName },
-        { NOT: { id: sticker.id } },
-      ],
-    },
-  });
-  if (otherStickersWithSameNameInPackCount !== 0) {
-    await interactionReply(context, interaction, {
-      content: t('commands.create-sticker.responses.duplicateName'),
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
+    if (otherStickersWithSameNameInPackCount !== 0) {
+      await interactionReply(context, interaction, {
+        content: t('commands.create-sticker.responses.duplicateName'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
   }
 
   let stickerUrl = data[EditStickerModalCustomIds.NEW_URL_INPUT];

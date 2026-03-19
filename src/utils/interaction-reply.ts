@@ -3,6 +3,7 @@ import {
   CommandInteraction,
   ComponentType,
   ContextMenuCommandInteraction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   MessageComponentInteraction,
   MessageFlags,
@@ -24,7 +25,9 @@ const upgradeToComponentsV2 = (options: InteractionReplyOptions): InteractionRep
   const { content, flags, ...rest } = options;
   return {
     ...rest,
-    flags: (typeof flags === 'number' ? flags : 0) | MessageFlags.IsComponentsV2,
+    flags: Array.isArray(flags)
+      ? [...flags, MessageFlags.IsComponentsV2]
+      : ((typeof flags === 'number' ? flags : 0) | MessageFlags.IsComponentsV2),
     components: [
       {
         type: ComponentType.TextDisplay,
@@ -50,8 +53,14 @@ export const createCommandMention = (commandName: string, {
 };
 
 export const interactionReply = (context: Pick<UserInteractionContext, 't' | 'commandIdMap'>, interaction: CommandInteraction | ChatInputCommandInteraction | ContextMenuCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction, options: InteractionReplyOptions) => {
-  if (options.content && (interaction.replied || interaction.deferred)) {
-    return interaction.editReply({ content: options.content });
+  if (interaction.replied || interaction.deferred) {
+    if (Array.isArray(options.flags) && options.flags.includes(MessageFlags.Ephemeral)) {
+      options.flags = options.flags.filter(flag => flag !== MessageFlags.Ephemeral);
+    }
+    if (interaction.isContextMenuCommand()) {
+      return interaction.followUp(upgradeToComponentsV2(options));
+    }
+    return interaction.editReply(options as InteractionEditReplyOptions);
   }
   return interaction.reply(upgradeToComponentsV2(options));
 };

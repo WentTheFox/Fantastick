@@ -1,4 +1,9 @@
-import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandType } from 'discord-api-types/v10';
+import {
+  AutocompleteInteraction,
+  ChatInputCommandInteraction,
+  CommandInteraction,
+} from 'discord.js';
 import { createPackCommand } from '../../commands/create-pack.command.js';
 import { createStickerCommand } from '../../commands/create-sticker.command.js';
 import { deleteStickerCommand } from '../../commands/delete-sticker.command.js';
@@ -29,3 +34,7 @@ export const isKnownChatInputCommand = (commandName: string): commandName is Bot
 export const isKnownChatInputCommandInteraction = <InteractionType extends ChatInputCommandInteraction | AutocompleteInteraction>(interaction: InteractionType): interaction is InteractionType & {
   commandName: BotChatInputCommandName
 } => isKnownChatInputCommand(interaction.commandName);
+
+export const isChatInputCommandInteraction = (interaction: CommandInteraction): interaction is ChatInputCommandInteraction => {
+  return interaction.commandType === ApplicationCommandType.ChatInput;
+};

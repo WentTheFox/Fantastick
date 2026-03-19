@@ -4,7 +4,7 @@
       "responses": {
         "unexpectedError": "Váratlan hiba történt az interakció feldolgozása során",
         "noPermission": "Nincs jogosultságod ezt a parancsot használni",
-        "dmsUnsupported": "This command does not work in DM channels due to Discord API limitations"
+        "dmsUnsupported": "Ez a parancs nem működik privát üzenetekben a Discord API korlátai miatt"
       },
       "options": {}
     },
@@ -18,15 +18,15 @@
       "responses": {
         "noPacks": "Nincs hozzáférésed egyetlen matricacsomaghoz sem. Létrehozhatsz sajátot a {{createCommand}} paranccsal.",
         "invalidName": "Nem található matrica a megadott néven",
-        "messageNotFound": "This message does not seem to contain any stickers from this app",
-        "onlyExecutorCanDelete": "Only {{user}} (who sent the sticker) can delete it using this button",
-        "recentlyUpdated": "This message has already been updated recently. Please trying again {{ts}}.",
-        "updated": "The message has been updated successfully",
-        "deleted": "The message has been deleted successfully"
+        "messageNotFound": "Úgy tűnik, ez az üzenet nem tartalmaz semmilyen ebből az alkalmazásból származó matricát",
+        "onlyExecutorCanDelete": "Csak {{user}} (aki a matricát küldte) törölheti azt ezzel a gombbal",
+        "recentlyUpdated": "Ez az üzenet nemrégiben már frissítve lett. Kérlek, próbálkozz újra {{ts}}.",
+        "updated": "Az üzenet sikeresen frissítve",
+        "deleted": "Az üzenet sikeresen törölve"
       },
       "components": {
-        "updateMessageButton": "Update",
-        "deleteMessageButton": "Delete"
+        "updateMessageButton": "Frissítés",
+        "deleteMessageButton": "Törlés"
       },
       "options": {
         "name": {
@@ -52,8 +52,8 @@
         "createdPrivate": "Új **privát** matricacsomag létrehozva {{name}} néven"
       },
       "components": {
-        "createPackModalTitle": "Create new sticker pack",
-        "nameLabel": "Pack name",
+        "createPackModalTitle": "Új matricacsomag létrehozása",
+        "nameLabel": "Csomag neve",
         "nameDescription": "Adj meg egy egyedi nevet az új matricacsomagnak. Két csomagnak nem lehet ugyanaz a neve az alkalmazáson belül.",
         "publicChoiceLabel": "Csomag láthatósága",
         "publicChoiceDescription": "Meghatározza, hogy ki láthatja és használhatja a csomagban lévő matricákat.",
@@ -190,7 +190,7 @@
         "stickerOnlyMethodDescription": "Az alapértelmezett módszer, amely törli a matricát, és nem változtatja meg a korábban elküldött üzeneteket",
         "deleteMessagesMethodLabel": "Matrica és meglévő üzenetek törlése",
         "deleteMessagesMethodDescription": "A matrica törlése mellett az azt tartalmazó üzenetek is törlődnek, amiket az alkalmazás küldött",
-        "limitationsText": "Due to Discord API limitations, messages older than 15 minutes cannot always be edited/updated automatically. Use the \"{{updateMessageCommandName}}\" context menu command in server to delete messages that were not deleted automatically after deletion. Using this command in DMs is not supported due to Discord API limitations."
+        "limitationsText": "A Discord API korlátai miatt a 15 percnél régebbi üzenetek nem mindig szerkeszthetők/frissíthetők automatikusan. Az \"{{updateMessageCommandName}}\" környezeti menü paranccsal törölheted azokat az üzeneteket, amelyek nem törlődtek automatikusan. Ez a parancs privát üzenetekben nem működik a Discord API korlátai miatt."
       },
       "options": {
         "name": {

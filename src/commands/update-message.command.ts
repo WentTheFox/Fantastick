@@ -34,7 +34,7 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
 
     if (stickerMessages.length === 0) {
       await interactionReply(context, interaction, {
-        content: t('commands.Update Message.responses.messageNotFound'),
+        content: t('commands.sticker.responses.messageNotFound'),
         flags: MessageFlags.Ephemeral,
       });
       return;

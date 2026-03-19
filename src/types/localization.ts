@@ -48,6 +48,11 @@ export const enum GlobalCommandResponse {
 export const enum StickerCommandResponse {
   noPacks = 'noPacks',
   invalidName = 'invalidName',
+  messageNotFound = 'messageNotFound',
+  onlyExecutorCanDelete = 'onlyExecutorCanDelete',
+  recentlyUpdated = 'recentlyUpdated',
+  updated = 'updated',
+  deleted = 'deleted',
 }
 
 export const enum CreatePackCommandResponse {

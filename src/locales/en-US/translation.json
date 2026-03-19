@@ -17,6 +17,7 @@
       "responses": {
         "noPacks": "You do not have access to any sticker packs. You can create your own using {{createCommand}}.",
         "invalidName": "There is no sticker with the specified name",
+        "messageNotFound": "This message does not seem to contain any stickers from this app",
         "onlyExecutorCanDelete": "Only {{user}} (who sent the sticker) can delete it using this button",
         "recentlyUpdated": "This message has already been updated recently. Please trying again {{ts}}.",
         "updated": "The message has been updated successfully",
@@ -199,10 +200,7 @@
       }
     },
     "Update Message": {
-      "name": "Update Message",
-      "responses": {
-        "messageNotFound": "This message does not seem to contain any stickers from this app"
-      }
+      "name": "Update Message"
     }
   }
 }

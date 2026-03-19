@@ -50,7 +50,7 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
 
   if (stickerMessages.length === 0) {
     await interaction.followUp({
-      content: t('commands.Update Message.responses.messageNotFound'),
+      content: t('commands.sticker.responses.messageNotFound'),
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -61,7 +61,7 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
     if (lastUpdatedAt !== null && differenceInMinutes(new Date(), lastUpdatedAt) < updateRateLimitMinutes) {
       const retryAt = addMinutes(lastUpdatedAt, updateRateLimitMinutes);
       await interaction.followUp({
-        content: t('commands.Update Message.responses.recentlyUpdated', {
+        content: t('commands.sticker.responses.recentlyUpdated', {
           ts: time(retryAt, TimestampStyles.RelativeTime),
         }),
         flags: MessageFlags.Ephemeral,
@@ -103,8 +103,8 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
   await interaction.followUp({
     content: `${EmojiCharacters.GREEN_CHECK} ${t(
       updateData.deletedAt
-        ? 'commands.Update Message.responses.deleted'
-        : 'commands.Update Message.responses.updated'
+        ? 'commands.sticker.responses.deleted'
+        : 'commands.sticker.responses.updated'
     )}`,
     flags: MessageFlags.Ephemeral,
   });

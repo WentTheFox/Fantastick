@@ -3,7 +3,8 @@
     "global": {
       "responses": {
         "unexpectedError": "Váratlan hiba történt az interakció feldolgozása során",
-        "noPermission": "Nincs jogosultságod ezt a parancsot használni"
+        "noPermission": "Nincs jogosultságod ezt a parancsot használni",
+        "dmsUnsupported": "Ez a parancs nem működik privát üzenetekben a Discord API korlátai miatt"
       },
       "options": {}
     },
@@ -16,7 +17,16 @@
       "description": "Matrica küldése",
       "responses": {
         "noPacks": "Nincs hozzáférésed egyetlen matricacsomaghoz sem. Létrehozhatsz sajátot a {{createCommand}} paranccsal.",
-        "invalidName": "Nem található matrica a megadott néven"
+        "invalidName": "Nem található matrica a megadott néven",
+        "messageNotFound": "Úgy tűnik, ez az üzenet nem tartalmaz semmilyen ebből az alkalmazásból származó matricát",
+        "onlyExecutorCanDelete": "Csak {{user}} (aki a matricát küldte) törölheti azt ezzel a gombbal",
+        "recentlyUpdated": "Ez az üzenet nemrégiben már frissítve lett. Kérlek, próbálkozz újra {{ts}}.",
+        "updated": "Az üzenet sikeresen frissítve",
+        "deleted": "Az üzenet sikeresen törölve"
+      },
+      "components": {
+        "updateMessageButton": "Frissítés",
+        "deleteMessageButton": "Törlés"
       },
       "options": {
         "name": {
@@ -42,34 +52,26 @@
         "createdPrivate": "Új **privát** matricacsomag létrehozva {{name}} néven"
       },
       "components": {
-        "createPackModalTitle": "Create new sticker pack",
-        "nameLabel": "Pack name",
-        "nameDescription": "Enter a unique name for the new sticker pack. Two packs cannot have the same name within the app.",
-        "publicChoiceLabel": "Pack visibility",
-        "publicChoiceDescription": "Determines who will be able to see and use the stickers in the pack.",
-        "publicTrueLabel": "Public",
-        "publicTrueDescription": "The pack will be visible usable by everyone",
-        "publicFalseLabel": "Private",
-        "publicFalseDescription": "The pack will only be visible to and usable by you",
-        "nsfwChoiceLabel": "Pack content rating",
-        "nsfwChoiceDescription": "Determines where and how the stickers in this pack will be usable.",
-        "nsfwTrueLabel": "Age-restricted (NSFW)",
-        "nsfwTrueDescription": "Stickers will only be usable in age-restricted channels and DMs via {{command}}",
-        "nsfwFalseLabel": "Safe for all audiences",
-        "nsfwFalseDescription": "Stickers will be usable in any channel and DMs via {{command}}"
+        "createPackModalTitle": "Új matricacsomag létrehozása",
+        "nameLabel": "Csomag neve",
+        "nameDescription": "Adj meg egy egyedi nevet az új matricacsomagnak. Két csomagnak nem lehet ugyanaz a neve az alkalmazáson belül.",
+        "publicChoiceLabel": "Csomag láthatósága",
+        "publicChoiceDescription": "Meghatározza, hogy ki láthatja és használhatja a csomagban lévő matricákat.",
+        "publicTrueLabel": "Publikus",
+        "publicTrueDescription": "A csomag mindenki számára látható és használható lesz",
+        "publicFalseLabel": "Privát",
+        "publicFalseDescription": "A csomag csak az számodra lesz látható és használható",
+        "nsfwChoiceLabel": "Csomag tartalmi besorolása",
+        "nsfwChoiceDescription": "Meghatározza, hogy a csomagban lévő matricák hol és hogyan lesznek használhatók.",
+        "nsfwTrueLabel": "Korhatáros (NSFW)",
+        "nsfwTrueDescription": "A matricák csak korhatáros csatornákban lesznek használhatók a {{command}} paranccsal",
+        "nsfwFalseLabel": "Korhatárra való tekintet nélkül megtekinthető",
+        "nsfwFalseDescription": "A matricák bárhol használhatók lesznek a {{command}} paranccsal"
       },
       "options": {
         "name": {
           "name": "név",
           "description": "Az új matricacsomag neve"
-        },
-        "nsfw": {
-          "name": "nsfw",
-          "description": "Ha True, akkor a csomag matricáit csak korhatáros csatornákban lehet majd használni"
-        },
-        "public": {
-          "name": "publikus",
-          "description": "Ha True, a csomagot bárki használhatja, nem csak az, aki létrehozta"
         }
       }
     },
@@ -171,30 +173,34 @@
       }
     },
     "delete-sticker": {
-      "name": "delete-sticker",
-      "description": "Delete an existing sticker",
+      "name": "matrica-törlés",
+      "description": "Létező matrica törlése",
       "responses": {
-        "stickerNotFound": "The specified sticker could not be found",
-        "deleteFailed": "Could not delete the sticker due to an unexpected error, please try again later",
-        "unsupportedMethod": "The provided deletion method ({{method}}) is not (yet) supported",
-        "deleted": "The sticker {{name}} has been deleted successfully"
+        "stickerNotFound": "A megadott matrica nem található",
+        "deleteFailed": "Váratlan hiba miatt nem sikerült törölni a matricát, kérjük, próbáld újra később.",
+        "unsupportedMethod": "A megadott törlési módszer ({{method}}) nem támogatott (még).",
+        "deleted": "A(z) {{name}} nevű matrica sikeresen törölve"
       },
       "components": {
-        "deleteStickerModalTitle": "Delete sticker {{name}}",
-        "deletingText": "You are about to delete sticker {{name}} from pack {{pack}}.",
-        "deletionMethodLabel": "Choose deletion method",
-        "deletionMethodDescription": "Select how the sticker should be deleted",
-        "stickerOnlyMethodLabel": "Delete sticker only",
-        "stickerOnlyMethodDescription": "The default method, which deletes the sticker and does not change previously sent messages",
-        "deleteMessagesMethodLabel": "Delete sticker and existing messages",
-        "deleteMessagesMethodDescription": "In addition to deleting the sticker, all messages sent by the app that contain it will be deleted"
+        "deleteStickerModalTitle": "A(z) {{name}} matrica törlése",
+        "deletingText": "A(z) {{name}} matricát készülsz törölni a(z) {{pack}} csomagból.",
+        "deletionMethodLabel": "Törlési módszer kiválasztása",
+        "deletionMethodDescription": "Válaszd ki, hogyan szeretnéd törölni a matricát",
+        "stickerOnlyMethodLabel": "Csak matrica törlése",
+        "stickerOnlyMethodDescription": "Az alapértelmezett módszer, amely törli a matricát, és nem változtatja meg a korábban elküldött üzeneteket",
+        "deleteMessagesMethodLabel": "Matrica és meglévő üzenetek törlése",
+        "deleteMessagesMethodDescription": "A matrica törlése mellett az azt tartalmazó üzenetek is törlődnek, amiket az alkalmazás küldött",
+        "limitationsText": "A Discord API korlátai miatt a 15 percnél régebbi üzenetek nem mindig szerkeszthetők/frissíthetők automatikusan. Az \"{{updateMessageCommandName}}\" környezeti menü paranccsal törölheted azokat az üzeneteket, amelyek nem törlődtek automatikusan. Ez a parancs privát üzenetekben nem működik a Discord API korlátai miatt."
       },
       "options": {
         "name": {
-          "name": "name",
-          "description": "Name of the sticker you want to delete"
+          "name": "név",
+          "description": "A törölni kívánt matrica neve"
         }
       }
+    },
+    "Update Message": {
+      "name": "Üzenet frissítése"
     }
   }
 }

@@ -189,13 +189,21 @@
         "stickerOnlyMethodDescription": "The default method, which deletes the sticker and does not change previously sent messages",
         "deleteMessagesMethodLabel": "Delete sticker and existing messages",
         "deleteMessagesMethodDescription": "In addition to deleting the sticker, messages sent by the app that contain it will be deleted",
-        "limitationsText": "Due to Discord API limitations, messages older than 15 minutes cannot always be edited/updated automatically."
+        "limitationsText": "Due to Discord API limitations, messages older than 15 minutes cannot always be edited/updated automatically. Use the \"{{updateMessageCommandName}}\" context menu command to delete messages that were not deleted automatically after deletion."
       },
       "options": {
         "name": {
           "name": "name",
           "description": "Name of the sticker you want to delete"
         }
+      }
+    },
+    "Update Message": {
+      "name": "Update Message",
+      "responses": {
+        "messageNotFound": "This message does not seem to contain any stickers from this app",
+        "recentlyUpdated": "This message has already been updated recently. Please trying again {{ts}}.",
+        "updated": "The message has been updated successfully"
       }
     }
   }

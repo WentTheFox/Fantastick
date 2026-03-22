@@ -24,7 +24,7 @@ export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInp
     return;
   }
 
-  const reply = await interaction.deferReply();
+  const reply = await interaction.deferReply({ flags: preview ? MessageFlags.Ephemeral : undefined });
 
   const searchConditions: StickerWhereInput[] = [
     { name: stickerQuery },

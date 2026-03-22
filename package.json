@@ -51,7 +51,7 @@
     "@typescript-eslint/eslint-plugin": "^8.46.0",
     "@typescript-eslint/parser": "^8.46.0",
     "concurrently": "^9.2.1",
-    "eslint": "^9.37.0",
+    "eslint": "^10.1.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-i18n-validator": "^0.1.4",
     "eslint-plugin-import": "^2.32.0",

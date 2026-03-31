@@ -34,7 +34,7 @@ export const createPackModalHandler: ModalHandler = async (interaction, context)
 
   const { data } = collectModalSubmittedData(interaction, CreatePackModalCustomIds);
   const packName = data[CreatePackModalCustomIds.NAME_INPUT];
-  if (packName.length < packNameOptionMeta.min_length) {
+  if (packName === null || packName.length < packNameOptionMeta.min_length) {
     await interactionReply(context, interaction, {
       content: t('commands.create-pack.responses.nameTooShot'),
       flags: MessageFlags.Ephemeral,

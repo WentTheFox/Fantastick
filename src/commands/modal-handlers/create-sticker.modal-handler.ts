@@ -40,7 +40,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     data,
   } = collectModalSubmittedData(interaction, CreateStickerModalCustomIds);
   const packName = data[CreateStickerModalCustomIds.PACK_INPUT];
-  if (packName.length < packNameOptionMeta.min_length || packName.length > packNameOptionMeta.max_length) {
+  if (packName === null || packName.length < packNameOptionMeta.min_length || packName.length > packNameOptionMeta.max_length) {
     context.logger.warn(`Invalid pack name: ${packName}`);
     await interactionReply(context, interaction, {
       content: t('commands.create-sticker.responses.invalidPack'),
@@ -63,7 +63,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     return;
   }
   const stickerName = data[CreateStickerModalCustomIds.NAME_INPUT];
-  if (stickerName.length < stickerNameOptionMeta.min_length) {
+  if (stickerName == null || stickerName.length < stickerNameOptionMeta.min_length) {
     await interactionReply(context, interaction, {
       content: t('commands.create-sticker.responses.nameTooShot'),
       flags: MessageFlags.Ephemeral,
@@ -108,7 +108,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
   const source = stickerUrl ? CreateStickerModalCustomIds.URL_INPUT : (stickerFileId ? CreateStickerModalCustomIds.FILE_INPUT : null);
   switch (source) {
     case CreateStickerModalCustomIds.URL_INPUT: {
-      if (!stickerUrl.startsWith('https://')) {
+      if (stickerUrl == null || !stickerUrl.startsWith('https://')) {
         await interactionReply(context, interaction, {
           content: t('commands.create-sticker.responses.missingFile'),
           flags: MessageFlags.Ephemeral,
@@ -118,7 +118,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     }
       break;
     case CreateStickerModalCustomIds.FILE_INPUT: {
-      const stickerFileMeta = indexedAttachments[stickerFileId];
+      const stickerFileMeta = stickerFileId ? indexedAttachments[stickerFileId] : undefined;
       if (!stickerFileMeta) {
         context.logger.warn(`Could not find attachment with id ${stickerFileId}`);
         await interactionReply(context, interaction, {
@@ -148,7 +148,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
       }
 
       ({ stickerFileId: stickerId, stickerUrl } = await saveStickerFile(context, {
-        fileId: stickerFileId,
+        fileId: stickerFileMeta.id,
         fileName: stickerFileMeta.name,
         data: Readable.fromWeb(stickerFileData as never),
       }));

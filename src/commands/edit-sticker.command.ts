@@ -9,7 +9,6 @@ import { EditStickerCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
-import { isFileUploadStickerUrl } from '../utils/filesystem.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -116,7 +115,6 @@ export const editStickerCommand: BotChatInputCommand = {
             maxLength: stickerUrlOptionMeta.max_length,
             required: false,
             placeholder: t('commands.create-sticker.components.urlPlaceholder'),
-            value: isFileUploadStickerUrl(sticker.url) ? undefined : sticker.url,
           } as TextInputComponentData,
         },
       ],

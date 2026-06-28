@@ -202,18 +202,18 @@
     "Update Message": {
       "name": "Üzenet frissítése",
       "responses": {
-        "upToDate": "This message is already up to date"
+        "upToDate": "Ez az üzenet már a lehető legfrissebb"
       }
     },
     "Sticker Details": {
-      "name": "Sticker Details",
+      "name": "Sticker részletei",
       "responses": {
-        "alreadyDeleted": "already deleted",
-        "name": "Name",
-        "pack": "Pack",
-        "uploadedBy": "Uploaded by",
-        "latestImage": "Latest image",
-        "outdatedNote": "The source message may be outdated, use the **{{updateMessageCommand}}** context menu command to refresh it."
+        "alreadyDeleted": "már törölve",
+        "name": "Név",
+        "pack": "Csomag",
+        "uploadedBy": "Feltöltötte",
+        "latestImage": "Legújabb kép",
+        "outdatedNote": "Lehet, hogy a forrás üzenet elavult. Használd az **{{updateMessageCommand}}** környezeti menü menüparancsot a frisítéshez."
       }
     }
   }

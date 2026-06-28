@@ -31,6 +31,7 @@ export const enum BotChatInputCommandName {
 
 export const enum BotMessageContextMenuCommandName {
   UPDATE_MESSAGE = 'Update Message',
+  STICKER_DETAILS = 'Sticker Details',
 }
 
 export const enum BotModalId {

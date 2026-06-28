@@ -23,7 +23,7 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
       return;
     }
 
-    if (interaction.targetMessage.channel.isDMBased()) {
+    if (interaction.targetMessage.channel?.isDMBased()) {
       await interactionReply(context, interaction, {
         content: t('commands.global.responses.dmsUnsupported'),
         flags: MessageFlags.Ephemeral,
@@ -37,6 +37,7 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
       where: {
         messageId: BigInt(interaction.targetMessage.id),
         channelId: BigInt(interaction.targetMessage.channelId),
+        isFeed: false,
       },
     });
 
@@ -56,6 +57,22 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
         deletedAt: null,
       },
     });
+
+    const stickerMessageByStickerId = new Map(stickerMessages.map(sm => [sm.stickerId, sm]));
+    const someStickersDeleted = stickers.length < stickerMessages.length;
+    const someStickersUpdated = stickers.some(sticker => {
+      const sm = stickerMessageByStickerId.get(sticker.id);
+      const lastRefreshed = sm?.updatedAt ?? sm?.createdAt;
+      return sticker.updatedAt !== null && lastRefreshed !== undefined && sticker.updatedAt > lastRefreshed;
+    });
+
+    if (!someStickersDeleted && !someStickersUpdated) {
+      await interactionReply(context, interaction, {
+        content: t('commands.Update Message.responses.upToDate'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
 
     const updateData: StickerMessageUpdateInput = {};
     if (stickers.length === 0) {

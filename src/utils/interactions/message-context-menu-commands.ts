@@ -1,4 +1,5 @@
 import { ContextMenuCommandInteraction } from 'discord.js';
+import { stickerDetailsCommand } from '../../commands/sticker-details.command.js';
 import { updateMessageCommand } from '../../commands/update-message.command.js';
 import {
   BotMessageContextMenuCommand,
@@ -7,6 +8,7 @@ import {
 
 export const messageContextMenuCommandMap: Record<BotMessageContextMenuCommandName, BotMessageContextMenuCommand> = {
   [BotMessageContextMenuCommandName.UPDATE_MESSAGE]: updateMessageCommand,
+  [BotMessageContextMenuCommandName.STICKER_DETAILS]: stickerDetailsCommand,
 };
 
 export const messageContextMenuCommands = (Object.keys(messageContextMenuCommandMap) as BotMessageContextMenuCommandName[]);

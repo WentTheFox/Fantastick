@@ -201,7 +201,21 @@
       }
     },
     "Update Message": {
-      "name": "Update Message"
+      "name": "Update Message",
+      "responses": {
+        "upToDate": "This message is already up to date"
+      }
+    },
+    "Sticker Details": {
+      "name": "Sticker Details",
+      "responses": {
+        "alreadyDeleted": "already deleted",
+        "name": "Name",
+        "pack": "Pack",
+        "uploadedBy": "Uploaded by",
+        "latestImage": "Latest image",
+        "outdatedNote": "The source message may be outdated, use the **{{updateMessageCommand}}** context menu command to refresh it."
+      }
     }
   }
 }

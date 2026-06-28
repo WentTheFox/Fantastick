@@ -4,12 +4,12 @@ Discord app written in Node.js (using [discord.js](https://www.npmjs.com/package
 
 ```
 $ sudo npm install -g pm2
-$ npm install
+$ pnpm install
 $ cp .env.example .env
 $ nano .env # Fill in the neccessary environment variables
-$ npx prisma generate
-$ npm build
-$ npx prisma migrate deploy
+$ pnpm exec prisma generate
+$ pnpm run build
+$ pnpm exec prisma migrate deploy
 $ pm2 start pm2.json
 ```
 

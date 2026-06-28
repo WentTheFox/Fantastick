@@ -1,0 +1,9 @@
+minimumReleaseAge: 20160
+
+allowBuilds:
+  '@prisma/engines': true
+  bufferutil: true
+  esbuild: true
+  prisma: true
+  unrs-resolver: true
+  utf-8-validate: true

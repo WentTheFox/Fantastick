@@ -62,8 +62,10 @@ export const getStickerFilePathFromFileName = (stickerFileName: string): Sticker
   return { folderPath, filePath, stickerFileName };
 };
 
+export const isFileUploadStickerUrl = (url: string) => url.startsWith(fsUrlPrefix);
+
 export const getStickerFilePathFromUrl = (url: string): StickerFileLocation | null => {
-  if (!url.startsWith(fsUrlPrefix)) {
+  if (!isFileUploadStickerUrl(url)) {
     return null;
   }
 

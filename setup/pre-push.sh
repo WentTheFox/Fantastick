@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-npm run build
-npm run test
+pnpm run build
+pnpm run test

@@ -154,7 +154,7 @@ export const getModalCustomIdSegments = (customId: string): ModalCustomIdSegment
 };
 
 export interface ModalSubmittedData<CustomIds extends string> {
-  data: Record<CustomIds, string>;
+  data: Record<CustomIds, string | null>;
   indexedAttachments: Record<string, Attachment>;
 }
 
@@ -170,7 +170,6 @@ export const collectModalSubmittedData = <CustomIds extends string>(interaction:
 
         if (isValidCustomId(customId)) {
           switch (component.component.type) {
-            // @ts-expect-error they types are wrong, trust me bro
             case ComponentType.RadioGroup:
             case ComponentType.TextInput:
               acc[customId] = component.component.value;
@@ -190,6 +189,6 @@ export const collectModalSubmittedData = <CustomIds extends string>(interaction:
         break;
     }
     return acc;
-  }, {} as Record<CustomIds, string>);
+  }, {} as Record<CustomIds, string | null>);
   return { data, indexedAttachments };
 };

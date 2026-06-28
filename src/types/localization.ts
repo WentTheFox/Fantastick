@@ -87,6 +87,7 @@ export const enum ImportCommandResponse {
   finalizingImport = 'finalizingImport',
   rollbackProgress = 'rollbackProgress',
   imported = 'imported',
+  importQueued = 'importQueued',
 }
 
 export const enum PackCommandResponse {

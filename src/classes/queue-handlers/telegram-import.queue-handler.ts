@@ -241,7 +241,7 @@ const postImportedStickersToFeed = async ({ db, stickers, pack, importedBy, logg
         content: [
           '# Sticker imported',
           `**Name:** \`${sticker.name}\` (\`${sticker.id}\`)`,
-          `**Description:** _(empty)_`,
+          '**Description:** _(empty)_',
           `**Pack:** \`${pack.name}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
           `**Imported by:** ${userMention(importedBy)} (\`${importedBy}\`)`,
           `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => pack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,

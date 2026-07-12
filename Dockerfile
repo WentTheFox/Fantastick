@@ -21,7 +21,10 @@ COPY src ./src
 COPY utils ./utils
 RUN pnpm run build
 
-RUN pnpm prune --prod
+# --ignore-scripts: pnpm reruns the root "prepare" script (ts-patch install)
+# during prune, but ts-patch is a devDependency being removed by this same
+# prune and is no longer needed now that the build is done.
+RUN pnpm prune --prod --ignore-scripts
 
 
 FROM node:24-bookworm-slim AS runtime

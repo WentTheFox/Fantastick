@@ -55,7 +55,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   const updateDiscordProgress = async (content: string) => {
     if (!interactionId || !interactionToken) return;
     try {
-      await rest.patch(Routes.webhookMessage(interactionId, interactionToken, '@original'), {
+      await rest.patch(Routes.webhookMessage(env.DISCORD_CLIENT_ID, interactionToken, '@original'), {
         body: { content },
       });
     } catch (e) {

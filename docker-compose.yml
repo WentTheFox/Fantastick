@@ -7,7 +7,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - fantastick-postgres-data:/var/lib/postgresql/data
+      # PostgreSQL 18+ images store data in a version-specific subdirectory
+      # under /var/lib/postgresql (pg_ctlcluster-style layout) rather than
+      # directly at /var/lib/postgresql/data; mounting the old path makes
+      # the container refuse to start.
+      - fantastick-postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s

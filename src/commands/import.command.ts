@@ -2,7 +2,7 @@ import { MessageFlags } from 'discord-api-types/v10';
 import { env } from '../env.js';
 import { getImportOptions } from '../options/import.options.js';
 import { stickerUrlPrefix } from '../options/metadata/import-url.option-meta.js';
-import { BotChatInputCommand } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
 import { ImportCommandOptionName } from '../types/localization.js';
 import { QueueType } from '../types/queue.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
@@ -11,12 +11,16 @@ import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 
 export const importCommand: BotChatInputCommand = {
+  name: BotChatInputCommandName.IMPORT,
   registerCondition: () => env.LOCAL,
-  getDefinition: (t) => ({
-    ...getLocalizedObject('description', (lng) => t('commands.import.description', { lng })),
-    ...getLocalizedObject('name', (lng) => t('commands.import.name', { lng })),
-    options: getImportOptions(t),
-  }),
+  getDefinition: (t) => {
+    if (!t) throw new Error('Missing translation function');
+    return {
+      ...getLocalizedObject('description', (lng) => t('commands.import.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.import.name', { lng })),
+      options: getImportOptions(t),
+    };
+  },
   autocomplete: {
     [ImportCommandOptionName.PACK]: getPackNameAutocompleteHandler(true),
   },

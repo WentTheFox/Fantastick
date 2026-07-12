@@ -1,26 +1,39 @@
+import {
+  ApplicationIntegrationType,
+  InteractionContextType,
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+} from 'discord-api-types/v10';
 import { filledBar } from 'string-progressbar';
+import { buildApplicationCommandsBody, createCommandRegistrar } from '@wentthefox-org/discord-bot-framework/commands';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { env } from '../env.js';
 
 import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
 import { InteractionContext } from '../types/contexts/interaction.context.js';
-import {
-  cleanGlobalCommands,
-  getAuthorizedServers,
-  updateGlobalCommands,
-  updateGuildCommands,
-} from './update-guild-commands.js';
+import { chatInputCommandRegistry, contextMenuCommandRegistry } from './interactions.js';
+import { rest } from './rest.js';
+
+const commonCommandOptions: Pick<RESTPostAPIChatInputApplicationCommandsJSONBody, 'integration_types' | 'contexts'> = {
+  integration_types: [ApplicationIntegrationType.UserInstall, ApplicationIntegrationType.GuildInstall],
+  contexts: [InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel],
+};
 
 export type BasicCommandData = Array<{ id: string, name: string }>;
 
 export const updateCommandsFromInteraction = async (interactionContext: InteractionContext, progressReporter?: (progress: string) => Promise<unknown>): Promise<BasicCommandData | undefined> => {
   interactionContext.logger.log(`Application ${env.LOCAL ? 'is' : 'is NOT'} in local mode`);
+  const registrar = createCommandRegistrar({ rest, applicationId: env.DISCORD_CLIENT_ID, logger: interactionContext.logger });
+  const body = buildApplicationCommandsBody(
+    { chatInput: chatInputCommandRegistry, contextMenu: contextMenuCommandRegistry },
+    { sharedMetadata: commonCommandOptions, definitionArg: interactionContext.t },
+  );
+
   let result: BasicCommandData | undefined;
   if (env.LOCAL) {
     await progressReporter?.('Getting authorized servers list…');
-    const serverIds = await getAuthorizedServers(interactionContext);
+    const serverIds = await registrar.getAuthorizedServers();
     await progressReporter?.('Cleaning global commands…');
-    await cleanGlobalCommands(interactionContext);
+    await registrar.cleanGlobalCommands();
     const serverCount = serverIds.length;
     let completed = 0;
     const updateProgress = progressReporter ? async () => {
@@ -29,13 +42,13 @@ export const updateCommandsFromInteraction = async (interactionContext: Interact
     } : undefined;
     await Promise.all(serverIds.map(async (serverId) => {
       await updateProgress?.();
-      result = await updateGuildCommands(interactionContext, serverId);
+      result = await registrar.updateGuildCommands(serverId, body);
       completed++;
       await updateProgress?.();
     }));
   } else {
     await progressReporter?.('Updating global commands…');
-    result = await updateGlobalCommands(interactionContext);
+    result = await registrar.updateGlobalCommands(body);
   }
 
   return result;

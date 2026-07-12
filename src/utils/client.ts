@@ -1,11 +1,9 @@
-import { Client, Events, InteractionType, Partials } from 'discord.js';
+import { Client, Partials } from 'discord.js';
+import { createBotClient } from '@wentthefox-org/discord-bot-framework/client';
+import { getGitData } from '@wentthefox-org/discord-bot-framework/utils';
 import { env } from '../env.js';
 import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
-import { getGitData } from './get-git-data.js';
-import { handleComponentInteraction } from './interaction-handlers/handle-component-interaction.js';
-import { handleModalInteraction } from './interaction-handlers/handle-modal-interaction.js';
-import { handleCommandAutocomplete } from './interaction-handlers/handle-command-autocomplete.js';
-import { handleCommandInteraction } from './interaction-handlers/handle-command-interaction.js';
+import { handleInteraction } from './handle-interaction.js';
 
 const handleReady = (context: InteractionHandlerContext) => async (client: Client<true>) => {
   const { logger } = context;
@@ -20,33 +18,11 @@ const handleReady = (context: InteractionHandlerContext) => async (client: Clien
 };
 
 export const createClient = async (context: InteractionHandlerContext): Promise<void> => {
-  const client = new Client({
+  await createBotClient({
     intents: [],
     partials: [Partials.Message, Partials.Channel],
+    token: env.DISCORD_BOT_TOKEN,
+    onReady: handleReady(context),
+    onInteraction: (interaction) => handleInteraction(interaction, context),
   });
-
-  client.on(Events.ClientReady, handleReady(context));
-
-  client.on(Events.InteractionCreate, async (interaction) => {
-    switch (interaction.type) {
-      case InteractionType.ApplicationCommand:
-        await handleCommandInteraction(interaction, context);
-        return;
-      case InteractionType.ApplicationCommandAutocomplete:
-        await handleCommandAutocomplete(interaction, context);
-        return;
-      case InteractionType.ModalSubmit:
-        await handleModalInteraction(interaction, context);
-        return;
-      case InteractionType.MessageComponent:
-        await handleComponentInteraction(interaction, context);
-        return;
-      default:
-        // @ts-expect-error All types are handled currently but new ones might be added later
-        throw new Error(`Unhandled interaction of type ${interaction.type}`);
-    }
-
-  });
-
-  await client.login();
 };

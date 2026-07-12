@@ -1,7 +1,7 @@
 import { ComponentType, MessageFlags } from 'discord-api-types/v10';
 import { ComponentInLabelData } from 'discord.js';
 import { getDeleteStickerOptions } from '../options/delete-sticker.options.js';
-import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { DeleteStickerCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
@@ -17,11 +17,15 @@ import {
 } from './modal-handlers/delete-sticker.modal-handler.js';
 
 export const deleteStickerCommand: BotChatInputCommand = {
-  getDefinition: (t) => ({
-    ...getLocalizedObject('description', (lng) => t('commands.delete-sticker.description', { lng })),
-    ...getLocalizedObject('name', (lng) => t('commands.delete-sticker.name', { lng })),
-    options: getDeleteStickerOptions(t),
-  }),
+  name: BotChatInputCommandName.DELETE_STICKER,
+  getDefinition: (t) => {
+    if (!t) throw new Error('Missing translation function');
+    return {
+      ...getLocalizedObject('description', (lng) => t('commands.delete-sticker.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.delete-sticker.name', { lng })),
+      options: getDeleteStickerOptions(t),
+    };
+  },
   autocomplete: {
     [DeleteStickerCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),
   },

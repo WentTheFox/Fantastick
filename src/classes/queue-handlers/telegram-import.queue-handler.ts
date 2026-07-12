@@ -4,11 +4,11 @@ import * as fs from 'node:fs';
 import { Readable } from 'node:stream';
 import { filledBar } from 'string-progressbar';
 import typia from 'typia';
-import { ApiHttpException } from '../../classes/api-http-exception.class.js';
+import { ApiHttpException } from '@wentthefox-org/discord-bot-framework/api-client';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { env } from '../../env.js';
 import { Pack, Sticker } from '../../generated/prisma/client.js';
-import { NestableLogger } from '../../types/logger-types.js';
+import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
@@ -71,8 +71,8 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   // Fetch sticker set from Telegram
   await db.importJob.update({ where: { id: importJobId }, data: { status: 'FETCHING' } });
 
-  const telegramClient = createTelegramApiClient();
-  const telegramFileClient = createTelegramFileClient();
+  const telegramClient = createTelegramApiClient(logger);
+  const telegramFileClient = createTelegramFileClient(logger);
 
   let getStickerSetRequest;
   try {

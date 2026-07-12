@@ -1,19 +1,15 @@
-import {
-  APIMessageComponent,
-  ApplicationCommandOptionType,
-  ApplicationCommandType,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
-  RESTPostAPIContextMenuApplicationCommandsJSONBody,
-} from 'discord-api-types/v10';
-import type {
-  AutocompleteInteraction,
-  BaseInteraction,
-  ChatInputCommandInteraction,
-  MessageComponentInteraction,
-  MessageContextMenuCommandInteraction,
-  ModalSubmitInteraction,
-} from 'discord.js';
+import { ApplicationCommandOptionType } from 'discord-api-types/v10';
+import type { APIMessageComponent } from 'discord.js';
 import { TFunction } from 'i18next';
+import type {
+  AutocompleteHandler as FrameworkAutocompleteHandler,
+  CommandHandler as FrameworkCommandHandler,
+  ComponentHandler as FrameworkComponentHandler,
+  ModalHandler as FrameworkModalHandler,
+  NamedChatInputCommand,
+  NamedComponent,
+  NamedContextMenuCommand,
+} from '@wentthefox-org/discord-bot-framework/interactions';
 
 import { UserInteractionContext } from './contexts/user-interaction.context.js';
 
@@ -46,54 +42,22 @@ export const enum BotMessageComponentCustomId {
   DELETE_MESSAGE = 'delete-message',
 }
 
-export type InteractionHandler<T extends BaseInteraction> = (
-  interaction: T,
-  context: UserInteractionContext,
-) => void | Promise<void>;
-
-export type AutocompleteHandler = (
-  interaction: AutocompleteInteraction,
-  context: UserInteractionContext,
-  optionName: string,
-) => void | Promise<void>;
-
+export type CommandHandler = FrameworkCommandHandler<UserInteractionContext>;
+export type AutocompleteHandler = FrameworkAutocompleteHandler<UserInteractionContext>;
 export type AutocompleteHandlers = Record<string, AutocompleteHandler>;
-
-export type ModalHandler = (
-  interaction: ModalSubmitInteraction,
-  context: UserInteractionContext,
-  resourceId: string | undefined,
-) => void | Promise<void>;
+export type ModalHandler = FrameworkModalHandler<UserInteractionContext>;
 export type ModalHandlers = Record<string, ModalHandler>;
+export type BotMessageComponentHandler = FrameworkComponentHandler<UserInteractionContext>;
 
-export type BotMessageComponentHandler = InteractionHandler<MessageComponentInteraction & {
-  customId: BotMessageComponentCustomId
-}>;
+export type BotChatInputCommand = NamedChatInputCommand<UserInteractionContext, BotChatInputCommandName, TFunction>;
+
+export type BotMessageContextMenuCommand = NamedContextMenuCommand<UserInteractionContext, BotMessageContextMenuCommandName, TFunction>;
+
 export type BotMessageComponentDefinitionGetter = (t: TFunction, emojiIdMap: Record<string, string>) => APIMessageComponent;
 
-export interface BotChatInputCommand {
-  registerCondition?: () => boolean;
-  getDefinition: (t: TFunction) => RESTPostAPIChatInputApplicationCommandsJSONBody;
-  handle: InteractionHandler<ChatInputCommandInteraction & {
-    commandName: BotChatInputCommandName
-  }>;
-  autocomplete?: AutocompleteHandlers;
-  modal?: ModalHandlers;
-}
-
-export interface BotMessageContextMenuCommand {
-  getDefinition: (t: TFunction) => Omit<RESTPostAPIContextMenuApplicationCommandsJSONBody, 'type'> & {
-    type: ApplicationCommandType.Message
-  };
-  handle: InteractionHandler<MessageContextMenuCommandInteraction & {
-    commandName: BotMessageContextMenuCommandName
-  }>;
-}
-
-export interface BotMessageComponent {
+export type BotMessageComponent = NamedComponent<UserInteractionContext, BotMessageComponentCustomId> & {
   getDefinition: BotMessageComponentDefinitionGetter;
-  handle: BotMessageComponentHandler;
-}
+};
 
 export interface StringOptionMetadata {
   type: ApplicationCommandOptionType.String;

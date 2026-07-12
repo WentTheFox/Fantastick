@@ -1,4 +1,4 @@
-import { Logger } from './classes/logger.js';
+import { Logger } from '@wentthefox-org/discord-bot-framework/logger';
 import { initI18next } from './constants/locales.js';
 import { createClient } from './utils/client.js';
 import { createDb } from './utils/create-db.js';

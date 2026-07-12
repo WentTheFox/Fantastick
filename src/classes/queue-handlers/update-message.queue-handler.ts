@@ -6,12 +6,12 @@ import {
   Routes,
 } from 'discord-api-types/v10';
 import fs from 'node:fs';
-import { NestableLogger } from '../../types/logger-types.js';
+import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
 import { rest } from '../../utils/rest.js';
-import { runAttempts } from '../../utils/run-attempts.js';
+import { runAttempts } from '@wentthefox-org/discord-bot-framework/utils';
 
 export const updateMessageQueueHandler = (logger: NestableLogger): QueueHandler<QueueType.UpdateMessage> => async ([job]) => {
   const {

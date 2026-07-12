@@ -21,6 +21,10 @@ COPY src ./src
 COPY utils ./utils
 RUN pnpm run build
 
+# Separate stage so `docker compose build`'s `migrate` service (target: build)
+# still has the full toolchain, including the prisma CLI, which is a
+# devDependency this prune removes.
+FROM build AS pruned
 # --ignore-scripts: pnpm reruns the root "prepare" script (ts-patch install)
 # during prune, but ts-patch is a devDependency being removed by this same
 # prune and is no longer needed now that the build is done.
@@ -31,9 +35,9 @@ FROM node:24-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 
-COPY --from=build --chown=node:node /app/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/build ./build
-COPY --from=build --chown=node:node /app/package.json ./package.json
+COPY --from=pruned --chown=node:node /app/node_modules ./node_modules
+COPY --from=pruned --chown=node:node /app/build ./build
+COPY --from=pruned --chown=node:node /app/package.json ./package.json
 # tsc does not copy JSON locale files into build/; i18next reads them from
 # disk at runtime relative to process.cwd() (see src/constants/locales.ts).
 COPY --chown=node:node src/locales ./src/locales

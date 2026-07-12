@@ -77,7 +77,7 @@
     },
     "import": {
       "name": "import",
-      "description": "Import stickers from a Telegram pack",
+      "description": "Import static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
         "packNotFound": "The provided pack could not be found",
         "invalidUrl": "The provided Telegram pack URL is invalid",

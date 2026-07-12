@@ -91,11 +91,16 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     return;
   }
 
-  const telegramStickers = getStickerSetRequest.response.result?.stickers ?? [];
+  const allStickers = getStickerSetRequest.response.result?.stickers ?? [];
+  const telegramStickers = allStickers.filter(s => !s.is_animated && !s.is_video);
+  const skippedAnimated = allStickers.length - telegramStickers.length;
+  if (skippedAnimated > 0) {
+    logger.info(`Skipping ${skippedAnimated} animated/video sticker(s) from set ${telegramPackName}`);
+  }
   const total = telegramStickers.length;
   if (total === 0) {
-    await failJob('No stickers found in Telegram pack', 'No stickers found in Telegram pack.');
-    logger.error(`Telegram sticker set ${telegramPackName} has no stickers`);
+    await failJob('No supported stickers found in Telegram pack', 'No supported (non-animated) stickers found in this Telegram pack.');
+    logger.error(`Telegram sticker set ${telegramPackName} has no non-animated stickers`);
     return;
   }
 

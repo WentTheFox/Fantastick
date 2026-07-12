@@ -44,10 +44,14 @@ jobs:
         run: docker compose build
 
       - name: Start Postgres and wait for healthy
-        run: docker compose up -d --wait postgres
+        run: docker compose up -d --wait --wait-timeout 60 postgres
 
       - name: Run database migrations
         run: docker compose run --rm migrate
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose logs
 
       - name: Tear down
         if: always()

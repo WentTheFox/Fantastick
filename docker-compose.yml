@@ -13,6 +13,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 15s
 
   # One-shot job that applies Prisma migrations before app/queue-worker start.
   # Safe to run on every `docker compose up`; `prisma migrate deploy` is a no-op

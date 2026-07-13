@@ -3,6 +3,7 @@ build
 coverage
 .git
 .github
+.husky
 tests
 fs/*
 !fs/.gitignore

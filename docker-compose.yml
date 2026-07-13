@@ -36,6 +36,10 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
 
   app:
+    # Pre-built by CI on every release; `docker compose pull app queue-worker`
+    # fetches it instead of building locally. `build:` is still here so
+    # `docker compose build` (or `up --build`) works from source too.
+    image: ghcr.io/wentthefox/fantastick:latest
     build:
       context: .
       target: runtime
@@ -52,6 +56,7 @@ services:
       - fantastick-sticker-storage:/app/fs
 
   queue-worker:
+    image: ghcr.io/wentthefox/fantastick:latest
     build:
       context: .
       target: runtime

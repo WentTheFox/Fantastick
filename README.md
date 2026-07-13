@@ -23,6 +23,13 @@ This starts PostgreSQL, applies database migrations automatically, then starts t
 
 > **Note:** `DATABASE_URL`/`SHADOW_DATABASE_URL` in `.env` are only used for bare-metal hosting. The Docker Compose setup builds its own internal database connection string from `POSTGRES_USER`/`POSTGRES_PASSWORD`/`POSTGRES_DB`, so you don't need to edit `DATABASE_URL` for the Docker path.
 
+Prefer not to build locally? Every push to `main` publishes a new version of the app/queue-worker image to [GHCR](https://github.com/WentTheFox/Fantastick/pkgs/container/fantastick). You can pull that instead of building from source (the `migrate` service still needs a local build, since it must match your checked-out schema/migrations):
+```
+$ docker compose pull app queue-worker
+$ docker compose build migrate
+$ docker compose up -d
+```
+
 View logs:
 ```
 $ docker compose logs -f app queue-worker

@@ -1,0 +1,81 @@
+name: Publish container image
+
+on:
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: ci-docker-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  commitlint:
+    name: 'Lint commit messages'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Lint commits
+        uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6.2.1
+
+  publish:
+    name: 'Version and publish to GHCR'
+    needs: commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      # dry_run: compute the next version without creating/pushing the tag yet.
+      # The tag is only created once the image below has actually been
+      # published, so a failed build never leaves a version tag with no
+      # matching GHCR image behind it.
+      - name: Compute next version from conventional commits
+        id: tag
+        uses: mathieudutour/github-tag-action@a22cf08638b34d5badda920f9daf6e72c477b07b # v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: main
+          default_bump: false
+          dry_run: true
+
+      - name: Set lowercase image name
+        if: steps.tag.outputs.new_tag
+        run: echo "IMAGE_NAME=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
+      - name: Set up Docker Buildx
+        if: steps.tag.outputs.new_tag
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      - name: Log in to GHCR
+        if: steps.tag.outputs.new_tag
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        if: steps.tag.outputs.new_tag
+        run: |
+          docker buildx build \
+            --target runtime \
+            --push \
+            -t "$IMAGE_NAME:${{ steps.tag.outputs.new_version }}" \
+            -t "$IMAGE_NAME:latest" \
+            .
+
+      - name: Tag release
+        if: steps.tag.outputs.new_tag
+        run: |
+          git tag ${{ steps.tag.outputs.new_tag }}
+          git push origin ${{ steps.tag.outputs.new_tag }}

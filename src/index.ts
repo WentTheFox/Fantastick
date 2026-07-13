@@ -1,11 +1,12 @@
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { createShardManager } from '@wentthefox-org/discord-bot-framework/client';
-import { Logger, NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { initI18next } from './constants/locales.js';
 import { env } from './env.js';
 import { InteractionHandlerContext } from './types/contexts/interaction-handler.context.js';
 import { createDb } from './utils/create-db.js';
+import { createAppLogger } from './utils/create-logger.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
 import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
 import { initQueueManager } from './utils/init-queue-manager.js';
@@ -34,7 +35,7 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
 }
 
 (async function createShards() {
-  const logger = new Logger('ShardingManager');
+  const logger = createAppLogger('ShardingManager');
   const currentFolder = dirname(fileURLToPath(import.meta.url));
   const botScriptPath = `${currentFolder}/bot.js`;
 

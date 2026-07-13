@@ -8,6 +8,7 @@ export const env = defineEnv({
   DISCORD_BOT_TOKEN: z.string().min(1),
   DISCORD_CLIENT_ID: z.string().min(1),
   DISCORD_FEED_WEBHOOK_URL: z.string().nullable().default(null),
+  DISCORD_LOG_WEBHOOK_URL: z.string().nullable().default(null),
   LOCAL: boolFromString(),
   DEBUG_I18N: boolFromString(),
   DISABLE_SETTINGS: boolFromString(),

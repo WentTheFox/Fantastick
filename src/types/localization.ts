@@ -30,6 +30,10 @@ export const enum DeleteStickerCommandOptionName {
   NAME = 'name',
 }
 
+export const enum DeletePackCommandOptionName {
+  NAME = 'name',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
@@ -39,6 +43,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandOptionName,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandOptionName,
+  [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -106,6 +111,12 @@ export const enum DeleteStickerCommandResponse {
   deleted = 'deleted',
 }
 
+export const enum DeletePackCommandResponse {
+  packNotFound = 'packNotFound',
+  deleteFailed = 'deleteFailed',
+  deleted = 'deleted',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
@@ -115,6 +126,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.PACK]: PackCommandResponse,
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandResponse,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandResponse,
+  [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
 }
 
 interface ComponentsMap {
@@ -153,6 +165,10 @@ interface ComponentsMap {
     'stickerOnlyMethodDescription',
     'deleteMessagesMethodLabel',
     'deleteMessagesMethodDescription',
+  ],
+  [BotChatInputCommandName.DELETE_PACK]: [
+    'deletePackModalTitle',
+    'deletingText',
   ],
   [BotChatInputCommandName.CREATE_PACK]: [
     'createPackModalTitle',

@@ -22,7 +22,7 @@ export const importCommand: BotChatInputCommand = {
     };
   },
   autocomplete: {
-    [ImportCommandOptionName.PACK]: getPackNameAutocompleteHandler(true),
+    [ImportCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },
   async handle(interaction, context) {
     const { t, db } = context;

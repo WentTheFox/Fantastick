@@ -6,6 +6,7 @@ import {
 } from '@wentthefox-org/discord-bot-framework/interactions';
 import { createPackCommand } from '../commands/create-pack.command.js';
 import { createStickerCommand } from '../commands/create-sticker.command.js';
+import { deletePackCommand } from '../commands/delete-pack.command.js';
 import { deleteStickerCommand } from '../commands/delete-sticker.command.js';
 import { editStickerCommand } from '../commands/edit-sticker.command.js';
 import { importCommand } from '../commands/import.command.js';
@@ -28,6 +29,7 @@ export const chatInputCommandRegistry = createChatInputCommandRegistry([
   nsfwPackCommand,
   editStickerCommand,
   deleteStickerCommand,
+  deletePackCommand,
 ]);
 
 export const contextMenuCommandRegistry = createContextMenuCommandRegistry([

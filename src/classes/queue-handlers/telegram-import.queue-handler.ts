@@ -12,9 +12,12 @@ import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
+import { getEmojiIdMap } from '../../utils/get-emoji-id-map.js';
+import { withBackoff } from '../../utils/with-backoff.js';
 import { getPackNsfwEmoji } from '../../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../../utils/get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
+import { emoji } from '../../utils/messaging.js';
 import { rest } from '../../utils/rest.js';
 import {
   createTelegramApiClient,
@@ -23,9 +26,9 @@ import {
   TelegramApiGetStickerSetResponse,
 } from '../../utils/telegram-api.js';
 
-const buildProgressContent = (total: number, current: number, failed = false, finalizing = false) => {
+const buildProgressContent = (emojiIdMap: Record<string, string>, total: number, current: number, failed = false, finalizing = false) => {
   const [bar] = filledBar(total, current, 18, EmojiCharacters.WHITE_SQUARE, failed ? EmojiCharacters.RED_SQUARE : EmojiCharacters.GREEN_SQUARE);
-  const icon = failed ? EmojiCharacters.OCTAGONAL_SIGN : EmojiCharacters.RELOAD;
+  const icon = emoji({ emojiIdMap }, failed ? 'loadingerror' : 'loading', true);
   let text: string;
   if (finalizing) {
     text = 'Finalizing import…';
@@ -52,6 +55,8 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
 
   const { interactionId, interactionToken, telegramPackName, packId, importedBy, pack } = importJob;
 
+  const emojiIdMap = await getEmojiIdMap({ logger });
+
   const updateDiscordProgress = async (content: string) => {
     if (!interactionId || !interactionToken) return;
     try {
@@ -76,11 +81,11 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
 
   let getStickerSetRequest;
   try {
-    getStickerSetRequest = await telegramClient.request({
+    getStickerSetRequest = await withBackoff(() => telegramClient.request({
       path: '/getStickerSet',
       query: { name: telegramPackName },
       validator: typia.createValidate<TelegramApiGetStickerSetResponse>(),
-    });
+    }), { shouldRetry: e => !(e instanceof ApiHttpException && e.status === 400) });
   } catch (e) {
     const isNotFound = e instanceof ApiHttpException && e.status === 400;
     await failJob(
@@ -105,7 +110,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   }
 
   await db.importJob.update({ where: { id: importJobId }, data: { status: 'IMPORTING', total } });
-  await updateDiscordProgress(buildProgressContent(total, 0));
+  await updateDiscordProgress(buildProgressContent(emojiIdMap, total, 0));
   logger.debug(`Importing ${total} stickers from Telegram set ${telegramPackName}…`);
 
   const createStickerRecords: Parameters<typeof db.sticker.create>[0][] = [];
@@ -121,32 +126,32 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       logger.info(`Skipping sticker ${sticker.file_unique_id} (already imported as ${existing.id})`);
       completed++;
       await db.importJob.update({ where: { id: importJobId }, data: { completed } });
-      await updateDiscordProgress(buildProgressContent(total, completed));
+      await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed));
       continue;
     }
 
     let telegramFilePath: string;
     try {
-      const getFileRequest = await telegramClient.request({
+      const getFileRequest = await withBackoff(() => telegramClient.request({
         path: '/getFile',
         query: { file_id: sticker.file_id },
         validator: typia.createValidate<TelegramApiGetFileResponse>(),
-      });
+      }));
       telegramFilePath = getFileRequest.response.result!.file_path;
     } catch (e) {
       logger.error(`Failed to get file path for sticker ${sticker.file_id} (#${order})`, e);
       failedCount++;
       completed++;
       await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-      await updateDiscordProgress(buildProgressContent(total, completed));
+      await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed));
       continue;
     }
 
-    const fileRequest = await telegramFileClient.request({
+    const fileRequest = await withBackoff(() => telegramFileClient.request({
       path: `/${telegramFilePath}`,
       raw: true,
       validator: typia.createValidate<Readable>(),
-    });
+    }));
 
     const { stickerFileId: stickerId, filePath, stickerUrl } = await saveStickerFile({ logger }, {
       fileId: sticker.file_id,
@@ -171,12 +176,12 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     completed++;
     logger.info(`Downloaded sticker ${sticker.file_id} (#${order}) → ${stickerId}`);
     await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-    await updateDiscordProgress(buildProgressContent(total, completed));
+    await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed));
   }
 
   // Finalize: write sticker records and update pack
   await db.importJob.update({ where: { id: importJobId }, data: { status: 'FINALIZING' } });
-  await updateDiscordProgress(buildProgressContent(total, completed, false, true));
+  await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed, false, true));
   logger.info('Creating sticker records and updating pack…');
 
   let createdStickers: Sticker[] | null = null;
@@ -197,7 +202,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
           logger.error(`Failed to delete ${filePath} during rollback`, unlinkErr);
         }
         rolled++;
-        await updateDiscordProgress(buildProgressContent(total, total - rolled, true));
+        await updateDiscordProgress(buildProgressContent(emojiIdMap, total, total - rolled, true));
       }
       logger.info(`Rolled back ${fileList.length} files`);
     }

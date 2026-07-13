@@ -88,6 +88,7 @@ export const enum ImportCommandResponse {
   rollbackProgress = 'rollbackProgress',
   imported = 'imported',
   importQueued = 'importQueued',
+  importAlreadyRunning = 'importAlreadyRunning',
 }
 
 export const enum PackCommandResponse {

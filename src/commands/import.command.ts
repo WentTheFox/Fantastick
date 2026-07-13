@@ -62,6 +62,20 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
+    const activeImport = await db.importJob.findFirst({
+      where: {
+        importedBy: user.id,
+        status: { in: ['PENDING', 'FETCHING', 'IMPORTING', 'FINALIZING'] },
+      },
+    });
+    if (activeImport) {
+      await interactionReply(context, interaction, {
+        content: t('commands.import.responses.importAlreadyRunning'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const importJob = await db.importJob.create({
@@ -74,7 +88,7 @@ export const importCommand: BotChatInputCommand = {
       },
     });
 
-    await context.qm.send(QueueType.TelegramImport, { importJobId: importJob.id });
+    await context.qm.send(QueueType.TelegramImport, { importJobId: importJob.id }, { group: { id: String(user.id) } });
 
     await interactionReply(context, interaction, {
       content: t('commands.import.responses.importQueued'),

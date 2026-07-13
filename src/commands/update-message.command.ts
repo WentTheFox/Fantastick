@@ -1,18 +1,25 @@
 import { ApplicationCommandType, MessageFlags } from 'discord-api-types/v10';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { StickerMessageUpdateInput } from '../generated/prisma/models/StickerMessage.js';
-import { BotMessageContextMenuCommand } from '../types/bot-interaction.js';
+import { BotMessageContextMenuCommand, BotMessageContextMenuCommandName } from '../types/bot-interaction.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { getStickerMessageContent } from '../utils/get-sticker-message-content.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 
 export const updateMessageCommand: BotMessageContextMenuCommand = {
-  getDefinition: (t) => ({
-    type: ApplicationCommandType.Message,
-    ...getLocalizedObject('name', (lng) => t('commands.Update Message.name', { lng }), true, false),
-  }),
+  name: BotMessageContextMenuCommandName.UPDATE_MESSAGE,
+  getDefinition: (t) => {
+    if (!t) throw new Error('Missing translation function');
+    return {
+      type: ApplicationCommandType.Message,
+      ...getLocalizedObject('name', (lng) => t('commands.Update Message.name', { lng }), true, false),
+    };
+  },
   async handle(interaction, context) {
+    if (!interaction.isMessageContextMenuCommand()) {
+      throw new Error('Expected message context menu interaction');
+    }
     const { t, db } = context;
     const user = await updateOrCreateUser(context, interaction);
     if (user.readOnly) {

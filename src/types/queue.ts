@@ -2,6 +2,7 @@ import { WorkHandler } from 'pg-boss/dist/types.js';
 
 export enum QueueType {
   UpdateMessage = 'update-message',
+  TelegramImport = 'telegram-import',
 }
 
 export interface QueueReqData {
@@ -14,6 +15,9 @@ export interface QueueReqData {
     action: 'delete' | 'update';
     newUrl?: string;
     description?: string;
+  };
+  [QueueType.TelegramImport]: {
+    importJobId: string;
   };
 }
 

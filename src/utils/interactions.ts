@@ -1,0 +1,45 @@
+import {
+  createChatInputCommandRegistry,
+  createComponentRegistry,
+  createContextMenuCommandRegistry,
+  flattenCommandModals,
+} from '@wentthefox-org/discord-bot-framework/interactions';
+import { createPackCommand } from '../commands/create-pack.command.js';
+import { createStickerCommand } from '../commands/create-sticker.command.js';
+import { deletePackCommand } from '../commands/delete-pack.command.js';
+import { deleteStickerCommand } from '../commands/delete-sticker.command.js';
+import { editStickerCommand } from '../commands/edit-sticker.command.js';
+import { importCommand } from '../commands/import.command.js';
+import { nsfwPackCommand } from '../commands/nsfw-pack.command.js';
+import { nsfwStickerCommand } from '../commands/nsfw-sticker.command.js';
+import { packCommand } from '../commands/pack.command.js';
+import { stickerCommand } from '../commands/sticker.command.js';
+import { stickerDetailsCommand } from '../commands/sticker-details.command.js';
+import { updateMessageCommand } from '../commands/update-message.command.js';
+import { deleteMessageComponent } from '../components/delete-message.component.js';
+import { updateMessageComponent } from '../components/update-message.component.js';
+
+export const chatInputCommandRegistry = createChatInputCommandRegistry([
+  stickerCommand,
+  nsfwStickerCommand,
+  createPackCommand,
+  importCommand,
+  createStickerCommand,
+  packCommand,
+  nsfwPackCommand,
+  editStickerCommand,
+  deleteStickerCommand,
+  deletePackCommand,
+]);
+
+export const contextMenuCommandRegistry = createContextMenuCommandRegistry([
+  updateMessageCommand,
+  stickerDetailsCommand,
+]);
+
+export const componentRegistry = createComponentRegistry([
+  updateMessageComponent,
+  deleteMessageComponent,
+]);
+
+export const modalRegistry = flattenCommandModals(chatInputCommandRegistry);

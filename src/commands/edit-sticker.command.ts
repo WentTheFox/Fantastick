@@ -4,7 +4,7 @@ import { getEditStickerOptions } from '../options/edit-sticker.options.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
-import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { EditStickerCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
@@ -19,11 +19,15 @@ import {
 } from './modal-handlers/edit-sticker.modal-handler.js';
 
 export const editStickerCommand: BotChatInputCommand = {
-  getDefinition: (t) => ({
-    ...getLocalizedObject('description', (lng) => t('commands.edit-sticker.description', { lng })),
-    ...getLocalizedObject('name', (lng) => t('commands.edit-sticker.name', { lng })),
-    options: getEditStickerOptions(t),
-  }),
+  name: BotChatInputCommandName.EDIT_STICKER,
+  getDefinition: (t) => {
+    if (!t) throw new Error('Missing translation function');
+    return {
+      ...getLocalizedObject('description', (lng) => t('commands.edit-sticker.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.edit-sticker.name', { lng })),
+      options: getEditStickerOptions(t),
+    };
+  },
   autocomplete: {
     [EditStickerCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),
   },

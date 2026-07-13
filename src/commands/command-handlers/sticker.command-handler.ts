@@ -1,7 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { ChatInputCommandInteraction } from 'discord.js';
 import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
-import { BotChatInputCommandName, InteractionHandler } from '../../types/bot-interaction.js';
+import { BotChatInputCommandName, CommandHandler } from '../../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../../types/localization.js';
 import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
 import { getStickerMessageContent } from '../../utils/get-sticker-message-content.js';
@@ -9,7 +8,7 @@ import { createCommandMention, interactionReply } from '../../utils/interaction-
 import { isUuidV4 } from '../../utils/is-uuid-v4.js';
 import { recordStickerMessages } from '../../utils/record-sticker-messages.js';
 
-export const stickerCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputCommandInteraction> => async function handle(interaction, context) {
+export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async function handle(interaction, context) {
   const { t, db } = context;
   const stickerQuery = interaction.options.getString(StickerCommandOptionName.NAME, true);
   const preview = interaction.options.getBoolean(StickerCommandOptionName.PREVIEW) ?? false;

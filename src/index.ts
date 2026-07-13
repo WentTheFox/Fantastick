@@ -1,11 +1,10 @@
-import { ShardingManager } from 'discord.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { Logger } from './classes/logger.js';
+import { createShardManager } from '@wentthefox-org/discord-bot-framework/client';
+import { Logger, NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { initI18next } from './constants/locales.js';
 import { env } from './env.js';
 import { InteractionHandlerContext } from './types/contexts/interaction-handler.context.js';
-import { NestableLogger } from './types/logger-types.js';
 import { createDb } from './utils/create-db.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
 import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
@@ -36,35 +35,14 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
 
 (async function createShards() {
   const logger = new Logger('ShardingManager');
-  await startupCommandsUpdate(logger);
-
   const currentFolder = dirname(fileURLToPath(import.meta.url));
   const botScriptPath = `${currentFolder}/bot.js`;
 
-  logger.log(`Starting recommended number of shards with path ${botScriptPath}`);
-  const manager = new ShardingManager(botScriptPath, {
-    mode: process.env.npm_lifecycle_script?.includes('.ts') ? 'worker' : 'process',
+  await createShardManager({
     token: env.DISCORD_BOT_TOKEN,
+    botScriptPath,
+    logger,
+    mode: process.env.npm_lifecycle_script?.includes('.ts') ? 'worker' : 'process',
+    beforeSpawn: () => startupCommandsUpdate(logger),
   });
-
-  manager.on('shardCreate', shard => {
-    logger.log(`Shard ${shard.id} created`);
-
-    shard.on('spawn', () => {
-      logger.log(`Shard ${shard.id} spawned`);
-    });
-    shard.on('ready', () => {
-      logger.log(`Shard ${shard.id} ready`);
-    });
-    shard.on('disconnect', () => {
-      logger.log(`Shard ${shard.id} disconnected`);
-    });
-    shard.on('reconnecting', () => {
-      logger.log(`Shard ${shard.id} reconnecting`);
-    });
-    shard.on('death', () => {
-      logger.log(`Shard ${shard.id} died`);
-    });
-  });
-  await manager.spawn();
 })();

@@ -1,17 +1,24 @@
 import { ApplicationCommandType, MessageFlags } from 'discord-api-types/v10';
 import { AttachmentBuilder, userMention } from 'discord.js';
-import { BotMessageContextMenuCommand } from '../types/bot-interaction.js';
+import { BotMessageContextMenuCommand, BotMessageContextMenuCommandName } from '../types/bot-interaction.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-items.js';
 
 export const stickerDetailsCommand: BotMessageContextMenuCommand = {
-  getDefinition: (t) => ({
-    type: ApplicationCommandType.Message,
-    ...getLocalizedObject('name', (lng) => t('commands.Sticker Details.name', { lng }), true, false),
-  }),
+  name: BotMessageContextMenuCommandName.STICKER_DETAILS,
+  getDefinition: (t) => {
+    if (!t) throw new Error('Missing translation function');
+    return {
+      type: ApplicationCommandType.Message,
+      ...getLocalizedObject('name', (lng) => t('commands.Sticker Details.name', { lng }), true, false),
+    };
+  },
   async handle(interaction, context) {
+    if (!interaction.isMessageContextMenuCommand()) {
+      throw new Error('Expected message context menu interaction');
+    }
     const { t, db } = context;
 
     if (interaction.targetMessage.channel?.isDMBased()) {

@@ -1,18 +1,19 @@
-import { rest } from './rest.js';
 import {
   RESTGetAPIApplicationCommandsResult,
   RESTGetAPIApplicationGuildCommandResult,
   Routes,
 } from 'discord-api-types/v10';
+import { createCommandRegistrar } from '@wentthefox-org/discord-bot-framework/commands';
+import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { env } from '../env.js';
-import { NestableLogger } from '../types/logger-types.js';
-import { getAuthorizedServers } from './update-guild-commands.js';
+import { rest } from './rest.js';
 
 export const getCommandIdMap = async (context: { logger: NestableLogger }): Promise<Record<string, string>> => {
   const logger = context.logger.nest('getCommandIdMap');
   let commandsResponse: RESTGetAPIApplicationCommandsResult | RESTGetAPIApplicationGuildCommandResult;
   if (env.LOCAL) {
-    const authorizedServers = await getAuthorizedServers({ logger });
+    const registrar = createCommandRegistrar({ rest, applicationId: env.DISCORD_CLIENT_ID, logger });
+    const authorizedServers = await registrar.getAuthorizedServers();
     if (authorizedServers.length === 0) {
       throw new Error('No authorized servers were found');
     }

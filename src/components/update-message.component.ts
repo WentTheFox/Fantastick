@@ -1,4 +1,4 @@
-import { BotMessageComponent } from '../types/bot-interaction.js';
+import { BotMessageComponent, BotMessageComponentCustomId } from '../types/bot-interaction.js';
 import {
   updateMessageComponentDefinition,
 } from './component-definitions/update-message.component-definition.js';
@@ -7,6 +7,7 @@ import {
 } from './component-handlers/sticker-button.component-handler.js';
 
 export const updateMessageComponent: BotMessageComponent = {
+  id: BotMessageComponentCustomId.UPDATE_MESSAGE,
   getDefinition: updateMessageComponentDefinition,
   handle: stickerButtonComponentHandler(false),
 };

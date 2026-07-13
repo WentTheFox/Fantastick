@@ -77,7 +77,7 @@
     },
     "import": {
       "name": "importálás",
-      "description": "Matricák importálása egy Telegram csomagból",
+      "description": "Import static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
         "packNotFound": "A megadott csomag nem található",
         "invalidUrl": "A megadott Telegram csomag URL érvénytelen",
@@ -85,7 +85,9 @@
         "importProgress": "Matricák importálása… ({{current}}/{{total}})",
         "finalizingImport": "Importálás véglegesítése…",
         "rollbackProgress": "Az importálás véglegesítése nem sikerült. Ideiglenes fájlok törlése… ({{current}}/{{total}})",
-        "imported": "Az importálás sikeresen megtörtént"
+        "imported": "Az importálás sikeresen megtörtént",
+        "importQueued": "Import queued…",
+        "importAlreadyRunning": "You already have an import in progress. Please wait for it to finish before starting another."
       },
       "options": {
         "pack": {
@@ -169,6 +171,25 @@
         "name": {
           "name": "név",
           "description": "A szerkeszteni kívánt matrica neve"
+        }
+      }
+    },
+    "delete-pack": {
+      "name": "delete-pack",
+      "description": "Delete a sticker pack and all of its stickers",
+      "responses": {
+        "packNotFound": "The specified pack could not be found",
+        "deleteFailed": "Could not delete the pack due to an unexpected error, please try again later",
+        "deleted": "The pack {{name}} and all its stickers have been deleted successfully"
+      },
+      "components": {
+        "deletePackModalTitle": "Delete pack {{name}}",
+        "deletingText": "You are about to delete the pack {{name}}. This will also delete all {{count}} sticker(s) inside it. This action cannot be undone."
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Name of the pack you want to delete"
         }
       }
     },

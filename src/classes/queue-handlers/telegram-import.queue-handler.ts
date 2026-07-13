@@ -4,7 +4,6 @@ import * as fs from 'node:fs';
 import { Readable } from 'node:stream';
 import { filledBar } from 'string-progressbar';
 import typia from 'typia';
-import { ApiHttpException } from '@wentthefox-org/discord-bot-framework/api-client';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { env } from '../../env.js';
 import { Pack, Sticker } from '../../generated/prisma/client.js';
@@ -13,7 +12,6 @@ import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
 import { getEmojiIdMap } from '../../utils/get-emoji-id-map.js';
-import { withBackoff } from '../../utils/with-backoff.js';
 import { getPackNsfwEmoji } from '../../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../../utils/get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
@@ -22,6 +20,7 @@ import { rest } from '../../utils/rest.js';
 import {
   createTelegramApiClient,
   createTelegramFileClient,
+  isTelegramNotFoundError,
   TelegramApiGetFileResponse,
   TelegramApiGetStickerSetResponse,
 } from '../../utils/telegram-api.js';
@@ -81,13 +80,13 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
 
   let getStickerSetRequest;
   try {
-    getStickerSetRequest = await withBackoff(() => telegramClient.request({
+    getStickerSetRequest = await telegramClient.request({
       path: '/getStickerSet',
       query: { name: telegramPackName },
       validator: typia.createValidate<TelegramApiGetStickerSetResponse>(),
-    }), { shouldRetry: e => !(e instanceof ApiHttpException && e.status === 400) });
+    });
   } catch (e) {
-    const isNotFound = e instanceof ApiHttpException && e.status === 400;
+    const isNotFound = isTelegramNotFoundError(e);
     await failJob(
       isNotFound ? 'Telegram pack not found' : `Failed to fetch sticker set: ${e}`,
       'Failed to fetch Telegram sticker set.',
@@ -132,11 +131,11 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
 
     let telegramFilePath: string;
     try {
-      const getFileRequest = await withBackoff(() => telegramClient.request({
+      const getFileRequest = await telegramClient.request({
         path: '/getFile',
         query: { file_id: sticker.file_id },
         validator: typia.createValidate<TelegramApiGetFileResponse>(),
-      }));
+      });
       telegramFilePath = getFileRequest.response.result!.file_path;
     } catch (e) {
       logger.error(`Failed to get file path for sticker ${sticker.file_id} (#${order})`, e);
@@ -147,11 +146,11 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       continue;
     }
 
-    const fileRequest = await withBackoff(() => telegramFileClient.request({
+    const fileRequest = await telegramFileClient.request({
       path: `/${telegramFilePath}`,
       raw: true,
       validator: typia.createValidate<Readable>(),
-    }));
+    });
 
     const { stickerFileId: stickerId, filePath, stickerUrl } = await saveStickerFile({ logger }, {
       fileId: sticker.file_id,

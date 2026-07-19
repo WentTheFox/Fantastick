@@ -11,4 +11,8 @@ export enum EmojiCharacters {
   LOCKED = '🔒',
   TRASH_CAN = '🗑️',
   RELOAD = '🔄',
+  ARROW_LEFT = '⬅️',
+  ARROW_RIGHT = '➡️',
+  SKIP_BACK = '⏮️',
+  SKIP_FORWARD = '⏭️',
 }

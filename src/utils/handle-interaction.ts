@@ -75,7 +75,8 @@ export const handleInteraction = async (interaction: Interaction, baseContext: I
 
   if (interaction.isMessageComponent()) {
     const context = buildUserInteractionContext(baseContext, interaction, true);
-    if (!componentRegistry.isKnown(interaction.customId)) {
+    const { id: componentId } = parseCustomIdSegments(interaction.customId);
+    if (!componentRegistry.isKnown(componentId)) {
       await interactionReply(context, interaction, {
         content: `Unsupported component interaction with customId ${interaction.customId}`,
         flags: MessageFlags.Ephemeral,

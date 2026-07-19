@@ -44,6 +44,10 @@ export const enum BotModalId {
 export const enum BotMessageComponentCustomId {
   UPDATE_MESSAGE = 'update-message',
   DELETE_MESSAGE = 'delete-message',
+  PACK_PAGE_FIRST = 'pack-page-first',
+  PACK_PAGE_PREV = 'pack-page-prev',
+  PACK_PAGE_NEXT = 'pack-page-next',
+  PACK_PAGE_LAST = 'pack-page-last',
 }
 
 export type CommandHandler = FrameworkCommandHandler<UserInteractionContext>;

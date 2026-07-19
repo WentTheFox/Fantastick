@@ -18,10 +18,10 @@ export const mapStickersToGalleryItems = (stickers: Pick<Sticker, 'url' | 'descr
       };
     }
 
-    const attachmentUrl = `attachment://${paths.stickerFileName}`;
     const newFile = new AttachmentBuilder(paths.filePath, {
       name: paths.stickerFileName,
     }).setSpoiler(spoiler);
+    const attachmentUrl = `attachment://${newFile.name}`;
     return {
       galleryStickers: [...acc.galleryStickers, { ...sticker, url: attachmentUrl }],
       files: [

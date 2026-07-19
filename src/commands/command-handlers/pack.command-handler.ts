@@ -1,11 +1,8 @@
-import { ComponentType, MessageFlags } from 'discord-api-types/v10';
+import { MessageFlags } from 'discord-api-types/v10';
 import { CommandHandler } from '../../types/bot-interaction.js';
 import { PackCommandOptionName } from '../../types/localization.js';
-import { getFormattedPackName } from '../../utils/get-formatted-pack-name.js';
+import { getPackPreviewContent, packItemsPerPage } from '../../utils/get-pack-preview-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
-import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
-
-const itemsPerPage = 9;
 
 export const packCommandHandler = (nsfw: boolean): CommandHandler => async function handle(interaction, context) {
   const { t, db } = context;
@@ -26,35 +23,21 @@ export const packCommandHandler = (nsfw: boolean): CommandHandler => async funct
     });
     return;
   }
+
+  const stickerCount = await db.sticker.count({
+    where: { deletedAt: null, packId: pack.id },
+  });
+  const totalPages = Math.max(1, Math.ceil(stickerCount / packItemsPerPage));
   const stickers = await db.sticker.findMany({
     where: {
       deletedAt: null,
       packId: pack.id,
     },
-    take: itemsPerPage,
+    take: packItemsPerPage,
     orderBy: { order: 'asc' },
   });
 
-  const { files, items } = mapStickersToGalleryItems(stickers, pack.nsfw);
+  const { flags, components, files } = getPackPreviewContent({ t, pack, stickers, page: 0, totalPages });
 
-  await interactionReply(context, interaction, {
-    flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
-    components: [
-      {
-        type: ComponentType.TextDisplay,
-        content: [
-          `# ${getFormattedPackName(pack)}`,
-          items.length === 0
-            ? t('commands.pack.responses.emptyPack')
-            : t('commands.pack.components.packPreview'),
-        ].join('\n'),
-      },
-      {
-        type: ComponentType.MediaGallery,
-        items,
-      },
-      // TODO Paging buttons
-    ],
-    files,
-  });
+  await interactionReply(context, interaction, { flags, components, files });
 };

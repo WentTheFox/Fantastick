@@ -8,6 +8,7 @@ import { createPackCommand } from '../commands/create-pack.command.js';
 import { createStickerCommand } from '../commands/create-sticker.command.js';
 import { deletePackCommand } from '../commands/delete-pack.command.js';
 import { deleteStickerCommand } from '../commands/delete-sticker.command.js';
+import { editPackCommand } from '../commands/edit-pack.command.js';
 import { editStickerCommand } from '../commands/edit-sticker.command.js';
 import { importCommand } from '../commands/import.command.js';
 import { nsfwPackCommand } from '../commands/nsfw-pack.command.js';
@@ -30,6 +31,7 @@ export const chatInputCommandRegistry = createChatInputCommandRegistry([
   editStickerCommand,
   deleteStickerCommand,
   deletePackCommand,
+  editPackCommand,
 ]);
 
 export const contextMenuCommandRegistry = createContextMenuCommandRegistry([

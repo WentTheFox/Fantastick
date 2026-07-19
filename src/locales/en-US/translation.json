@@ -45,7 +45,7 @@
       "responses": {
         "nameTooShort": "The provided sticker pack name is too short (minimum {{min}} characters)",
         "nameTooLong": "The provided sticker pack name is too long (maximum {{max}} characters)",
-        "invalidName": "The provided sticker pack name contains the following  invalid character(s): {{chars}}",
+        "invalidName": "The provided sticker pack name contains the following invalid character(s): {{chars}}",
         "duplicateName": "A sticker pack with the same name already exists, please choose a different one",
         "tooManyPacks": "You can only create up to {{maxPacks}} sticker packs. Please delete an existing pack before creating a new one.",
         "createdPublic": "New **public** sticker pack created with name {{name}}",
@@ -108,7 +108,7 @@
         "invalidPack": "The selected pack could not be found",
         "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
         "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
-        "invalidName": "The provided sticker name contains the following  invalid character(s): {{chars}}",
+        "invalidName": "The provided sticker name contains the following invalid character(s): {{chars}}",
         "duplicateName": "A sticker with the same name already exists in this pack, please choose a different one",
         "missingFile": "You must upload a file for the sticker",
         "invalidUrl": "The provided URL is invalid",
@@ -191,6 +191,41 @@
         "name": {
           "name": "name",
           "description": "Name of the pack you want to delete"
+        }
+      }
+    },
+    "edit-pack": {
+      "name": "edit-pack",
+      "description": "Update the name, visibility, or content rating of an existing sticker pack",
+      "responses": {
+        "packNotFound": "The specified pack could not be found",
+        "nameTooShort": "The provided sticker pack name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker pack name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker pack name contains the following invalid character(s): {{chars}}",
+        "duplicateName": "A sticker pack with the same name already exists, please choose a different one",
+        "updated": "The pack {{name}} has been updated successfully"
+      },
+      "components": {
+        "editPackModalTitle": "Edit pack {{name}}",
+        "nameLabel": "Pack name",
+        "nameDescription": "Enter a unique name for the sticker pack. Two packs cannot have the same name within the app.",
+        "publicChoiceLabel": "Pack visibility",
+        "publicChoiceDescription": "Determines who will be able to see and use the stickers in the pack.",
+        "publicTrueLabel": "Public",
+        "publicTrueDescription": "The pack will be visible usable by everyone",
+        "publicFalseLabel": "Private",
+        "publicFalseDescription": "The pack will only be visible to and usable by you",
+        "nsfwChoiceLabel": "Pack content rating",
+        "nsfwChoiceDescription": "Determines where and how the stickers in this pack will be usable.",
+        "nsfwTrueLabel": "Age-restricted (NSFW)",
+        "nsfwTrueDescription": "Stickers will only be usable in age-restricted channels and DMs via {{command}}",
+        "nsfwFalseLabel": "Safe for all audiences",
+        "nsfwFalseDescription": "Stickers will be usable in any channel and DMs via {{command}}"
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Name of the pack you want to edit"
         }
       }
     },

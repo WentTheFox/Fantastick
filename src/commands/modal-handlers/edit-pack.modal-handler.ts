@@ -1,0 +1,122 @@
+import { MessageFlags } from 'discord-api-types/v10';
+import { EmojiCharacters } from '../../constants/emoji-characters.js';
+import {
+  packNameInvalidPattern,
+  packNameOptionMeta,
+} from '../../options/metadata/pack-name.option-meta.js';
+import { ModalHandler } from '../../types/bot-interaction.js';
+import { getPackVisibilityEmoji } from '../../utils/get-pack-visibility-emoji.js';
+import { interactionReply } from '../../utils/interaction-reply.js';
+import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
+import { PackSnapshot, postPackToFeed } from '../../utils/post-pack-to-feed.js';
+
+export enum EditPackModalCustomIds {
+  NAME_INPUT = 'nameInput',
+  PUBLIC_INPUT = 'publicInput',
+  NSFW_INPUT = 'nsfwInput',
+}
+
+export enum EditPackModalBooleanOption {
+  TRUE = 'true',
+  FALSE = 'false',
+}
+
+export const editPackModalHandler: ModalHandler = async (interaction, context, resourceId) => {
+  const { t, db } = context;
+  const user = await updateOrCreateUser(context, interaction);
+  if (user.readOnly) {
+    await interactionReply(context, interaction, {
+      content: t('commands.global.responses.noPermission'),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  let pack = resourceId ? await db.pack.findUnique({
+    where: { id: resourceId, deletedAt: null, createdBy: user.id },
+  }) : null;
+
+  if (!pack) {
+    await interactionReply(context, interaction, {
+      content: t('commands.edit-pack.responses.packNotFound'),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+  const packSnapshot: PackSnapshot = {
+    name: pack.name,
+    public: pack.public,
+    nsfw: pack.nsfw,
+  };
+
+  const { data } = collectModalSubmittedData(interaction, EditPackModalCustomIds);
+
+  const packName = data[EditPackModalCustomIds.NAME_INPUT];
+  if (packName !== pack.name) {
+    if (packName === null || packName.length < packNameOptionMeta.min_length) {
+      await interactionReply(context, interaction, {
+        content: t('commands.edit-pack.responses.nameTooShort'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    if (packName.length > packNameOptionMeta.max_length) {
+      await interactionReply(context, interaction, {
+        content: t('commands.edit-pack.responses.nameTooLong'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    const invalidChars = new Set(packName.match(packNameInvalidPattern));
+    if (invalidChars.size > 0) {
+      await interactionReply(context, interaction, {
+        content: t('commands.edit-pack.responses.invalidName', {
+          chars: '```\n' + Array.from(invalidChars).join('') + '\n```',
+        }),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    const otherPacksWithSameNameCount = await db.pack.count({
+      where: {
+        AND: [
+          { name: packName, deletedAt: null },
+          { NOT: { id: pack.id } },
+        ],
+      },
+    });
+    if (otherPacksWithSameNameCount !== 0) {
+      await interactionReply(context, interaction, {
+        content: t('commands.edit-pack.responses.duplicateName'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+  }
+
+  pack = await db.pack.update({
+    where: { id: pack.id },
+    data: {
+      name: packName,
+      public: data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE,
+      nsfw: data[EditPackModalCustomIds.NSFW_INPUT] === EditPackModalBooleanOption.TRUE,
+    },
+  });
+
+  await interactionReply(context, interaction, {
+    content: [
+      EmojiCharacters.GREEN_CHECK,
+      getPackVisibilityEmoji(pack),
+      t('commands.edit-pack.responses.updated', { name: `\`${pack.name}\`` }),
+    ].join(' '),
+    flags: MessageFlags.Ephemeral,
+  });
+
+  await postPackToFeed({
+    context,
+    interaction,
+    pack,
+    action: 'edit',
+    snapshot: packSnapshot,
+  });
+};

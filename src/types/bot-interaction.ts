@@ -24,6 +24,7 @@ export const enum BotChatInputCommandName {
   EDIT_STICKER = 'edit-sticker',
   DELETE_STICKER = 'delete-sticker',
   DELETE_PACK = 'delete-pack',
+  EDIT_PACK = 'edit-pack',
 }
 
 export const enum BotMessageContextMenuCommandName {
@@ -37,6 +38,7 @@ export const enum BotModalId {
   DELETE_STICKER = 'deleteStickerModal',
   CREATE_PACK = 'createPackModal',
   DELETE_PACK = 'deletePackModal',
+  EDIT_PACK = 'editPackModal',
 }
 
 export const enum BotMessageComponentCustomId {

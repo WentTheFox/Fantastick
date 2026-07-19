@@ -34,6 +34,10 @@ export const enum DeletePackCommandOptionName {
   NAME = 'name',
 }
 
+export const enum EditPackCommandOptionName {
+  NAME = 'name',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
@@ -44,6 +48,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandOptionName,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandOptionName,
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
+  [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -117,6 +122,15 @@ export const enum DeletePackCommandResponse {
   deleted = 'deleted',
 }
 
+export const enum EditPackCommandResponse {
+  packNotFound = 'packNotFound',
+  nameTooShort = 'nameTooShort',
+  nameTooLong = 'nameTooLong',
+  invalidName = 'invalidName',
+  duplicateName = 'duplicateName',
+  updated = 'updated',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
@@ -127,6 +141,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandResponse,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandResponse,
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
+  [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
 }
 
 interface ComponentsMap {
@@ -172,6 +187,23 @@ interface ComponentsMap {
   ],
   [BotChatInputCommandName.CREATE_PACK]: [
     'createPackModalTitle',
+    'nameLabel',
+    'nameDescription',
+    'publicChoiceLabel',
+    'publicChoiceDescription',
+    'publicTrueLabel',
+    'publicTrueDescription',
+    'publicFalseLabel',
+    'publicFalseDescription',
+    'nsfwChoiceLabel',
+    'nsfwChoiceDescription',
+    'nsfwTrueLabel',
+    'nsfwTrueDescription',
+    'nsfwFalseLabel',
+    'nsfwFalseDescription',
+  ],
+  [BotChatInputCommandName.EDIT_PACK]: [
+    'editPackModalTitle',
     'nameLabel',
     'nameDescription',
     'publicChoiceLabel',

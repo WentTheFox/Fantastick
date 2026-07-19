@@ -20,7 +20,7 @@ export const deletePackCommand: BotChatInputCommand = {
     };
   },
   autocomplete: {
-    [DeletePackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ ownedOnly: true }),
+    [DeletePackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },
   async handle(interaction, context) {
     const { t, db } = context;

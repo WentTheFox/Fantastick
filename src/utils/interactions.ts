@@ -18,6 +18,10 @@ import { stickerCommand } from '../commands/sticker.command.js';
 import { stickerDetailsCommand } from '../commands/sticker-details.command.js';
 import { updateMessageCommand } from '../commands/update-message.command.js';
 import { deleteMessageComponent } from '../components/delete-message.component.js';
+import { packPageFirstComponent } from '../components/pack-page-first.component.js';
+import { packPageLastComponent } from '../components/pack-page-last.component.js';
+import { packPageNextComponent } from '../components/pack-page-next.component.js';
+import { packPagePrevComponent } from '../components/pack-page-prev.component.js';
 import { updateMessageComponent } from '../components/update-message.component.js';
 
 export const chatInputCommandRegistry = createChatInputCommandRegistry([
@@ -42,6 +46,10 @@ export const contextMenuCommandRegistry = createContextMenuCommandRegistry([
 export const componentRegistry = createComponentRegistry([
   updateMessageComponent,
   deleteMessageComponent,
+  packPageFirstComponent,
+  packPagePrevComponent,
+  packPageNextComponent,
+  packPageLastComponent,
 ]);
 
 export const modalRegistry = flattenCommandModals(chatInputCommandRegistry);

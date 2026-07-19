@@ -165,7 +165,12 @@ interface ComponentsMap {
   ],
   [BotChatInputCommandName.PACK]: [
     'emptyPack',
-    'packPreview'
+    'packPreview',
+    'firstPageButton',
+    'previousPageButton',
+    'nextPageButton',
+    'lastPageButton',
+    'pageIndicator',
   ],
   [BotChatInputCommandName.EDIT_STICKER]: [
     'editStickerModalTitle',

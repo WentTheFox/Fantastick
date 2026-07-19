@@ -27,7 +27,7 @@ export const editPackCommand: BotChatInputCommand = {
     };
   },
   autocomplete: {
-    [EditPackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ ownedOnly: true }),
+    [EditPackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },
   async handle(interaction, context) {
     const { t, db } = context;

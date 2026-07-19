@@ -43,6 +43,28 @@ jobs:
       - name: Build images
         run: docker compose build
 
+      - name: Determine Postgres image cache key
+        id: postgres-cache-key
+        run: echo "week=$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Postgres image
+        id: cache-postgres-image
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/docker-image-cache/postgres.tar
+          key: postgres-image-${{ steps.postgres-cache-key.outputs.week }}
+
+      - name: Load cached Postgres image
+        if: steps.cache-postgres-image.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/docker-image-cache/postgres.tar
+
+      - name: Pull and cache Postgres image
+        if: steps.cache-postgres-image.outputs.cache-hit != 'true'
+        run: |
+          docker compose pull postgres
+          mkdir -p /tmp/docker-image-cache
+          docker save postgres:latest -o /tmp/docker-image-cache/postgres.tar
+
       - name: Start Postgres and wait for healthy
         run: docker compose up -d --wait --wait-timeout 60 postgres
 

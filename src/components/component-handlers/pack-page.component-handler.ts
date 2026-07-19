@@ -14,7 +14,13 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
   const currentPage = separatorIndex === -1 ? NaN : Number(resourceId?.substring(separatorIndex + 1));
 
   const pack = typeof packId === 'string' && !Number.isNaN(currentPage)
-    ? await db.pack.findUnique({ where: { id: packId, deletedAt: null } })
+    ? await db.pack.findFirst({
+      where: {
+        id: packId,
+        deletedAt: null,
+        OR: [{ public: true }, { createdBy: BigInt(interaction.user.id) }],
+      },
+    })
     : null;
 
   if (!pack) {

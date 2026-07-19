@@ -9,11 +9,12 @@ export const packCommandHandler = (nsfw: boolean): CommandHandler => async funct
   const packId = interaction.options.getString(PackCommandOptionName.NAME) ?? undefined;
   const pack = await db.pack.findFirst({
     where: {
-      OR: [
-        { id: packId },
-        { name: packId },
+      AND: [
+        { OR: [{ id: packId }, { name: packId }] },
+        { OR: [{ public: true }, { createdBy: BigInt(interaction.user.id) }] },
       ],
       nsfw: nsfw ? undefined : false,
+      deletedAt: null,
     },
   });
   if (!pack) {

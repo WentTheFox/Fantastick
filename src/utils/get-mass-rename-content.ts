@@ -5,7 +5,6 @@ import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { Pack, PrismaClient, Sticker, TelegramSticker } from '../generated/prisma/client.js';
 import { BotMessageComponentCustomId } from '../types/bot-interaction.js';
 import { FormattablePack, getFormattedPackName } from './get-formatted-pack-name.js';
-import { getFormattedStickerName } from './get-formatted-sticker-name.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
 
 export type MassRenamePack = Pick<Pack, 'id' | 'telegramPackId'> & FormattablePack;
@@ -28,6 +27,12 @@ interface GetMassRenameStickerContentOptions {
 export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: GetMassRenameStickerContentOptions) => {
   const { files, items } = mapStickersToGalleryItems([sticker], pack.nsfw);
 
+  // Imported stickers are identified by their emoji and position; the custom name (if any)
+  // gets its own line so it is not duplicated. Regular stickers only have their name.
+  const isImportedSticker = sticker.telegramSticker !== null;
+  const stickerIdentifier = isImportedSticker
+    ? `${sticker.telegramSticker?.emoji}#${(sticker.telegramSticker?.order ?? 0) + 1}`
+    : sticker.name;
   const components: APIMessageTopLevelComponent[] = [
     {
       type: ComponentType.TextDisplay,
@@ -36,9 +41,9 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
           pack: getFormattedPackName(pack),
           position: index + 1,
           total,
-          name: `\`${getFormattedStickerName(sticker)}\``,
+          name: `\`${stickerIdentifier}\``,
         }),
-        ...(sticker.name ? [t('commands.mass-rename-stickers.components.currentNameText', {
+        ...(isImportedSticker && sticker.name ? [t('commands.mass-rename-stickers.components.currentNameText', {
           name: `\`${sticker.name}\``,
         })] : []),
       ].join('\n'),

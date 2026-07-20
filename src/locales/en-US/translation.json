@@ -79,8 +79,7 @@
       "name": "import",
       "description": "Import or update static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
-        "nsfwRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the nsfw option to create your copy",
-        "publicRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the public option to create your copy",
+        "optionsRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the following option(s) to create your copy: {{options}}",
         "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",
         "invalidUrl": "The provided Telegram pack URL is invalid",
         "importFailed": "The import failed, please try again later",

@@ -98,8 +98,7 @@ export const enum CreateStickerCommandResponse {
 }
 
 export const enum ImportCommandResponse {
-  nsfwRequiredForNewPack = 'nsfwRequiredForNewPack',
-  publicRequiredForNewPack = 'publicRequiredForNewPack',
+  optionsRequiredForNewPack = 'optionsRequiredForNewPack',
   packImportAlreadyRunning = 'packImportAlreadyRunning',
   invalidUrl = 'invalidUrl',
   importFailed = 'importFailed',

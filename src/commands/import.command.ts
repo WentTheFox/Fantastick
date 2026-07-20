@@ -53,16 +53,15 @@ export const importCommand: BotChatInputCommand = {
       where: { telegramPackId: telegramPack.id, createdBy: user.id, deletedAt: null },
     }) : null;
     if (!userPack) {
-      if (nsfw === null) {
+      const missingOptions = [
+        ...(nsfw === null ? [ImportCommandOptionName.NSFW] : []),
+        ...(isPublic === null ? [ImportCommandOptionName.PUBLIC] : []),
+      ];
+      if (missingOptions.length > 0) {
         await interactionReply(context, interaction, {
-          content: t('commands.import.responses.nsfwRequiredForNewPack'),
-          flags: MessageFlags.Ephemeral,
-        });
-        return;
-      }
-      if (isPublic === null) {
-        await interactionReply(context, interaction, {
-          content: t('commands.import.responses.publicRequiredForNewPack'),
+          content: t('commands.import.responses.optionsRequiredForNewPack', {
+            options: missingOptions.map(option => `\`${t(`commands.import.options.${option}.name`)}\``).join(', '),
+          }),
           flags: MessageFlags.Ephemeral,
         });
         return;

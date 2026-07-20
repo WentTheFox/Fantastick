@@ -8,9 +8,10 @@ import {
   WebhookClient,
 } from 'discord.js';
 import { env } from '../env.js';
-import { Pack, Sticker } from '../generated/prisma/client.js';
+import { Pack, Sticker, TelegramPack, TelegramSticker } from '../generated/prisma/client.js';
 import { InteractionContext } from '../types/contexts/interaction.context.js';
 import { getFormattedStickerName } from './get-formatted-sticker-name.js';
+import { getStickerUrl } from './get-sticker-url.js';
 import { getPackNsfwEmoji } from './get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from './get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
@@ -20,7 +21,7 @@ import { wrapUrlsInAngleBrackets } from './wrap-urls-in-angle-brackets.js';
 export interface StickerSnapshot {
   name: string;
   description: string | null;
-  url: string;
+  url: string | null;
 }
 
 const mapDescription = (description: string | null, prefix: string) => (
@@ -38,8 +39,8 @@ const wrapUrlInSpoiler = (userPack: Pick<Pack, 'nsfw'>, url: string) => {
 interface PostStickerToFeedParams {
   context: InteractionContext;
   interaction: ChatInputCommandInteraction | ModalSubmitInteraction;
-  sticker: Sticker;
-  userPack: Pack;
+  sticker: Sticker & { telegramSticker: TelegramSticker | null };
+  userPack: Pack & { telegramPack?: TelegramPack | null };
   action: 'create' | 'edit' | 'import' | 'delete';
   snapshot?: StickerSnapshot;
 }
@@ -78,8 +79,8 @@ export const postStickerToFeed = async ({
       ...(sticker.deletedAt ? [`**Deleted at:** ${time(sticker.deletedAt, TimestampStyles.FullDateShortTime)} (${time(sticker.deletedAt, TimestampStyles.RelativeTime)})`] : []),
       `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
       ...(sticker.deletedBy ? [`**Deleted by:** ${userMention(String(sticker.deletedBy))} (\`${sticker.deletedBy}\`)`] : []),
-      `**Pack:** \`${wrapUrlsInAngleBrackets(userPack.name)}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
-      ...(urlChanged ? [`**Old URL:** ${wrapUrlInSpoiler(userPack, snapshot.url)}`, `**New URL:** \`${sticker.url}\``] : []),
+      `**Pack:** \`${wrapUrlsInAngleBrackets(userPack.telegramPack?.title ?? userPack.name)}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
+      ...(urlChanged ? [`**Old URL:** ${snapshot.url ? wrapUrlInSpoiler(userPack, snapshot.url) : '_(none)_'}`, `**New URL:** \`${getStickerUrl(sticker)}\``] : []),
       `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => wrapUrlInSpoiler(userPack, item.media.url)).join(' ')}`,
     ].join('\n'),
     files,

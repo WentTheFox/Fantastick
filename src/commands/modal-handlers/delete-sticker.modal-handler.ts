@@ -29,12 +29,22 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
 
   let sticker = resourceId ? await db.sticker.findUnique({
     where: { id: resourceId, deletedAt: null, createdBy: user.id },
-    include: { pack: true },
+    include: { pack: true, telegramSticker: true },
   }) : null;
 
   if (!sticker) {
     await interactionReply(context, interaction, {
       content: t('commands.delete-sticker.responses.stickerNotFound'),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  // Imported stickers mirror the Telegram set; they only disappear when removed from
+  // the Telegram pack or when the whole pack is deleted
+  if (sticker.telegramStickerId !== null) {
+    await interactionReply(context, interaction, {
+      content: t('commands.delete-sticker.responses.importedSticker'),
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -95,7 +105,7 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
         deletedBy: user.id,
         deletedAt: new Date(),
       },
-      include: { pack: true },
+      include: { pack: true, telegramSticker: true },
     });
   } catch (e) {
     context.logger.error('Failed to delete sticker record', e);

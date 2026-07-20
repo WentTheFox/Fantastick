@@ -79,8 +79,8 @@
       "name": "import",
       "description": "Import or update static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
-        "packOwnedByAnotherUser": "This Telegram pack was already imported by another user, so you cannot import it",
-        "nsfwRequiredForNewPack": "This Telegram pack has not been imported yet, please specify the nsfw option to create it",
+        "nsfwRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the nsfw option to create your copy",
+        "publicRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the public option to create your copy",
         "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",
         "invalidUrl": "The provided Telegram pack URL is invalid",
         "importFailed": "The import failed, please try again later",
@@ -98,7 +98,11 @@
         },
         "nsfw": {
           "name": "nsfw",
-          "description": "Whether the imported pack is age-restricted (required when importing a pack for the first time)"
+          "description": "Whether your copy of the pack is age-restricted (required when importing it for the first time)"
+        },
+        "public": {
+          "name": "public",
+          "description": "Whether your copy of the pack is visible to everyone (required when importing it for the first time)"
         }
       }
     },
@@ -273,6 +277,7 @@
       "description": "Delete an existing sticker",
       "responses": {
         "stickerNotFound": "The specified sticker could not be found",
+        "importedSticker": "Imported stickers cannot be deleted individually. They disappear when removed from the Telegram pack, or you can delete your copy of the whole pack.",
         "deleteFailed": "Could not delete the sticker due to an unexpected error, please try again later",
         "unsupportedMethod": "The provided deletion method ({{method}}) is not (yet) supported",
         "deleted": "The sticker {{name}} has been deleted successfully"

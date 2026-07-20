@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
-import { getFormattedPackName } from './get-formatted-pack-name.js';
+import { getFormattedPackName, getPackDisplayName } from './get-formatted-pack-name.js';
+
+describe('getPackDisplayName', () => {
+  it('should use the pack name for regular packs', () => {
+    expect(getPackDisplayName({ name: 'My Pack', telegramPack: null })).toEqual('My Pack');
+  });
+
+  it('should use the Telegram title for imported packs', () => {
+    expect(getPackDisplayName({ name: '', telegramPack: { title: 'Telegram Title' } })).toEqual('Telegram Title');
+  });
+});
 
 describe('getFormattedPackName', () => {
   it('should format regular packs without an import prefix', () => {
@@ -8,16 +18,16 @@ describe('getFormattedPackName', () => {
       name: 'My Pack',
       public: true,
       nsfw: false,
-      telegramPackName: null,
+      telegramPack: null,
     })).toEqual(`${EmojiCharacters.GLOBE} My Pack`);
   });
 
   it('should prefix imported pack names with the paper plane character', () => {
     expect(getFormattedPackName({
-      name: 'Imported Pack',
+      name: '',
       public: true,
       nsfw: false,
-      telegramPackName: 'imported_pack',
+      telegramPack: { title: 'Imported Pack' },
     })).toEqual(`${EmojiCharacters.GLOBE} ${EmojiCharacters.PAPER_PLANE} Imported Pack`);
   });
 
@@ -26,16 +36,16 @@ describe('getFormattedPackName', () => {
       name: 'Secret Pack',
       public: false,
       nsfw: true,
-      telegramPackName: null,
+      telegramPack: null,
     })).toEqual(`${EmojiCharacters.LOCKED} Secret Pack ${EmojiCharacters.NO_ONE_UNDER_18}`);
   });
 
   it('should wrap URLs in pack names in angle brackets', () => {
     expect(getFormattedPackName({
-      name: 'Visit https://example.com/pack now',
-      public: true,
+      name: '',
+      public: false,
       nsfw: false,
-      telegramPackName: 'url_pack',
-    })).toEqual(`${EmojiCharacters.GLOBE} ${EmojiCharacters.PAPER_PLANE} Visit <https://example.com/pack> now`);
+      telegramPack: { title: 'Visit https://example.com/pack now' },
+    })).toEqual(`${EmojiCharacters.LOCKED} ${EmojiCharacters.PAPER_PLANE} Visit <https://example.com/pack> now`);
   });
 });

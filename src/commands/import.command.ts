@@ -35,6 +35,7 @@ export const importCommand: BotChatInputCommand = {
 
     const url = interaction.options.getString(ImportCommandOptionName.URL, true);
     const nsfw = interaction.options.getBoolean(ImportCommandOptionName.NSFW);
+    const isPublic = interaction.options.getBoolean(ImportCommandOptionName.PUBLIC);
 
     const telegramPackName = parseTelegramPackName(url);
     if (!telegramPackName) {
@@ -45,22 +46,27 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
-    let pack = await db.pack.findFirst({
-      where: { telegramPackName, deletedAt: null },
+    const telegramPack = await db.telegramPack.findUnique({
+      where: { telegramPackName },
     });
-    if (pack && pack.createdBy !== user.id) {
-      await interactionReply(context, interaction, {
-        content: t('commands.import.responses.packOwnedByAnotherUser'),
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-    if (!pack && nsfw === null) {
-      await interactionReply(context, interaction, {
-        content: t('commands.import.responses.nsfwRequiredForNewPack'),
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
+    const userPack = telegramPack ? await db.pack.findFirst({
+      where: { telegramPackId: telegramPack.id, createdBy: user.id, deletedAt: null },
+    }) : null;
+    if (!userPack) {
+      if (nsfw === null) {
+        await interactionReply(context, interaction, {
+          content: t('commands.import.responses.nsfwRequiredForNewPack'),
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+      if (isPublic === null) {
+        await interactionReply(context, interaction, {
+          content: t('commands.import.responses.publicRequiredForNewPack'),
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
     }
 
     const activeImport = await db.importJob.findFirst({
@@ -93,17 +99,19 @@ export const importCommand: BotChatInputCommand = {
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    if (!pack) {
-      pack = await db.pack.create({
-        data: {
-          name: telegramPackName,
-          telegramPackName,
-          nsfw: nsfw === true,
-          public: true,
-          createdBy: user.id,
-        },
-      });
-    }
+    const packTelegramPack = telegramPack ?? await db.telegramPack.create({
+      // The placeholder title is replaced with the real one by the import job
+      data: { telegramPackName, title: telegramPackName },
+    });
+    const pack = userPack ?? await db.pack.create({
+      data: {
+        name: '',
+        nsfw: nsfw === true,
+        public: isPublic === true,
+        createdBy: user.id,
+        telegramPackId: packTelegramPack.id,
+      },
+    });
 
     const importJob = await db.importJob.create({
       data: {

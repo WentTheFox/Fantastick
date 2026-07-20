@@ -3,7 +3,7 @@ import { deletePackOptions } from '../options/delete-pack.options.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { DeletePackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
-import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
+import { getFormattedPackName, getPackDisplayName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -36,6 +36,7 @@ export const deletePackCommand: BotChatInputCommand = {
     const id = interaction.options.getString(DeletePackCommandOptionName.NAME, true);
     const pack = await db.pack.findUnique({
       where: { id, deletedAt: null, createdBy: user.id },
+      include: { telegramPack: true },
     });
 
     if (!pack) {
@@ -52,7 +53,7 @@ export const deletePackCommand: BotChatInputCommand = {
 
     await interaction.showModal({
       customId: `${BotModalId.DELETE_PACK}:${pack.id}`,
-      title: t('commands.delete-pack.components.deletePackModalTitle', { name: pack.name }),
+      title: t('commands.delete-pack.components.deletePackModalTitle', { name: getPackDisplayName(pack) }),
       components: [
         {
           type: ComponentType.TextDisplay,

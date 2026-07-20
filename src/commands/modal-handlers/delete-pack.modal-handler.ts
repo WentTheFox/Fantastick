@@ -1,6 +1,7 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
+import { getPackDisplayName } from '../../utils/get-formatted-pack-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 
@@ -17,6 +18,7 @@ export const deletePackModalHandler: ModalHandler = async (interaction, context,
 
   const pack = resourceId ? await db.pack.findUnique({
     where: { id: resourceId, deletedAt: null, createdBy: user.id },
+    include: { telegramPack: true },
   }) : null;
 
   if (!pack) {
@@ -50,7 +52,7 @@ export const deletePackModalHandler: ModalHandler = async (interaction, context,
 
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.delete-pack.responses.deleted', {
-      name: `\`${pack.name}\``,
+      name: `\`${getPackDisplayName(pack)}\``,
     })}`,
     flags: MessageFlags.Ephemeral,
   });

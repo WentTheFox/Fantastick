@@ -64,7 +64,7 @@ export const reorderStickerCommand: BotChatInputCommand = {
     const id = interaction.options.getString(ReorderStickerCommandOptionName.STICKER, true);
     const sticker = await db.sticker.findUnique({
       where: { id, deletedAt: null, createdBy: user.id },
-      include: { pack: true },
+      include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
     });
     if (!sticker) {
       await interactionReply(context, interaction, {
@@ -75,7 +75,7 @@ export const reorderStickerCommand: BotChatInputCommand = {
     }
 
     // Imported sticker ordering is dictated by Telegram and would be reverted on re-import
-    if (sticker.telegramFileUniqueId !== null) {
+    if (sticker.telegramStickerId !== null) {
       await interactionReply(context, interaction, {
         content: t('commands.reorder-sticker.responses.importedStickerImmutable'),
         flags: MessageFlags.Ephemeral,
@@ -85,6 +85,7 @@ export const reorderStickerCommand: BotChatInputCommand = {
 
     const target = await db.sticker.findUnique({
       where: { id: targetId, deletedAt: null, createdBy: user.id, packId: sticker.packId },
+      include: { telegramSticker: true },
     });
     if (!target || target.id === sticker.id) {
       await interactionReply(context, interaction, {

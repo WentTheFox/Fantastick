@@ -26,50 +26,80 @@ model DiscordUser {
   importJobs      ImportJob[] @relation("ImportedJobs")
 }
 
+model TelegramPack {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  telegramPackName String            @db.VarChar(255)
+  title            String
+  lastImportedAt   DateTime?         @db.Timestamptz(0)
+  createdAt        DateTime          @default(now()) @db.Timestamptz(0)
+  updatedAt        DateTime?         @updatedAt @db.Timestamptz(0)
+  stickers         TelegramSticker[]
+  packs            Pack[]
+
+  @@unique([telegramPackName])
+}
+
+model TelegramSticker {
+  id                   String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  telegramPack         TelegramPack @relation(fields: [telegramPackId], references: [id])
+  telegramPackId       String       @db.Uuid
+  telegramFileUniqueId String       @db.VarChar(255)
+  emoji                String
+  order                Int          @default(0)
+  url                  String       @db.VarChar(255)
+  createdAt            DateTime     @default(now()) @db.Timestamptz(0)
+  updatedAt            DateTime?    @updatedAt @db.Timestamptz(0)
+  deletedAt            DateTime?    @db.Timestamptz(0)
+  stickers             Sticker[]
+
+  @@unique([telegramPackId, telegramFileUniqueId])
+  @@index([deletedAt])
+}
+
 model Pack {
-  id               String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name             String
-  stickers         Sticker[]
-  importJobs       ImportJob[]
-  createdBy        BigInt
-  creator          DiscordUser  @relation("CreatedPacks", fields: [createdBy], references: [id])
-  createdAt        DateTime     @default(now()) @db.Timestamptz(0)
-  updatedAt        DateTime?    @updatedAt @db.Timestamptz(0)
-  deletedAt        DateTime?    @db.Timestamptz(0)
-  deletedBy        BigInt?
-  deleter          DiscordUser? @relation("DeletedPacks", fields: [deletedBy], references: [id])
-  nsfw             Boolean      @default(false)
-  public           Boolean      @default(false)
-  telegramPackName String?      @db.VarChar(255)
-  lastImportedAt   DateTime?    @db.Timestamptz(0)
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  stickers       Sticker[]
+  importJobs     ImportJob[]
+  createdBy      BigInt
+  creator        DiscordUser   @relation("CreatedPacks", fields: [createdBy], references: [id])
+  createdAt      DateTime      @default(now()) @db.Timestamptz(0)
+  updatedAt      DateTime?     @updatedAt @db.Timestamptz(0)
+  deletedAt      DateTime?     @db.Timestamptz(0)
+  deletedBy      BigInt?
+  deleter        DiscordUser?  @relation("DeletedPacks", fields: [deletedBy], references: [id])
+  nsfw           Boolean       @default(false)
+  public         Boolean       @default(false)
+  telegramPack   TelegramPack? @relation(fields: [telegramPackId], references: [id])
+  telegramPackId String?       @db.Uuid
 
   @@index([name])
   @@index([deletedAt])
-  @@index([telegramPackName])
+  @@index([telegramPackId])
 }
 
 model Sticker {
-  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  pack            Pack             @relation(fields: [packId], references: [id])
-  packId          String           @db.Uuid
-  name            String
-  description     String?          @db.VarChar(255)
-  emoji           String?
-  url             String           @db.VarChar(255)
-  createdBy       BigInt
-  creator         DiscordUser      @relation("CreatedStickers", fields: [createdBy], references: [id])
-  createdAt       DateTime         @default(now()) @db.Timestamptz(0)
-  updatedAt       DateTime?        @updatedAt @db.Timestamptz(0)
-  deletedAt       DateTime?        @db.Timestamptz(0)
-  deletedBy       BigInt?
-  deleter         DiscordUser?     @relation("DeletedStickers", fields: [deletedBy], references: [id])
-  order                Int              @default(0)
-  telegramFileUniqueId String?          @db.VarChar(255)
-  stickerMessages      StickerMessage[] @ignore
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pack              Pack             @relation(fields: [packId], references: [id])
+  packId            String           @db.Uuid
+  name              String
+  description       String?          @db.VarChar(255)
+  url               String?          @db.VarChar(255)
+  createdBy         BigInt
+  creator           DiscordUser      @relation("CreatedStickers", fields: [createdBy], references: [id])
+  createdAt         DateTime         @default(now()) @db.Timestamptz(0)
+  updatedAt         DateTime?        @updatedAt @db.Timestamptz(0)
+  deletedAt         DateTime?        @db.Timestamptz(0)
+  deletedBy         BigInt?
+  deleter           DiscordUser?     @relation("DeletedStickers", fields: [deletedBy], references: [id])
+  order             Int              @default(0)
+  telegramSticker   TelegramSticker? @relation(fields: [telegramStickerId], references: [id])
+  telegramStickerId String?          @db.Uuid
+  stickerMessages   StickerMessage[] @ignore
 
   @@index([deletedAt])
   @@index([name])
-  @@index([telegramFileUniqueId])
+  @@index([telegramStickerId])
 }
 
 enum ImportJobStatus {

@@ -20,6 +20,7 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
         deletedAt: null,
         OR: [{ public: true }, { createdBy: BigInt(interaction.user.id) }],
       },
+      include: { telegramPack: true },
     })
     : null;
 
@@ -45,9 +46,11 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
 
   const stickers = await db.sticker.findMany({
     where: { deletedAt: null, packId: pack.id },
+    include: { telegramSticker: true },
     take: packItemsPerPage,
     skip: page * packItemsPerPage,
-    orderBy: { order: 'asc' },
+    // Imported sticker order lives on the shared TelegramSticker row
+    orderBy: pack.telegramPackId !== null ? { telegramSticker: { order: 'asc' } } : { order: 'asc' },
   });
 
   const { components, files } = getPackPreviewContent({ t, pack, stickers, page, totalPages });

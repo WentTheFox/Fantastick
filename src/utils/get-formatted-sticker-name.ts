@@ -1,6 +1,10 @@
-import { Sticker } from '../generated/prisma/client.js';
+import { Sticker, TelegramSticker } from '../generated/prisma/client.js';
 
-export const getFormattedStickerName = (sticker: Pick<Sticker, 'name' | 'emoji' | 'order' | 'telegramFileUniqueId'>) =>
-  sticker.telegramFileUniqueId !== null
-    ? `${sticker.emoji ?? ''}#${sticker.order + 1}${sticker.name ? ` ${sticker.name}` : ''}`
+export type FormattableSticker = Pick<Sticker, 'name'> & {
+  telegramSticker: Pick<TelegramSticker, 'emoji' | 'order'> | null;
+};
+
+export const getFormattedStickerName = (sticker: FormattableSticker) =>
+  sticker.telegramSticker !== null
+    ? `${sticker.telegramSticker.emoji}#${sticker.telegramSticker.order + 1}${sticker.name ? ` ${sticker.name}` : ''}`
     : sticker.name;

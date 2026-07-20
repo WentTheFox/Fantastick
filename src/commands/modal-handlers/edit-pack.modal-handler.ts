@@ -5,6 +5,7 @@ import {
   packNameOptionMeta,
 } from '../../options/metadata/pack-name.option-meta.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
+import { getPackDisplayName } from '../../utils/get-formatted-pack-name.js';
 import { getPackVisibilityEmoji } from '../../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
@@ -34,6 +35,7 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
 
   let pack = resourceId ? await db.pack.findUnique({
     where: { id: resourceId, deletedAt: null, createdBy: user.id },
+    include: { telegramPack: true },
   }) : null;
 
   if (!pack) {
@@ -44,7 +46,7 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
     return;
   }
   const packSnapshot: PackSnapshot = {
-    name: pack.name,
+    name: getPackDisplayName(pack),
     public: pack.public,
     nsfw: pack.nsfw,
   };
@@ -52,7 +54,7 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
   const { data } = collectModalSubmittedData(interaction, EditPackModalCustomIds);
 
   // Imported pack names come from Telegram and cannot be edited; the modal omits the name input
-  const isImportedPack = pack.telegramPackName !== null;
+  const isImportedPack = pack.telegramPackId !== null;
   const packName = data[EditPackModalCustomIds.NAME_INPUT];
   if (!isImportedPack && packName !== pack.name) {
     if (packName === null || packName.length < packNameOptionMeta.min_length) {
@@ -92,7 +94,7 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
     const otherPacksWithSameNameCount = await db.pack.count({
       where: {
         AND: [
-          { name: packName, deletedAt: null, telegramPackName: null },
+          { name: packName, deletedAt: null, telegramPackId: null },
           { NOT: { id: pack.id } },
         ],
       },
@@ -113,13 +115,14 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
       public: data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE,
       nsfw: data[EditPackModalCustomIds.NSFW_INPUT] === EditPackModalBooleanOption.TRUE,
     },
+    include: { telegramPack: true },
   });
 
   await interactionReply(context, interaction, {
     content: [
       EmojiCharacters.GREEN_CHECK,
       getPackVisibilityEmoji(pack),
-      t('commands.edit-pack.responses.updated', { name: `\`${pack.name}\`` }),
+      t('commands.edit-pack.responses.updated', { name: `\`${getPackDisplayName(pack)}\`` }),
     ].join(' '),
     flags: MessageFlags.Ephemeral,
   });

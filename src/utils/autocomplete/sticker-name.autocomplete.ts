@@ -1,5 +1,6 @@
 import { AutocompleteHandler } from '../../types/bot-interaction.js';
 import { findAvailableStickerPacks } from '../find-available-sticker-packs.js';
+import { getPackDisplayName } from '../get-formatted-pack-name.js';
 import { getFormattedStickerName } from '../get-formatted-sticker-name.js';
 import { truncateToMaximumLength } from '../messaging.js';
 
@@ -14,10 +15,10 @@ export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHan
 
   const packNameIndex = availablePacks.reduce((acc, pack) => ({
     ...acc,
-    [pack.id]: pack.name,
+    [pack.id]: getPackDisplayName(pack),
   }), {} as Record<string, string>);
   const userStickers = await db.sticker.findMany({
-    select: { id: true, name: true, packId: true, emoji: true, order: true, telegramFileUniqueId: true },
+    select: { id: true, name: true, packId: true, telegramSticker: { select: { emoji: true, order: true } } },
     where: {
       deletedAt: null,
       packId: {

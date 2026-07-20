@@ -54,7 +54,7 @@ export const stickerDetailsCommand: BotMessageContextMenuCommand = {
       where: {
         id: { in: stickerMessages.map(sm => sm.stickerId) },
       },
-      include: { pack: true },
+      include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
     });
 
     const allFiles: AttachmentBuilder[] = [];

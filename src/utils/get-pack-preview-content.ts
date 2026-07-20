@@ -4,15 +4,16 @@ import { TFunction } from 'i18next';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { Pack, Sticker } from '../generated/prisma/client.js';
 import { BotMessageComponentCustomId } from '../types/bot-interaction.js';
-import { getFormattedPackName } from './get-formatted-pack-name.js';
+import { FormattablePack, getFormattedPackName } from './get-formatted-pack-name.js';
+import { StickerUrlSource } from './get-sticker-url.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
 
 export const packItemsPerPage = 9;
 
 interface GetPackPreviewContentOptions {
   t: TFunction;
-  pack: Pick<Pack, 'id' | 'name' | 'public' | 'nsfw' | 'telegramPackName'>;
-  stickers: Pick<Sticker, 'url' | 'description'>[];
+  pack: Pick<Pack, 'id'> & FormattablePack;
+  stickers: (Pick<Sticker, 'description'> & StickerUrlSource)[];
   page: number;
   totalPages: number;
 }

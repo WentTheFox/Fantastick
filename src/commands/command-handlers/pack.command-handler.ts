@@ -16,6 +16,7 @@ export const packCommandHandler = (nsfw: boolean): CommandHandler => async funct
       nsfw: nsfw ? undefined : false,
       deletedAt: null,
     },
+    include: { telegramPack: true },
   });
   if (!pack) {
     await interactionReply(context, interaction, {
@@ -34,8 +35,10 @@ export const packCommandHandler = (nsfw: boolean): CommandHandler => async funct
       deletedAt: null,
       packId: pack.id,
     },
+    include: { telegramSticker: true },
     take: packItemsPerPage,
-    orderBy: { order: 'asc' },
+    // Imported sticker order lives on the shared TelegramSticker row
+    orderBy: pack.telegramPackId !== null ? { telegramSticker: { order: 'asc' } } : { order: 'asc' },
   });
 
   const { flags, components, files } = getPackPreviewContent({ t, pack, stickers, page: 0, totalPages });

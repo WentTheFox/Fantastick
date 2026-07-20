@@ -6,7 +6,7 @@ import { filledBar } from 'string-progressbar';
 import typia from 'typia';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { env } from '../../env.js';
-import { Pack, Sticker } from '../../generated/prisma/client.js';
+import { Pack, Sticker, TelegramPack, TelegramSticker } from '../../generated/prisma/client.js';
 import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';
@@ -47,7 +47,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
 
   const importJob = await db.importJob.findUnique({
     where: { id: importJobId },
-    include: { pack: true },
+    include: { pack: { include: { telegramPack: true } } },
   });
   if (!importJob) {
     logger.error(`Import job ${importJobId} not found`);
@@ -55,6 +55,12 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   }
 
   const { interactionId, interactionToken, telegramPackName, packId, importedBy, pack } = importJob;
+  const telegramPack = pack.telegramPack;
+  if (!telegramPack) {
+    logger.error(`Import job ${importJobId} references pack ${packId} without a linked Telegram pack`);
+    await db.importJob.update({ where: { id: importJobId }, data: { status: 'FAILED', errorMessage: 'Pack is not linked to a Telegram pack' } });
+    return;
+  }
 
   const emojiIdMap = await getEmojiIdMap({ logger });
 
@@ -69,10 +75,9 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     }
   };
 
-  // A pack freshly auto-created for this import (never imported into, no live stickers)
-  // is removed again when the job fails so a bad URL doesn't leave an orphan placeholder
+  // A pack freshly auto-created for this import (no live stickers yet) is removed again
+  // when the job fails so a bad URL doesn't leave an orphan placeholder pack
   const cleanUpFreshlyCreatedPack = async () => {
-    if (pack.lastImportedAt !== null) return;
     const liveStickerCount = await db.sticker.count({ where: { packId, deletedAt: null } });
     if (liveStickerCount > 0) return;
     await db.pack.update({
@@ -129,21 +134,28 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   await updateDiscordProgress(buildProgressContent(emojiIdMap, total, 0));
   logger.debug(`Importing ${total} stickers from Telegram set ${telegramPackName}…`);
 
-  const createStickerRecords: Parameters<typeof db.sticker.create>[0][] = [];
-  const updateStickerRecords: Parameters<typeof db.sticker.update>[0][] = [];
+  // Phase 1: sync the shared TelegramSticker rows (files are stored exactly once)
+  const createTelegramStickerRecords: Parameters<typeof db.telegramSticker.create>[0][] = [];
+  const updateTelegramStickerRecords: Parameters<typeof db.telegramSticker.update>[0][] = [];
   const createdFiles = new Set<string>();
   let completed = 0;
   let failedCount = 0;
 
   for (const [order, sticker] of telegramStickers.entries()) {
-    const existing = await db.sticker.findFirst({
-      where: { packId, telegramFileUniqueId: sticker.file_unique_id, deletedAt: null },
+    // Includes soft-deleted rows: a sticker re-added to the Telegram set is restored
+    const existing = await db.telegramSticker.findUnique({
+      where: {
+        telegramPackId_telegramFileUniqueId: {
+          telegramPackId: telegramPack.id,
+          telegramFileUniqueId: sticker.file_unique_id,
+        },
+      },
     });
     if (existing) {
-      if (existing.emoji !== sticker.emoji || existing.order !== order) {
-        updateStickerRecords.push({
+      if (existing.deletedAt !== null || existing.emoji !== sticker.emoji || existing.order !== order) {
+        updateTelegramStickerRecords.push({
           where: { id: existing.id },
-          data: { emoji: sticker.emoji, order },
+          data: { emoji: sticker.emoji, order, deletedAt: null },
         });
       }
       completed++;
@@ -175,75 +187,120 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       validator: typia.createValidate<Readable>(),
     });
 
-    const { stickerFileId: stickerId, filePath, stickerUrl } = await saveStickerFile({ logger }, {
+    const { stickerFileId: telegramStickerId, filePath, stickerUrl } = await saveStickerFile({ logger }, {
       fileId: sticker.file_id,
       fileName: 'sticker.webp',
       data: fileRequest.response,
     });
     createdFiles.add(filePath);
 
-    createStickerRecords.push({
+    createTelegramStickerRecords.push({
       data: {
-        id: stickerId,
-        name: '',
+        id: telegramStickerId,
+        telegramPackId: telegramPack.id,
+        telegramFileUniqueId: sticker.file_unique_id,
         emoji: sticker.emoji,
-        description: null,
-        packId,
-        createdBy: importedBy,
         order,
         url: stickerUrl,
-        telegramFileUniqueId: sticker.file_unique_id,
       },
     });
 
     completed++;
-    logger.info(`Downloaded sticker ${sticker.file_id} (#${order}) → ${stickerId}`);
+    logger.info(`Downloaded sticker ${sticker.file_id} (#${order}) → ${telegramStickerId}`);
     await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
     await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed));
   }
 
-  // Stickers previously imported into this pack but no longer part of the Telegram set
-  const staleStickers = await db.sticker.findMany({
+  // Telegram stickers no longer part of the set
+  const staleTelegramStickers = await db.telegramSticker.findMany({
     where: {
-      packId,
+      telegramPackId: telegramPack.id,
       deletedAt: null,
-      telegramFileUniqueId: { not: null, notIn: telegramStickers.map(s => s.file_unique_id) },
+      telegramFileUniqueId: { notIn: telegramStickers.map(s => s.file_unique_id) },
     },
   });
 
-  // Finalize: write sticker records and update pack
+  // Phase 2: finalize shared rows and fan the changes out to every subscribed pack
   await db.importJob.update({ where: { id: importJobId }, data: { status: 'FINALIZING' } });
   await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed, false, true));
   logger.info('Creating sticker records and updating pack…');
 
-  let createdStickers: Sticker[] | null = null;
-  let updatedPack: Pack;
+  let initiatingPackStickerIds: string[];
   try {
-    [createdStickers, updatedPack] = await db.$transaction(async (tx) => {
-      const created: Sticker[] = [];
-      for (const args of createStickerRecords) {
-        created.push(await tx.sticker.create(args));
+    initiatingPackStickerIds = await db.$transaction(async (tx) => {
+      const createdTelegramStickers: TelegramSticker[] = [];
+      for (const args of createTelegramStickerRecords) {
+        createdTelegramStickers.push(await tx.telegramSticker.create(args));
       }
-      for (const args of updateStickerRecords) {
-        await tx.sticker.update(args);
+      for (const args of updateTelegramStickerRecords) {
+        await tx.telegramSticker.update(args);
       }
-      if (staleStickers.length > 0) {
-        await tx.sticker.updateMany({
-          where: { id: { in: staleStickers.map(s => s.id) } },
-          data: { deletedAt: new Date(), deletedBy: importedBy },
+      if (staleTelegramStickers.length > 0) {
+        await tx.telegramSticker.updateMany({
+          where: { id: { in: staleTelegramStickers.map(s => s.id) } },
+          data: { deletedAt: new Date() },
         });
       }
-      const packUpdate = await tx.pack.update({
-        where: { id: packId },
-        data: {
-          name: packTitle,
-          public: true,
-          telegramPackName,
-          lastImportedAt: new Date(),
-        },
+      await tx.telegramPack.update({
+        where: { id: telegramPack.id },
+        data: { title: packTitle, lastImportedAt: new Date() },
       });
-      return [created, packUpdate] as const;
-    });
+
+      const liveTelegramStickers = await tx.telegramSticker.findMany({
+        where: { telegramPackId: telegramPack.id, deletedAt: null },
+        select: { id: true },
+      });
+      const liveTelegramStickerIds = new Set(liveTelegramStickers.map(ts => ts.id));
+      const staleTelegramStickerIds = staleTelegramStickers.map(s => s.id);
+
+      // Every user's view of this Telegram pack mirrors the shared rows
+      const subscriberPacks = await tx.pack.findMany({
+        where: { telegramPackId: telegramPack.id, deletedAt: null },
+      });
+      const newInitiatingPackStickerIds: string[] = [];
+      for (const subscriberPack of subscriberPacks) {
+        const existingRows = await tx.sticker.findMany({
+          where: { packId: subscriberPack.id, telegramStickerId: { not: null } },
+        });
+        const rowsByTelegramStickerId = new Map(existingRows.map(row => [row.telegramStickerId as string, row]));
+
+        for (const telegramStickerId of liveTelegramStickerIds) {
+          const row = rowsByTelegramStickerId.get(telegramStickerId);
+          if (!row) {
+            const created = await tx.sticker.create({
+              data: {
+                name: '',
+                description: null,
+                packId: subscriberPack.id,
+                createdBy: subscriberPack.createdBy,
+                telegramStickerId,
+              },
+            });
+            if (subscriberPack.id === packId) {
+              newInitiatingPackStickerIds.push(created.id);
+            }
+          } else if (row.deletedAt !== null) {
+            // Restored on Telegram: bring the user's row (and their label) back
+            await tx.sticker.update({
+              where: { id: row.id },
+              data: { deletedAt: null, deletedBy: null },
+            });
+          }
+        }
+
+        if (staleTelegramStickerIds.length > 0) {
+          await tx.sticker.updateMany({
+            where: {
+              packId: subscriberPack.id,
+              telegramStickerId: { in: staleTelegramStickerIds },
+              deletedAt: null,
+            },
+            data: { deletedAt: new Date() },
+          });
+        }
+      }
+      return newInitiatingPackStickerIds;
+    }, { timeout: 60_000 });
   } catch (e) {
     logger.error('Failed to create sticker records', e);
 
@@ -272,30 +329,42 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     data: { status: 'COMPLETED', completedAt: new Date() },
   });
 
-  const importedCount = createdStickers.length;
+  const importedCount = createTelegramStickerRecords.length;
   const summaryParts = [
     `${importedCount} new sticker${importedCount !== 1 ? 's' : ''} imported`,
-    ...(updateStickerRecords.length > 0 ? [`${updateStickerRecords.length} updated`] : []),
-    ...(staleStickers.length > 0 ? [`${staleStickers.length} removed`] : []),
+    ...(updateTelegramStickerRecords.length > 0 ? [`${updateTelegramStickerRecords.length} updated`] : []),
+    ...(staleTelegramStickers.length > 0 ? [`${staleTelegramStickers.length} removed`] : []),
   ];
   await updateDiscordProgress(`${EmojiCharacters.GREEN_CHECK} ${summaryParts.join(', ')}.`);
-  logger.info(`Import job ${importJobId} completed: ${importedCount} created, ${updateStickerRecords.length} updated, ${staleStickers.length} removed in pack ${packId}`);
+  logger.info(`Import job ${importJobId} completed: ${importedCount} created, ${updateTelegramStickerRecords.length} updated, ${staleTelegramStickers.length} removed in Telegram pack ${telegramPack.id}`);
 
-  // Post each new sticker to the feed
-  if (env.DISCORD_FEED_WEBHOOK_URL !== null && createdStickers.length > 0) {
-    await postImportedStickersToFeed({ db, stickers: createdStickers, pack: updatedPack, importedBy: String(importedBy), logger });
+  // Post the initiating user's new stickers to the feed
+  if (env.DISCORD_FEED_WEBHOOK_URL !== null && initiatingPackStickerIds.length > 0) {
+    const newStickers = await db.sticker.findMany({
+      where: { id: { in: initiatingPackStickerIds } },
+      include: { telegramSticker: true },
+    });
+    await postImportedStickersToFeed({
+      db,
+      stickers: newStickers,
+      pack,
+      telegramPack: { ...telegramPack, title: packTitle },
+      importedBy: String(importedBy),
+      logger,
+    });
   }
 };
 
 interface PostImportedStickersToFeedParams {
   db: ReturnType<typeof createDb>;
-  stickers: Sticker[];
+  stickers: (Sticker & { telegramSticker: TelegramSticker | null })[];
   pack: Pack;
+  telegramPack: TelegramPack;
   importedBy: string;
   logger: NestableLogger;
 }
 
-const postImportedStickersToFeed = async ({ db, stickers, pack, importedBy, logger }: PostImportedStickersToFeedParams) => {
+const postImportedStickersToFeed = async ({ db, stickers, pack, telegramPack, importedBy, logger }: PostImportedStickersToFeedParams) => {
   const webhookClient = new WebhookClient({ url: env.DISCORD_FEED_WEBHOOK_URL! });
 
   for (const sticker of stickers) {
@@ -307,7 +376,7 @@ const postImportedStickersToFeed = async ({ db, stickers, pack, importedBy, logg
           '# Sticker imported',
           `**Name:** \`${getFormattedStickerName(sticker)}\` (\`${sticker.id}\`)`,
           '**Description:** _(empty)_',
-          `**Pack:** \`${wrapUrlsInAngleBrackets(pack.name)}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
+          `**Pack:** \`${wrapUrlsInAngleBrackets(telegramPack.title)}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
           `**Imported by:** ${userMention(importedBy)} (\`${importedBy}\`)`,
           `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => pack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,
         ].join('\n'),

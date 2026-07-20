@@ -40,6 +40,7 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
         in: availablePacks.map(pack => pack.id),
       },
     },
+    include: { telegramSticker: true },
     take: 1,
   });
   if (!stickers) {

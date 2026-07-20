@@ -8,7 +8,7 @@ import {
   WebhookClient,
 } from 'discord.js';
 import { env } from '../env.js';
-import { Pack } from '../generated/prisma/client.js';
+import { Pack, TelegramPack } from '../generated/prisma/client.js';
 import { InteractionContext } from '../types/contexts/interaction.context.js';
 
 export interface PackSnapshot {
@@ -20,7 +20,7 @@ export interface PackSnapshot {
 interface PostPackToFeedParams {
   context: InteractionContext;
   interaction: ChatInputCommandInteraction | ModalSubmitInteraction;
-  pack: Pack;
+  pack: Pack & { telegramPack?: TelegramPack | null };
   action: 'create' | 'edit' | 'delete';
   snapshot?: PackSnapshot;
 }
@@ -37,7 +37,8 @@ export const postPackToFeed = async ({
 
   const webhookClient = new WebhookClient({ url: env.DISCORD_FEED_WEBHOOK_URL });
 
-  const nameChanged = snapshot && snapshot.name !== pack.name;
+  const packName = pack.telegramPack?.title ?? pack.name;
+  const nameChanged = snapshot && snapshot.name !== packName;
   const nsfwChanged = snapshot && snapshot.nsfw !== pack.nsfw;
   const publicChanged = snapshot && snapshot.public !== pack.public;
   await webhookClient.send({
@@ -45,7 +46,7 @@ export const postPackToFeed = async ({
     content: [
       `# Pack ${action.replace(/e?$/, 'ed')}`,
       ...(nameChanged ? [`**Old name:** \`${snapshot.name}\``] : []),
-      `**${nameChanged ? 'New name' : 'Name'}:** \`${pack.name}\` (\`${pack.id}\`)`,
+      `**${nameChanged ? 'New name' : 'Name'}:** \`${packName}\` (\`${pack.id}\`)`,
       `**Public:** \`${pack.public}\`${publicChanged ? ` (was \`${snapshot.public}\`)` : ''}`,
       `**NSFW:** \`${pack.nsfw}\`${nsfwChanged ? ` (was \`${snapshot.nsfw}\`)` : ''}`,
       `**Created at:** ${time(pack.createdAt, TimestampStyles.FullDateShortTime)} (${time(pack.createdAt, TimestampStyles.RelativeTime)})`,

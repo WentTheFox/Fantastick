@@ -72,7 +72,7 @@ export const createPackModalHandler: ModalHandler = async (interaction, context)
     where: {
       name: packName,
       deletedAt: null,
-      telegramPackName: null,
+      telegramPackId: null,
     },
   });
   if (packPacksWithSameNameCount !== 0) {

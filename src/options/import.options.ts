@@ -17,5 +17,10 @@ export const getImportOptions = (t: TFunction): APIApplicationCommandOption[] =>
     required: false,
     type: ApplicationCommandOptionType.Boolean,
   },
+  {
+    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT, ImportCommandOptionName.PUBLIC),
+    required: false,
+    type: ApplicationCommandOptionType.Boolean,
+  },
   ...getGlobalOptions(t),
 ];

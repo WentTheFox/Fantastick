@@ -16,6 +16,7 @@ export const enum CreatePackCommandOptionName {
 export const enum ImportCommandOptionName {
   URL = 'url',
   NSFW = 'nsfw',
+  PUBLIC = 'public',
 }
 
 export const enum PackCommandOptionName {
@@ -97,8 +98,8 @@ export const enum CreateStickerCommandResponse {
 }
 
 export const enum ImportCommandResponse {
-  packOwnedByAnotherUser = 'packOwnedByAnotherUser',
   nsfwRequiredForNewPack = 'nsfwRequiredForNewPack',
+  publicRequiredForNewPack = 'publicRequiredForNewPack',
   packImportAlreadyRunning = 'packImportAlreadyRunning',
   invalidUrl = 'invalidUrl',
   importFailed = 'importFailed',
@@ -120,6 +121,7 @@ export const enum EditStickerCommandResponse {
 
 export const enum DeleteStickerCommandResponse {
   stickerNotFound = 'stickerNotFound',
+  importedSticker = 'importedSticker',
   deleteFailed = 'deleteFailed',
   unsupportedMethod = 'unsupportedMethod',
   deleted = 'deleted',

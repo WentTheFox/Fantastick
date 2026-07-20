@@ -23,7 +23,7 @@ export const getReorderStickerTargetAutocompleteHandler = (): AutocompleteHandle
   }
 
   const siblings = await db.sticker.findMany({
-    select: { id: true, name: true, emoji: true, order: true, telegramFileUniqueId: true },
+    select: { id: true, name: true, telegramSticker: { select: { emoji: true, order: true } } },
     where: {
       deletedAt: null,
       packId: sticker.packId,

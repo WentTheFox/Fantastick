@@ -36,7 +36,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   let sticker = resourceId ? await db.sticker.findUnique({
     where: { id: resourceId, deletedAt: null, createdBy: user.id },
-    include: { pack: true },
+    include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
   }) : null;
 
   if (!sticker) {
@@ -59,7 +59,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   // Imported stickers only carry an optional user-provided label; a blank name is
   // acceptable and their display name is derived from the emoji and order instead
-  const isImportedSticker = sticker.telegramFileUniqueId !== null;
+  const isImportedSticker = sticker.telegramStickerId !== null;
   const stickerName = isImportedSticker
     ? (data[EditStickerModalCustomIds.NEW_NAME_INPUT] ?? '')
     : data[EditStickerModalCustomIds.NEW_NAME_INPUT];
@@ -173,7 +173,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
       description,
       url: stickerUrl,
     },
-    include: { pack: true },
+    include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
   });
 
   await interactionReply(context, interaction, {

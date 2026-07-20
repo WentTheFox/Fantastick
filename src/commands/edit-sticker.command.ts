@@ -47,7 +47,7 @@ export const editStickerCommand: BotChatInputCommand = {
     const id = interaction.options.getString(EditStickerCommandOptionName.NAME, true);
     const sticker = await db.sticker.findUnique({
       where: { id, deletedAt: null },
-      include: { pack: true },
+      include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
     });
 
     if (!sticker) {
@@ -58,7 +58,7 @@ export const editStickerCommand: BotChatInputCommand = {
       return;
     }
 
-    const isImportedSticker = sticker.telegramFileUniqueId !== null;
+    const isImportedSticker = sticker.telegramStickerId !== null;
     const formattedStickerName = getFormattedStickerName(sticker);
     await interaction.showModal({
       customId: `${BotModalId.EDIT_STICKER}:${sticker.id}`,

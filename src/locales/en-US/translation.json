@@ -278,6 +278,7 @@
       },
       "components": {
         "renamingText": "Renaming stickers in pack {{pack}}\nSticker {{position}} of {{total}}: {{name}}",
+        "renamingModalText": "You are renaming sticker {{name}} from pack {{pack}}.",
         "renameButton": "Rename",
         "skipButton": "Skip",
         "renameModalTitle": "Rename sticker {{name}}",

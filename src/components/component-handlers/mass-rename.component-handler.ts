@@ -47,7 +47,7 @@ export const massRenameOpenComponentHandler: BotMessageComponentHandler = async 
     components: [
       {
         type: ComponentType.TextDisplay,
-        content: t('commands.edit-sticker.components.editingText', {
+        content: t('commands.mass-rename-stickers.components.renamingModalText', {
           name: `\`${formattedStickerName}\``,
           pack: getFormattedPackName(sticker.pack),
         }),

@@ -176,7 +176,7 @@
         "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged.",
         "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
         "importedNameLabel": "Sticker name (optional)",
-        "importedNameDescription": "Enter an optional name to make this sticker easier to find when sending. Leave blank to only search by emojis and position."
+        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position."
       },
       "options": {
         "name": {

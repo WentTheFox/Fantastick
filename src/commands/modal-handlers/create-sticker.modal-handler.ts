@@ -52,6 +52,8 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     where: {
       name: packName,
       createdBy: user.id,
+      deletedAt: null,
+      telegramPackId: null,
     },
   });
   if (!userPack) {
@@ -174,6 +176,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
       createdBy: user.id,
       order,
     },
+    include: { telegramSticker: true },
   });
 
   await interactionReply(context, interaction, {

@@ -1,5 +1,6 @@
 import { AutocompleteHandler } from '../../types/bot-interaction.js';
 import { ReorderStickerCommandOptionName } from '../../types/localization.js';
+import { getFormattedStickerName } from '../get-formatted-sticker-name.js';
 import { truncateToMaximumLength } from '../messaging.js';
 
 export const getReorderStickerTargetAutocompleteHandler = (): AutocompleteHandler => async (interaction, context, optionName) => {
@@ -22,7 +23,7 @@ export const getReorderStickerTargetAutocompleteHandler = (): AutocompleteHandle
   }
 
   const siblings = await db.sticker.findMany({
-    select: { id: true, name: true },
+    select: { id: true, name: true, telegramSticker: { select: { emoji: true, order: true } } },
     where: {
       deletedAt: null,
       packId: sticker.packId,
@@ -31,8 +32,12 @@ export const getReorderStickerTargetAutocompleteHandler = (): AutocompleteHandle
     orderBy: { order: 'asc' },
   });
 
-  await interaction.respond(siblings.filter(sibling => sibling.name.toLowerCase().includes(value)).slice(0, 25).map(sibling => ({
-    name: truncateToMaximumLength(sibling.name, 100),
-    value: sibling.id,
-  })));
+  await interaction.respond(siblings
+    .map(sibling => ({ id: sibling.id, displayName: getFormattedStickerName(sibling) }))
+    .filter(sibling => sibling.displayName.toLowerCase().includes(value))
+    .slice(0, 25)
+    .map(sibling => ({
+      name: truncateToMaximumLength(sibling.displayName, 100),
+      value: sibling.id,
+    })));
 };

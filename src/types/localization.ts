@@ -14,8 +14,9 @@ export const enum CreatePackCommandOptionName {
 }
 
 export const enum ImportCommandOptionName {
-  PACK = 'pack',
   URL = 'url',
+  NSFW = 'nsfw',
+  PUBLIC = 'public',
 }
 
 export const enum PackCommandOptionName {
@@ -97,7 +98,8 @@ export const enum CreateStickerCommandResponse {
 }
 
 export const enum ImportCommandResponse {
-  packNotFound = 'packNotFound',
+  optionsRequiredForNewPack = 'optionsRequiredForNewPack',
+  packImportAlreadyRunning = 'packImportAlreadyRunning',
   invalidUrl = 'invalidUrl',
   importFailed = 'importFailed',
   importProgress = 'importProgress',
@@ -118,6 +120,7 @@ export const enum EditStickerCommandResponse {
 
 export const enum DeleteStickerCommandResponse {
   stickerNotFound = 'stickerNotFound',
+  importedSticker = 'importedSticker',
   deleteFailed = 'deleteFailed',
   unsupportedMethod = 'unsupportedMethod',
   deleted = 'deleted',
@@ -146,6 +149,7 @@ export const enum ReorderStickerCommandResponse {
   conflict = 'conflict',
   movedBefore = 'movedBefore',
   movedAfter = 'movedAfter',
+  importedStickerImmutable = 'importedStickerImmutable',
 }
 
 interface CommandResponsesMap {
@@ -184,6 +188,7 @@ interface ComponentsMap {
   [BotChatInputCommandName.PACK]: [
     'emptyPack',
     'packPreview',
+    'importedFrom',
     'firstPageButton',
     'previousPageButton',
     'nextPageButton',
@@ -192,7 +197,10 @@ interface ComponentsMap {
   ],
   [BotChatInputCommandName.EDIT_STICKER]: [
     'editStickerModalTitle',
-    'editingText'
+    'editingText',
+    'importedStickerNote',
+    'importedNameLabel',
+    'importedNameDescription',
   ],
   [BotChatInputCommandName.DELETE_STICKER]: [
     'deleteStickerModalTitle',
@@ -227,6 +235,7 @@ interface ComponentsMap {
   ],
   [BotChatInputCommandName.EDIT_PACK]: [
     'editPackModalTitle',
+    'importedNameNote',
     'nameLabel',
     'nameDescription',
     'publicChoiceLabel',

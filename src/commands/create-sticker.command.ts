@@ -33,10 +33,14 @@ export const createStickerCommand: BotChatInputCommand = {
       return;
     }
 
+    // Imported packs mirror their Telegram set, so manual stickers cannot be added to them
     const userPacks = await db.pack.findMany({
       where: {
         createdBy: user.id,
+        deletedAt: null,
+        telegramPackId: null,
       },
+      include: { telegramPack: true },
     });
 
     if (userPacks.length === 0) {

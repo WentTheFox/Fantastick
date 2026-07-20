@@ -1,10 +1,10 @@
 import { ComponentType } from 'discord-api-types/v10';
 import { MessageEditOptions } from 'discord.js';
-import { Sticker } from '../generated/prisma/client.js';
+import { Sticker, TelegramSticker } from '../generated/prisma/client.js';
 import { mapStickersToGalleryItems, StickerGalleryItems } from './map-stickers-to-gallery-items.js';
 
 interface GetStickerMessageContentParams {
-  stickers: Sticker[];
+  stickers: (Sticker & { telegramSticker?: TelegramSticker | null })[];
 }
 
 export const getStickerMessageContent = ({

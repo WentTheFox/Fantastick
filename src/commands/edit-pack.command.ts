@@ -1,10 +1,12 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
+import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { editPackOptions } from '../options/edit-pack.options.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { EditPackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
+import { getPackDisplayName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { getPackNsfwEmoji } from '../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
@@ -43,6 +45,7 @@ export const editPackCommand: BotChatInputCommand = {
     const id = interaction.options.getString(EditPackCommandOptionName.NAME, true);
     const pack = await db.pack.findUnique({
       where: { id, deletedAt: null, createdBy: user.id },
+      include: { telegramPack: true },
     });
 
     if (!pack) {
@@ -55,22 +58,30 @@ export const editPackCommand: BotChatInputCommand = {
 
     await interaction.showModal({
       customId: `${BotModalId.EDIT_PACK}:${pack.id}`,
-      title: t('commands.edit-pack.components.editPackModalTitle', { name: pack.name }),
+      title: t('commands.edit-pack.components.editPackModalTitle', { name: getPackDisplayName(pack) }),
       components: [
-        {
-          type: ComponentType.Label,
-          label: t('commands.edit-pack.components.nameLabel'),
-          description: t('commands.edit-pack.components.nameDescription'),
-          component: {
-            type: ComponentType.TextInput,
-            customId: EditPackModalCustomIds.NAME_INPUT,
-            style: TextInputStyle.Short,
-            minLength: packNameOptionMeta.min_length,
-            maxLength: packNameOptionMeta.max_length,
-            required: true,
-            value: pack.name,
-          } as TextInputComponentData,
-        },
+        // Imported pack names come from Telegram and cannot be edited here
+        ...(pack.telegramPackId !== null ? [
+          {
+            type: ComponentType.TextDisplay as const,
+            content: `${EmojiCharacters.INFO} ${t('commands.edit-pack.components.importedNameNote')}`,
+          } as const,
+        ] : [
+          {
+            type: ComponentType.Label as const,
+            label: t('commands.edit-pack.components.nameLabel'),
+            description: t('commands.edit-pack.components.nameDescription'),
+            component: {
+              type: ComponentType.TextInput,
+              customId: EditPackModalCustomIds.NAME_INPUT,
+              style: TextInputStyle.Short,
+              minLength: packNameOptionMeta.min_length,
+              maxLength: packNameOptionMeta.max_length,
+              required: true,
+              value: pack.name,
+            } as TextInputComponentData,
+          },
+        ]),
         {
           type: ComponentType.Label,
           label: t('commands.edit-pack.components.publicChoiceLabel'),

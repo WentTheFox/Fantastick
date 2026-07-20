@@ -1,6 +1,7 @@
 import { AutocompleteHandler } from '../../types/bot-interaction.js';
 import { findAvailableStickerPacks } from '../find-available-sticker-packs.js';
-import { getFormattedPackName } from '../get-formatted-pack-name.js';
+import { getFormattedPackName, getPackDisplayName } from '../get-formatted-pack-name.js';
+import { truncateToMaximumLength } from '../messaging.js';
 
 interface PackNameAutocompleteOptions {
   nsfw?: boolean;
@@ -18,8 +19,11 @@ export const getPackNameAutocompleteHandler = ({ nsfw = false, ownedOnly = false
     return;
   }
 
-  await interaction.respond(packs.filter(pack => pack.name.toLowerCase().includes(value)).map(pack => ({
-    name: getFormattedPackName(pack),
-    value: pack.id,
-  })));
+  await interaction.respond(packs
+    .filter(pack => getPackDisplayName(pack).toLowerCase().includes(value) || pack.telegramPack?.telegramPackName.toLowerCase().includes(value))
+    .slice(0, 25)
+    .map(pack => ({
+      name: truncateToMaximumLength(getFormattedPackName(pack), 100),
+      value: pack.id,
+    })));
 };

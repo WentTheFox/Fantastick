@@ -75,8 +75,8 @@
         }
       }
     },
-    "import": {
-      "name": "import",
+    "import-telegram-pack": {
+      "name": "import-telegram-pack",
       "description": "Import or update static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
         "optionsRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the following option(s) to create your copy: {{options}}",

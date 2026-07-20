@@ -1,6 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { env } from '../env.js';
-import { getImportOptions } from '../options/import.options.js';
+import { getImportTelegramPackOptions } from '../options/import-telegram-pack.options.js';
 import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
 import { ImportCommandOptionName } from '../types/localization.js';
 import { QueueType } from '../types/queue.js';
@@ -11,15 +10,14 @@ import { parseTelegramPackName } from '../utils/parse-telegram-pack-name.js';
 
 const activeImportJobStatuses = ['PENDING', 'FETCHING', 'IMPORTING', 'FINALIZING'] as const;
 
-export const importCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.IMPORT,
-  registerCondition: () => env.LOCAL,
+export const importTelegramPackCommand: BotChatInputCommand = {
+  name: BotChatInputCommandName.IMPORT_TELEGRAM_PACK,
   getDefinition: (t) => {
     if (!t) throw new Error('Missing translation function');
     return {
-      ...getLocalizedObject('description', (lng) => t('commands.import.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.import.name', { lng })),
-      options: getImportOptions(t),
+      ...getLocalizedObject('description', (lng) => t('commands.import-telegram-pack.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.import-telegram-pack.name', { lng })),
+      options: getImportTelegramPackOptions(t),
     };
   },
   async handle(interaction, context) {
@@ -40,7 +38,7 @@ export const importCommand: BotChatInputCommand = {
     const telegramPackName = parseTelegramPackName(url);
     if (!telegramPackName) {
       await interactionReply(context, interaction, {
-        content: t('commands.import.responses.invalidUrl'),
+        content: t('commands.import-telegram-pack.responses.invalidUrl'),
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -59,8 +57,8 @@ export const importCommand: BotChatInputCommand = {
       ];
       if (missingOptions.length > 0) {
         await interactionReply(context, interaction, {
-          content: t('commands.import.responses.optionsRequiredForNewPack', {
-            options: missingOptions.map(option => `\`${t(`commands.import.options.${option}.name`)}\``).join(', '),
+          content: t('commands.import-telegram-pack.responses.optionsRequiredForNewPack', {
+            options: missingOptions.map(option => `\`${t(`commands.import-telegram-pack.options.${option}.name`)}\``).join(', '),
           }),
           flags: MessageFlags.Ephemeral,
         });
@@ -76,7 +74,7 @@ export const importCommand: BotChatInputCommand = {
     });
     if (activeImport) {
       await interactionReply(context, interaction, {
-        content: t('commands.import.responses.importAlreadyRunning'),
+        content: t('commands.import-telegram-pack.responses.importAlreadyRunning'),
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -90,7 +88,7 @@ export const importCommand: BotChatInputCommand = {
     });
     if (activePackImport) {
       await interactionReply(context, interaction, {
-        content: t('commands.import.responses.packImportAlreadyRunning'),
+        content: t('commands.import-telegram-pack.responses.packImportAlreadyRunning'),
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -125,7 +123,7 @@ export const importCommand: BotChatInputCommand = {
     await context.qm.send(QueueType.TelegramImport, { importJobId: importJob.id }, { group: { id: String(user.id) } });
 
     await interactionReply(context, interaction, {
-      content: t('commands.import.responses.importQueued'),
+      content: t('commands.import-telegram-pack.responses.importQueued'),
     });
   },
 };

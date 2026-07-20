@@ -10,7 +10,7 @@ import { deletePackCommand } from '../commands/delete-pack.command.js';
 import { deleteStickerCommand } from '../commands/delete-sticker.command.js';
 import { editPackCommand } from '../commands/edit-pack.command.js';
 import { editStickerCommand } from '../commands/edit-sticker.command.js';
-import { importCommand } from '../commands/import.command.js';
+import { importTelegramPackCommand } from '../commands/import-telegram-pack.command.js';
 import { nsfwPackCommand } from '../commands/nsfw-pack.command.js';
 import { nsfwStickerCommand } from '../commands/nsfw-sticker.command.js';
 import { packCommand } from '../commands/pack.command.js';
@@ -29,7 +29,7 @@ export const chatInputCommandRegistry = createChatInputCommandRegistry([
   stickerCommand,
   nsfwStickerCommand,
   createPackCommand,
-  importCommand,
+  importTelegramPackCommand,
   createStickerCommand,
   packCommand,
   nsfwPackCommand,

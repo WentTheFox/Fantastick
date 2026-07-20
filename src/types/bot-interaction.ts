@@ -17,7 +17,7 @@ export const enum BotChatInputCommandName {
   STICKER = 'sticker',
   NSFW_STICKER = 'nsfw-sticker',
   CREATE_PACK = 'create-pack',
-  IMPORT = 'import',
+  IMPORT_TELEGRAM_PACK = 'import-telegram-pack',
   CREATE_STICKER = 'create-sticker',
   PACK = 'pack',
   NSFW_PACK = 'nsfw-pack',

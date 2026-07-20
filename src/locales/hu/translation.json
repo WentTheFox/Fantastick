@@ -75,7 +75,7 @@
         }
       }
     },
-    "import": {
+    "import-telegram-pack": {
       "name": "importálás",
       "description": "Matricák importálása egy Telegram csomagból",
       "responses": {

@@ -6,19 +6,19 @@ import { getCommonOptionMeta } from '../utils/get-common-option-meta.js';
 import { getGlobalOptions } from './global.options.js';
 import { importUrlOptionMeta } from './metadata/import-url.option-meta.js';
 
-export const getImportOptions = (t: TFunction): APIApplicationCommandOption[] => [
+export const getImportTelegramPackOptions = (t: TFunction): APIApplicationCommandOption[] => [
   {
-    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT, ImportCommandOptionName.URL),
+    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT_TELEGRAM_PACK, ImportCommandOptionName.URL),
     required: true,
     ...importUrlOptionMeta,
   },
   {
-    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT, ImportCommandOptionName.NSFW),
+    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT_TELEGRAM_PACK, ImportCommandOptionName.NSFW),
     required: false,
     type: ApplicationCommandOptionType.Boolean,
   },
   {
-    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT, ImportCommandOptionName.PUBLIC),
+    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT_TELEGRAM_PACK, ImportCommandOptionName.PUBLIC),
     required: false,
     type: ApplicationCommandOptionType.Boolean,
   },

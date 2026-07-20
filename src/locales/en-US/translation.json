@@ -144,7 +144,12 @@
       },
       "components": {
         "emptyPack": "There are no stickers in this pack yet",
-        "packPreview": "Below is a preview of the stickers in this pack"
+        "packPreview": "Below is a preview of the stickers in this pack",
+        "firstPageButton": "First",
+        "previousPageButton": "Previous",
+        "nextPageButton": "Next",
+        "lastPageButton": "Last",
+        "pageIndicator": "Page {{page}} of {{totalPages}}"
       },
       "options": {
         "name": {

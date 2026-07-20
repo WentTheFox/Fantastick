@@ -15,6 +15,7 @@ export enum EmojiCharacters {
   ARROW_RIGHT = '➡️',
   SKIP_BACK = '⏮️',
   SKIP_FORWARD = '⏭️',
+  PENCIL = '✏️',
   // Reserved for imported pack names, must not appear in user-provided names
   PAPER_PLANE = '⌲',
 }

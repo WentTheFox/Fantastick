@@ -44,6 +44,10 @@ export const enum ReorderStickerCommandOptionName {
   AFTER = 'after',
 }
 
+export const enum MassRenameStickersCommandOptionName {
+  PACK = 'pack',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
@@ -56,6 +60,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandOptionName,
+  [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -151,6 +156,12 @@ export const enum ReorderStickerCommandResponse {
   importedStickerImmutable = 'importedStickerImmutable',
 }
 
+export const enum MassRenameStickersCommandResponse {
+  packNotFound = 'packNotFound',
+  emptyPack = 'emptyPack',
+  stickerNotFound = 'stickerNotFound',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
@@ -163,6 +174,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandResponse,
+  [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandResponse,
 }
 
 interface ComponentsMap {
@@ -249,6 +261,13 @@ interface ComponentsMap {
     'nsfwTrueDescription',
     'nsfwFalseLabel',
     'nsfwFalseDescription',
+  ],
+  [BotChatInputCommandName.MASS_RENAME_STICKERS]: [
+    'renamingText',
+    'renameButton',
+    'skipButton',
+    'renameModalTitle',
+    'allDoneText',
   ],
 }
 

@@ -11,6 +11,7 @@ import { deleteStickerCommand } from '../commands/delete-sticker.command.js';
 import { editPackCommand } from '../commands/edit-pack.command.js';
 import { editStickerCommand } from '../commands/edit-sticker.command.js';
 import { importTelegramPackCommand } from '../commands/import-telegram-pack.command.js';
+import { massRenameStickersCommand } from '../commands/mass-rename-stickers.command.js';
 import { nsfwPackCommand } from '../commands/nsfw-pack.command.js';
 import { nsfwStickerCommand } from '../commands/nsfw-sticker.command.js';
 import { packCommand } from '../commands/pack.command.js';
@@ -19,6 +20,8 @@ import { stickerCommand } from '../commands/sticker.command.js';
 import { stickerDetailsCommand } from '../commands/sticker-details.command.js';
 import { updateMessageCommand } from '../commands/update-message.command.js';
 import { deleteMessageComponent } from '../components/delete-message.component.js';
+import { massRenameOpenComponent } from '../components/mass-rename-open.component.js';
+import { massRenameSkipComponent } from '../components/mass-rename-skip.component.js';
 import { packPageFirstComponent } from '../components/pack-page-first.component.js';
 import { packPageLastComponent } from '../components/pack-page-last.component.js';
 import { packPageNextComponent } from '../components/pack-page-next.component.js';
@@ -38,6 +41,7 @@ export const chatInputCommandRegistry = createChatInputCommandRegistry([
   deletePackCommand,
   editPackCommand,
   reorderStickerCommand,
+  massRenameStickersCommand,
 ]);
 
 export const contextMenuCommandRegistry = createContextMenuCommandRegistry([
@@ -52,6 +56,8 @@ export const componentRegistry = createComponentRegistry([
   packPagePrevComponent,
   packPageNextComponent,
   packPageLastComponent,
+  massRenameOpenComponent,
+  massRenameSkipComponent,
 ]);
 
 export const modalRegistry = flattenCommandModals(chatInputCommandRegistry);

@@ -268,6 +268,28 @@
         }
       }
     },
+    "mass-rename-stickers": {
+      "name": "mass-rename-stickers",
+      "description": "Rename all stickers in a pack one at a time",
+      "responses": {
+        "packNotFound": "The specified pack could not be found",
+        "emptyPack": "The specified pack does not contain any stickers",
+        "stickerNotFound": "The specified sticker could not be found"
+      },
+      "components": {
+        "renamingText": "Renaming stickers in pack {{pack}}\nSticker {{position}} of {{total}}: {{name}}",
+        "renameButton": "Rename",
+        "skipButton": "Skip",
+        "renameModalTitle": "Rename sticker {{name}}",
+        "allDoneText": "All stickers in pack {{pack}} have been shown"
+      },
+      "options": {
+        "pack": {
+          "name": "pack",
+          "description": "The pack whose stickers you want to rename"
+        }
+      }
+    },
     "delete-sticker": {
       "name": "delete-sticker",
       "description": "Delete an existing sticker",

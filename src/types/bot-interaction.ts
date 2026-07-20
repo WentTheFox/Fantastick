@@ -26,6 +26,7 @@ export const enum BotChatInputCommandName {
   DELETE_PACK = 'delete-pack',
   EDIT_PACK = 'edit-pack',
   REORDER_STICKER = 'reorder-sticker',
+  MASS_RENAME_STICKERS = 'mass-rename-stickers',
 }
 
 export const enum BotMessageContextMenuCommandName {
@@ -40,6 +41,7 @@ export const enum BotModalId {
   CREATE_PACK = 'createPackModal',
   DELETE_PACK = 'deletePackModal',
   EDIT_PACK = 'editPackModal',
+  MASS_RENAME_STICKER = 'massRenameStickerModal',
 }
 
 export const enum BotMessageComponentCustomId {
@@ -49,6 +51,8 @@ export const enum BotMessageComponentCustomId {
   PACK_PAGE_PREV = 'pack-page-prev',
   PACK_PAGE_NEXT = 'pack-page-next',
   PACK_PAGE_LAST = 'pack-page-last',
+  MASS_RENAME_OPEN = 'mass-rename-open',
+  MASS_RENAME_SKIP = 'mass-rename-skip',
 }
 
 export type CommandHandler = FrameworkCommandHandler<UserInteractionContext>;

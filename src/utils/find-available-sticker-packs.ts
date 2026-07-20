@@ -12,6 +12,7 @@ export const findAvailableStickerPacks = async (context: Pick<InteractionContext
         { public: true },
       ],
       nsfw: nsfw ? undefined : false,
+      deletedAt: null,
     },
   });
 };

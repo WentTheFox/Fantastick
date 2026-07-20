@@ -75,11 +75,12 @@
         }
       }
     },
-    "import": {
-      "name": "import",
-      "description": "Import static stickers from a Telegram pack (animated stickers are skipped)",
+    "import-telegram-pack": {
+      "name": "import-telegram-pack",
+      "description": "Import or update static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
-        "packNotFound": "The provided pack could not be found",
+        "nsfwRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the nsfw option to create your copy",
+        "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",
         "invalidUrl": "The provided Telegram pack URL is invalid",
         "importFailed": "The import failed, please try again later",
         "importProgress": "Importing stickers… ({{current}}/{{total}})",
@@ -90,13 +91,13 @@
         "importAlreadyRunning": "You already have an import in progress. Please wait for it to finish before starting another."
       },
       "options": {
-        "pack": {
-          "name": "pack",
-          "description": "Name of the existing sticker pack within the app"
-        },
         "url": {
           "name": "url",
           "description": "URL of the Telegram sticker pack"
+        },
+        "nsfw": {
+          "name": "nsfw",
+          "description": "Whether your copy of the pack is age-restricted (required when importing it for the first time)"
         }
       }
     },
@@ -145,6 +146,7 @@
       "components": {
         "emptyPack": "There are no stickers in this pack yet",
         "packPreview": "Below is a preview of the stickers in this pack",
+        "importedFrom": "Imported from Telegram: {{url}}",
         "firstPageButton": "First",
         "previousPageButton": "Previous",
         "nextPageButton": "Next",
@@ -171,7 +173,10 @@
         "newFileLabel": "Update sticker file",
         "newFileDescription": "Upload a new file to change the sticker image. Leave blank to keep the image unchanged.",
         "newUrlLabel": "Update sticker URL",
-        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged."
+        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged.",
+        "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
+        "importedNameLabel": "Sticker name (optional)",
+        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position."
       },
       "options": {
         "name": {
@@ -212,6 +217,7 @@
       },
       "components": {
         "editPackModalTitle": "Edit pack {{name}}",
+        "importedNameNote": "This pack was imported from Telegram: its name is managed by the import and cannot be changed here, and imported packs always stay private. Re-run the import to refresh the name.",
         "nameLabel": "Pack name",
         "nameDescription": "Enter a unique name for the sticker pack. Two packs cannot have the same name within the app.",
         "publicChoiceLabel": "Pack visibility",
@@ -244,7 +250,8 @@
         "noneProvided": "You must specify either a before or an after sticker",
         "conflict": "The pack's stickers were changed while reordering, please try again",
         "movedBefore": "Moved {{name}} to before {{target}} in pack {{pack}}",
-        "movedAfter": "Moved {{name}} to after {{target}} in pack {{pack}}"
+        "movedAfter": "Moved {{name}} to after {{target}} in pack {{pack}}",
+        "importedStickerImmutable": "Imported stickers cannot be reordered because their order is managed by the Telegram pack they come from"
       },
       "options": {
         "sticker": {
@@ -261,11 +268,41 @@
         }
       }
     },
+    "mass-rename-stickers": {
+      "name": "mass-rename-stickers",
+      "description": "Rename all stickers in a pack one at a time",
+      "responses": {
+        "packNotFound": "The specified pack could not be found",
+        "emptyPack": "The specified pack does not contain any stickers",
+        "stickerNotFound": "The specified sticker could not be found"
+      },
+      "components": {
+        "renamingText": "Renaming stickers in pack {{pack}}\nSticker {{position}} of {{total}}{{identifier}}",
+        "currentNameText": "Current name: {{name}}",
+        "renamingModalText": "You are renaming sticker {{name}} from pack {{pack}}.",
+        "renameButton": "Rename",
+        "previousButton": "Previous",
+        "nextButton": "Next",
+        "renameModalTitle": "Rename sticker {{name}}",
+        "allDoneText": "All stickers in pack {{pack}} have been shown"
+      },
+      "options": {
+        "pack": {
+          "name": "pack",
+          "description": "The pack whose stickers you want to rename"
+        },
+        "start": {
+          "name": "start",
+          "description": "Position of the sticker to start from (defaults to 1, the first sticker)"
+        }
+      }
+    },
     "delete-sticker": {
       "name": "delete-sticker",
       "description": "Delete an existing sticker",
       "responses": {
         "stickerNotFound": "The specified sticker could not be found",
+        "importedSticker": "Imported stickers cannot be deleted individually. They disappear when removed from the Telegram pack, or you can delete your copy of the whole pack.",
         "deleteFailed": "Could not delete the sticker due to an unexpected error, please try again later",
         "unsupportedMethod": "The provided deletion method ({{method}}) is not (yet) supported",
         "deleted": "The sticker {{name}} has been deleted successfully"

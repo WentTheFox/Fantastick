@@ -27,12 +27,11 @@ interface GetMassRenameStickerContentOptions {
 export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: GetMassRenameStickerContentOptions) => {
   const { files, items } = mapStickersToGalleryItems([sticker], pack.nsfw);
 
-  // Imported stickers are identified by their emoji and position; the custom name (if any)
-  // gets its own line so it is not duplicated. Regular stickers only have their name.
-  const isImportedSticker = sticker.telegramSticker !== null;
-  const stickerIdentifier = isImportedSticker
-    ? `${sticker.telegramSticker?.emoji}#${(sticker.telegramSticker?.order ?? 0) + 1}`
-    : sticker.name;
+  // Imported stickers are identified by their emoji and position on the position line;
+  // the current name (if any) gets its own line for both sticker types
+  const stickerIdentifier = sticker.telegramSticker !== null
+    ? `: \`${sticker.telegramSticker.emoji}#${sticker.telegramSticker.order + 1}\``
+    : '';
   const components: APIMessageTopLevelComponent[] = [
     {
       type: ComponentType.TextDisplay,
@@ -41,9 +40,9 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
           pack: getFormattedPackName(pack),
           position: index + 1,
           total,
-          name: `\`${stickerIdentifier}\``,
+          identifier: stickerIdentifier,
         }),
-        ...(isImportedSticker && sticker.name ? [t('commands.mass-rename-stickers.components.currentNameText', {
+        ...(sticker.name ? [t('commands.mass-rename-stickers.components.currentNameText', {
           name: `\`${sticker.name}\``,
         })] : []),
       ].join('\n'),

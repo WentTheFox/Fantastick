@@ -277,7 +277,7 @@
         "stickerNotFound": "The specified sticker could not be found"
       },
       "components": {
-        "renamingText": "Renaming stickers in pack {{pack}}\nSticker {{position}} of {{total}}: {{name}}",
+        "renamingText": "Renaming stickers in pack {{pack}}\nSticker {{position}} of {{total}}{{identifier}}",
         "currentNameText": "Current name: {{name}}",
         "renamingModalText": "You are renaming sticker {{name}} from pack {{pack}}.",
         "renameButton": "Rename",

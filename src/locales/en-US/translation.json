@@ -280,7 +280,8 @@
         "renamingText": "Renaming stickers in pack {{pack}}\nSticker {{position}} of {{total}}: {{name}}",
         "renamingModalText": "You are renaming sticker {{name}} from pack {{pack}}.",
         "renameButton": "Rename",
-        "skipButton": "Skip",
+        "previousButton": "Previous",
+        "nextButton": "Next",
         "renameModalTitle": "Rename sticker {{name}}",
         "allDoneText": "All stickers in pack {{pack}} have been shown"
       },
@@ -288,6 +289,10 @@
         "pack": {
           "name": "pack",
           "description": "The pack whose stickers you want to rename"
+        },
+        "start": {
+          "name": "start",
+          "description": "Position of the sticker to start from (defaults to 1, the first sticker)"
         }
       }
     },

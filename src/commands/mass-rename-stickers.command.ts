@@ -58,11 +58,14 @@ export const massRenameStickersCommand: BotChatInputCommand = {
       return;
     }
 
+    // The user-facing start position is 1-based, matching the position shown in the message
+    const start = interaction.options.getInteger(MassRenameStickersCommandOptionName.START) ?? 1;
+    const startIndex = Math.min(start - 1, stickers.length - 1);
     const { components, files } = getMassRenameStickerContent({
       t,
       pack,
-      sticker: stickers[0],
-      index: 0,
+      sticker: stickers[startIndex],
+      index: startIndex,
       total: stickers.length,
     });
     await interactionReply(context, interaction, {

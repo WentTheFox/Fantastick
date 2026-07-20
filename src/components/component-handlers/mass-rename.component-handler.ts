@@ -5,7 +5,7 @@ import {
 } from '../../commands/modal-handlers/mass-rename-sticker.modal-handler.js';
 import { stickerNameOptionMeta } from '../../options/metadata/sticker-name.option-meta.js';
 import { BotMessageComponentHandler, BotModalId } from '../../types/bot-interaction.js';
-import { getMassRenameNextContent } from '../../utils/get-mass-rename-content.js';
+import { getMassRenameStepContent } from '../../utils/get-mass-rename-content.js';
 import { getFormattedPackName } from '../../utils/get-formatted-pack-name.js';
 import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
@@ -87,7 +87,7 @@ export const massRenameOpenComponentHandler: BotMessageComponentHandler = async 
   });
 };
 
-export const massRenameSkipComponentHandler: BotMessageComponentHandler = async (interaction, context, resourceId) => {
+export const massRenameStepComponentHandler = (direction: 'prev' | 'next'): BotMessageComponentHandler => async (interaction, context, resourceId) => {
   if (!interaction.isButton()) {
     throw new Error('Button interaction expected');
   }
@@ -115,11 +115,12 @@ export const massRenameSkipComponentHandler: BotMessageComponentHandler = async 
     return;
   }
 
-  const nextContent = await getMassRenameNextContent({
+  const nextContent = await getMassRenameStepContent({
     t,
     db,
     pack: sticker.pack,
     currentStickerId: sticker.id,
+    direction,
   });
   await interaction.update({ flags: MessageFlags.IsComponentsV2, ...nextContent });
 };

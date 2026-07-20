@@ -14,10 +14,18 @@ export const massRenameOpenComponentDefinition: BotMessageComponentDefinitionGet
   emoji: { name: EmojiCharacters.PENCIL },
 });
 
-export const massRenameSkipComponentDefinition: BotMessageComponentDefinitionGetter = (t) => ({
+export const massRenamePrevComponentDefinition: BotMessageComponentDefinitionGetter = (t) => ({
   type: ComponentType.Button,
-  custom_id: BotMessageComponentCustomId.MASS_RENAME_SKIP,
-  label: t('commands.mass-rename-stickers.components.skipButton'),
+  custom_id: BotMessageComponentCustomId.MASS_RENAME_PREV,
+  label: t('commands.mass-rename-stickers.components.previousButton'),
   style: ButtonStyle.Secondary,
-  emoji: { name: EmojiCharacters.SKIP_FORWARD },
+  emoji: { name: EmojiCharacters.ARROW_LEFT },
+});
+
+export const massRenameNextComponentDefinition: BotMessageComponentDefinitionGetter = (t) => ({
+  type: ComponentType.Button,
+  custom_id: BotMessageComponentCustomId.MASS_RENAME_NEXT,
+  label: t('commands.mass-rename-stickers.components.nextButton'),
+  style: ButtonStyle.Secondary,
+  emoji: { name: EmojiCharacters.ARROW_RIGHT },
 });

@@ -47,6 +47,14 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
       components: [
         {
           type: ComponentType.Button,
+          custom_id: `${BotMessageComponentCustomId.MASS_RENAME_PREV}:${sticker.id}`,
+          label: t('commands.mass-rename-stickers.components.previousButton'),
+          style: ButtonStyle.Secondary,
+          emoji: { name: EmojiCharacters.ARROW_LEFT },
+          disabled: index <= 0,
+        },
+        {
+          type: ComponentType.Button,
           custom_id: `${BotMessageComponentCustomId.MASS_RENAME_OPEN}:${sticker.id}`,
           label: t('commands.mass-rename-stickers.components.renameButton'),
           style: ButtonStyle.Primary,
@@ -54,10 +62,10 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
         },
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.MASS_RENAME_SKIP}:${sticker.id}`,
-          label: t('commands.mass-rename-stickers.components.skipButton'),
+          custom_id: `${BotMessageComponentCustomId.MASS_RENAME_NEXT}:${sticker.id}`,
+          label: t('commands.mass-rename-stickers.components.nextButton'),
           style: ButtonStyle.Secondary,
-          emoji: { name: EmojiCharacters.SKIP_FORWARD },
+          emoji: { name: EmojiCharacters.ARROW_RIGHT },
         },
       ],
     },
@@ -78,28 +86,29 @@ export const getMassRenameDoneContent = (t: TFunction, pack: MassRenamePack) => 
   files: [],
 });
 
-interface GetMassRenameNextContentOptions {
+interface GetMassRenameStepContentOptions {
   t: TFunction;
   db: PrismaClient;
   pack: MassRenamePack;
   currentStickerId: string;
+  direction: 'prev' | 'next';
 }
 
-// Builds the message content for the sticker following the current one, or the
+// Builds the message content for the sticker before/after the current one, or the
 // completion text once the end of the pack is reached
-export const getMassRenameNextContent = async ({ t, db, pack, currentStickerId }: GetMassRenameNextContentOptions) => {
+export const getMassRenameStepContent = async ({ t, db, pack, currentStickerId, direction }: GetMassRenameStepContentOptions) => {
   const stickers = await findOrderedPackStickers(db, pack);
   const currentIndex = stickers.findIndex(sticker => sticker.id === currentStickerId);
-  const nextIndex = currentIndex + 1;
-  if (currentIndex === -1 || nextIndex >= stickers.length) {
+  const targetIndex = direction === 'prev' ? Math.max(0, currentIndex - 1) : currentIndex + 1;
+  if (currentIndex === -1 || targetIndex >= stickers.length) {
     return getMassRenameDoneContent(t, pack);
   }
 
   return getMassRenameStickerContent({
     t,
     pack,
-    sticker: stickers[nextIndex],
-    index: nextIndex,
+    sticker: stickers[targetIndex],
+    index: targetIndex,
     total: stickers.length,
   });
 };

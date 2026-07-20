@@ -46,6 +46,7 @@ export const enum ReorderStickerCommandOptionName {
 
 export const enum MassRenameStickersCommandOptionName {
   PACK = 'pack',
+  START = 'start',
 }
 
 interface CommandOptionsMap {
@@ -266,7 +267,8 @@ interface ComponentsMap {
     'renamingText',
     'renamingModalText',
     'renameButton',
-    'skipButton',
+    'previousButton',
+    'nextButton',
     'renameModalTitle',
     'allDoneText',
   ],

@@ -1,4 +1,4 @@
-import { APIApplicationCommandOption } from 'discord-api-types/v10';
+import { APIApplicationCommandOption, ApplicationCommandOptionType } from 'discord-api-types/v10';
 import { TFunction } from 'i18next';
 import { BotChatInputCommandName } from '../types/bot-interaction.js';
 import { MassRenameStickersCommandOptionName } from '../types/localization.js';
@@ -12,6 +12,12 @@ export const getMassRenameStickersOptions = (t: TFunction): APIApplicationComman
     required: true,
     autocomplete: true,
     ...packNameOptionMeta,
+  },
+  {
+    ...getCommonOptionMeta(t, BotChatInputCommandName.MASS_RENAME_STICKERS, MassRenameStickersCommandOptionName.START),
+    type: ApplicationCommandOptionType.Integer,
+    required: false,
+    min_value: 1,
   },
   ...getGlobalOptions(t),
 ];

@@ -4,7 +4,7 @@ import {
   stickerNameOptionMeta,
 } from '../../options/metadata/sticker-name.option-meta.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
-import { getMassRenameNextContent } from '../../utils/get-mass-rename-content.js';
+import { getMassRenameStepContent } from '../../utils/get-mass-rename-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed, StickerSnapshot } from '../../utils/post-sticker-to-feed.js';
@@ -104,11 +104,12 @@ export const massRenameStickerModalHandler: ModalHandler = async (interaction, c
     });
   }
 
-  const nextContent = await getMassRenameNextContent({
+  const nextContent = await getMassRenameStepContent({
     t,
     db,
     pack: sticker.pack,
     currentStickerId: sticker.id,
+    direction: 'next',
   });
   if (interaction.isFromMessage()) {
     await interaction.update({ flags: MessageFlags.IsComponentsV2, ...nextContent });

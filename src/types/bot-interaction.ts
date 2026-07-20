@@ -52,7 +52,8 @@ export const enum BotMessageComponentCustomId {
   PACK_PAGE_NEXT = 'pack-page-next',
   PACK_PAGE_LAST = 'pack-page-last',
   MASS_RENAME_OPEN = 'mass-rename-open',
-  MASS_RENAME_SKIP = 'mass-rename-skip',
+  MASS_RENAME_PREV = 'mass-rename-prev',
+  MASS_RENAME_NEXT = 'mass-rename-next',
 }
 
 export type CommandHandler = FrameworkCommandHandler<UserInteractionContext>;

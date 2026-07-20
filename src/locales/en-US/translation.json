@@ -234,6 +234,33 @@
         }
       }
     },
+    "reorder-sticker": {
+      "name": "reorder-sticker",
+      "description": "Reorder a sticker within its pack",
+      "responses": {
+        "stickerNotFound": "The specified sticker could not be found",
+        "targetNotFound": "The specified sticker could not be found in the same pack",
+        "bothProvided": "You cannot specify both a before and an after sticker at the same time",
+        "noneProvided": "You must specify either a before or an after sticker",
+        "conflict": "The pack's stickers were changed while reordering, please try again",
+        "movedBefore": "Moved {{name}} to before {{target}} in pack {{pack}}",
+        "movedAfter": "Moved {{name}} to after {{target}} in pack {{pack}}"
+      },
+      "options": {
+        "sticker": {
+          "name": "sticker",
+          "description": "Name of the sticker you want to reorder"
+        },
+        "before": {
+          "name": "before",
+          "description": "Move the sticker before this sticker"
+        },
+        "after": {
+          "name": "after",
+          "description": "Move the sticker after this sticker"
+        }
+      }
+    },
     "delete-sticker": {
       "name": "delete-sticker",
       "description": "Delete an existing sticker",

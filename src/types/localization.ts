@@ -38,6 +38,12 @@ export const enum EditPackCommandOptionName {
   NAME = 'name',
 }
 
+export const enum ReorderStickerCommandOptionName {
+  STICKER = 'sticker',
+  BEFORE = 'before',
+  AFTER = 'after',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
@@ -49,6 +55,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandOptionName,
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
+  [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -131,6 +138,16 @@ export const enum EditPackCommandResponse {
   updated = 'updated',
 }
 
+export const enum ReorderStickerCommandResponse {
+  stickerNotFound = 'stickerNotFound',
+  targetNotFound = 'targetNotFound',
+  bothProvided = 'bothProvided',
+  noneProvided = 'noneProvided',
+  conflict = 'conflict',
+  movedBefore = 'movedBefore',
+  movedAfter = 'movedAfter',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
@@ -142,6 +159,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandResponse,
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
+  [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandResponse,
 }
 
 interface ComponentsMap {

@@ -172,6 +172,33 @@
         }
       }
     },
+    "reorder-sticker": {
+      "name": "matrica-átrendezés",
+      "description": "Egy matrica sorrendjének módosítása a csomagon belül",
+      "responses": {
+        "stickerNotFound": "A megadott matrica nem található",
+        "targetNotFound": "A megadott matrica nem található ugyanabban a csomagban",
+        "bothProvided": "Nem adhatsz meg egyszerre elé és mögé kerülő matricát is",
+        "noneProvided": "Meg kell adnod egy elé vagy egy mögé kerülő matricát",
+        "conflict": "A csomag matricái megváltoztak átrendezés közben, kérjük, próbáld újra",
+        "movedBefore": "A(z) {{name}} matrica áthelyezve a(z) {{target}} elé a(z) {{pack}} csomagban",
+        "movedAfter": "A(z) {{name}} matrica áthelyezve a(z) {{target}} mögé a(z) {{pack}} csomagban"
+      },
+      "options": {
+        "sticker": {
+          "name": "matrica",
+          "description": "Az átrendezni kívánt matrica neve"
+        },
+        "before": {
+          "name": "elé",
+          "description": "A matrica áthelyezése ez elé a matrica elé"
+        },
+        "after": {
+          "name": "mögé",
+          "description": "A matrica áthelyezése ez mögé a matrica mögé"
+        }
+      }
+    },
     "delete-sticker": {
       "name": "matrica-törlés",
       "description": "Létező matrica törlése",

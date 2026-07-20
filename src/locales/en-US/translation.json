@@ -151,6 +151,7 @@
       "components": {
         "emptyPack": "There are no stickers in this pack yet",
         "packPreview": "Below is a preview of the stickers in this pack",
+        "importedFrom": "Imported from Telegram: {{url}}",
         "firstPageButton": "First",
         "previousPageButton": "Previous",
         "nextPageButton": "Next",

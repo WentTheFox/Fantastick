@@ -189,6 +189,7 @@ interface ComponentsMap {
   [BotChatInputCommandName.PACK]: [
     'emptyPack',
     'packPreview',
+    'importedFrom',
     'firstPageButton',
     'previousPageButton',
     'nextPageButton',

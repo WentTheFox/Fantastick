@@ -1,14 +1,15 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { env } from '../env.js';
 import { getImportOptions } from '../options/import.options.js';
-import { stickerUrlPrefix } from '../options/metadata/import-url.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
 import { ImportCommandOptionName } from '../types/localization.js';
 import { QueueType } from '../types/queue.js';
-import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
+import { parseTelegramPackName } from '../utils/parse-telegram-pack-name.js';
+
+const activeImportJobStatuses = ['PENDING', 'FETCHING', 'IMPORTING', 'FINALIZING'] as const;
 
 export const importCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.IMPORT,
@@ -21,9 +22,6 @@ export const importCommand: BotChatInputCommand = {
       options: getImportOptions(t),
     };
   },
-  autocomplete: {
-    [ImportCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
-  },
   async handle(interaction, context) {
     const { t, db } = context;
     const user = await updateOrCreateUser(context, interaction);
@@ -35,25 +33,10 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
-    const packId = interaction.options.getString(ImportCommandOptionName.PACK, true);
-    const url = interaction.options.getString('url', true);
+    const url = interaction.options.getString(ImportCommandOptionName.URL, true);
+    const nsfw = interaction.options.getBoolean(ImportCommandOptionName.NSFW);
 
-    const appPack = await db.pack.findUnique({ where: { id: packId } });
-    if (!appPack) {
-      await interactionReply(context, interaction, {
-        content: t('commands.import.responses.packNotFound'),
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
-    let telegramPackName: string | undefined = undefined;
-    if (url.startsWith(stickerUrlPrefix)) {
-      const packNameFromUrl = decodeURIComponent(url.substring(stickerUrlPrefix.length));
-      if (/^[^/()]+$/.test(packNameFromUrl)) {
-        telegramPackName = packNameFromUrl;
-      }
-    }
+    const telegramPackName = parseTelegramPackName(url);
     if (!telegramPackName) {
       await interactionReply(context, interaction, {
         content: t('commands.import.responses.invalidUrl'),
@@ -62,10 +45,28 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
+    let pack = await db.pack.findFirst({
+      where: { telegramPackName, deletedAt: null },
+    });
+    if (pack && pack.createdBy !== user.id) {
+      await interactionReply(context, interaction, {
+        content: t('commands.import.responses.packOwnedByAnotherUser'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    if (!pack && nsfw === null) {
+      await interactionReply(context, interaction, {
+        content: t('commands.import.responses.nsfwRequiredForNewPack'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     const activeImport = await db.importJob.findFirst({
       where: {
         importedBy: user.id,
-        status: { in: ['PENDING', 'FETCHING', 'IMPORTING', 'FINALIZING'] },
+        status: { in: [...activeImportJobStatuses] },
       },
     });
     if (activeImport) {
@@ -76,11 +77,37 @@ export const importCommand: BotChatInputCommand = {
       return;
     }
 
+    const activePackImport = await db.importJob.findFirst({
+      where: {
+        telegramPackName,
+        status: { in: [...activeImportJobStatuses] },
+      },
+    });
+    if (activePackImport) {
+      await interactionReply(context, interaction, {
+        content: t('commands.import.responses.packImportAlreadyRunning'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+    if (!pack) {
+      pack = await db.pack.create({
+        data: {
+          name: telegramPackName,
+          telegramPackName,
+          nsfw: nsfw === true,
+          public: true,
+          createdBy: user.id,
+        },
+      });
+    }
 
     const importJob = await db.importJob.create({
       data: {
-        packId,
+        packId: pack.id,
         importedBy: user.id,
         telegramPackName,
         interactionId: interaction.id,

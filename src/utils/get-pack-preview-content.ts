@@ -11,7 +11,7 @@ export const packItemsPerPage = 9;
 
 interface GetPackPreviewContentOptions {
   t: TFunction;
-  pack: Pick<Pack, 'id' | 'name' | 'public' | 'nsfw'>;
+  pack: Pick<Pack, 'id' | 'name' | 'public' | 'nsfw' | 'telegramPackName'>;
   stickers: Pick<Sticker, 'url' | 'description'>[];
   page: number;
   totalPages: number;

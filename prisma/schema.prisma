@@ -28,7 +28,7 @@ model DiscordUser {
 
 model Pack {
   id               String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name             String       @db.VarChar(255)
+  name             String
   stickers         Sticker[]
   importJobs       ImportJob[]
   createdBy        BigInt
@@ -41,8 +41,9 @@ model Pack {
   nsfw             Boolean      @default(false)
   public           Boolean      @default(false)
   telegramPackName String?      @db.VarChar(255)
+  lastImportedAt   DateTime?    @db.Timestamptz(0)
 
-  @@unique([name])
+  @@index([name])
   @@index([deletedAt])
   @@index([telegramPackName])
 }
@@ -51,8 +52,9 @@ model Sticker {
   id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   pack            Pack             @relation(fields: [packId], references: [id])
   packId          String           @db.Uuid
-  name            String           @db.VarChar(255)
+  name            String
   description     String?          @db.VarChar(255)
+  emoji           String?
   url             String           @db.VarChar(255)
   createdBy       BigInt
   creator         DiscordUser      @relation("CreatedStickers", fields: [createdBy], references: [id])

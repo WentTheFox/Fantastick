@@ -1,5 +1,6 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
+import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { editPackOptions } from '../options/edit-pack.options.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
@@ -57,20 +58,28 @@ export const editPackCommand: BotChatInputCommand = {
       customId: `${BotModalId.EDIT_PACK}:${pack.id}`,
       title: t('commands.edit-pack.components.editPackModalTitle', { name: pack.name }),
       components: [
-        {
-          type: ComponentType.Label,
-          label: t('commands.edit-pack.components.nameLabel'),
-          description: t('commands.edit-pack.components.nameDescription'),
-          component: {
-            type: ComponentType.TextInput,
-            customId: EditPackModalCustomIds.NAME_INPUT,
-            style: TextInputStyle.Short,
-            minLength: packNameOptionMeta.min_length,
-            maxLength: packNameOptionMeta.max_length,
-            required: true,
-            value: pack.name,
-          } as TextInputComponentData,
-        },
+        // Imported pack names come from Telegram and cannot be edited here
+        ...(pack.telegramPackName !== null ? [
+          {
+            type: ComponentType.TextDisplay as const,
+            content: `${EmojiCharacters.INFO} ${t('commands.edit-pack.components.importedNameNote')}`,
+          } as const,
+        ] : [
+          {
+            type: ComponentType.Label as const,
+            label: t('commands.edit-pack.components.nameLabel'),
+            description: t('commands.edit-pack.components.nameDescription'),
+            component: {
+              type: ComponentType.TextInput,
+              customId: EditPackModalCustomIds.NAME_INPUT,
+              style: TextInputStyle.Short,
+              minLength: packNameOptionMeta.min_length,
+              maxLength: packNameOptionMeta.max_length,
+              required: true,
+              value: pack.name,
+            } as TextInputComponentData,
+          },
+        ]),
         {
           type: ComponentType.Label,
           label: t('commands.edit-pack.components.publicChoiceLabel'),

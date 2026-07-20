@@ -12,6 +12,7 @@ import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
 import { getEmojiIdMap } from '../../utils/get-emoji-id-map.js';
+import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { getPackNsfwEmoji } from '../../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../../utils/get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
@@ -24,6 +25,7 @@ import {
   TelegramApiGetFileResponse,
   TelegramApiGetStickerSetResponse,
 } from '../../utils/telegram-api.js';
+import { wrapUrlsInAngleBrackets } from '../../utils/wrap-urls-in-angle-brackets.js';
 
 const buildProgressContent = (emojiIdMap: Record<string, string>, total: number, current: number, failed = false, finalizing = false) => {
   const [bar] = filledBar(total, current, 18, EmojiCharacters.WHITE_SQUARE, failed ? EmojiCharacters.RED_SQUARE : EmojiCharacters.GREEN_SQUARE);
@@ -67,8 +69,22 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     }
   };
 
+  // A pack freshly auto-created for this import (never imported into, no live stickers)
+  // is removed again when the job fails so a bad URL doesn't leave an orphan placeholder
+  const cleanUpFreshlyCreatedPack = async () => {
+    if (pack.lastImportedAt !== null) return;
+    const liveStickerCount = await db.sticker.count({ where: { packId, deletedAt: null } });
+    if (liveStickerCount > 0) return;
+    await db.pack.update({
+      where: { id: packId },
+      data: { deletedAt: new Date(), deletedBy: importedBy },
+    });
+    logger.info(`Soft-deleted freshly created pack ${packId} after failed import`);
+  };
+
   const failJob = async (errorMessage: string, discordMessage: string) => {
     await db.importJob.update({ where: { id: importJobId }, data: { status: 'FAILED', errorMessage } });
+    await cleanUpFreshlyCreatedPack();
     await updateDiscordProgress(`${EmojiCharacters.OCTAGONAL_SIGN} ${discordMessage}`);
   };
 
@@ -95,6 +111,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     return;
   }
 
+  const packTitle = getStickerSetRequest.response.result?.title ?? telegramPackName;
   const allStickers = getStickerSetRequest.response.result?.stickers ?? [];
   const telegramStickers = allStickers.filter(s => !s.is_animated && !s.is_video);
   const skippedAnimated = allStickers.length - telegramStickers.length;
@@ -113,6 +130,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   logger.debug(`Importing ${total} stickers from Telegram set ${telegramPackName}…`);
 
   const createStickerRecords: Parameters<typeof db.sticker.create>[0][] = [];
+  const updateStickerRecords: Parameters<typeof db.sticker.update>[0][] = [];
   const createdFiles = new Set<string>();
   let completed = 0;
   let failedCount = 0;
@@ -122,7 +140,12 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       where: { packId, telegramFileUniqueId: sticker.file_unique_id, deletedAt: null },
     });
     if (existing) {
-      logger.info(`Skipping sticker ${sticker.file_unique_id} (already imported as ${existing.id})`);
+      if (existing.emoji !== sticker.emoji || existing.order !== order) {
+        updateStickerRecords.push({
+          where: { id: existing.id },
+          data: { emoji: sticker.emoji, order },
+        });
+      }
       completed++;
       await db.importJob.update({ where: { id: importJobId }, data: { completed } });
       await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed));
@@ -162,7 +185,8 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     createStickerRecords.push({
       data: {
         id: stickerId,
-        name: `${sticker.emoji}#${order + 1}`,
+        name: '',
+        emoji: sticker.emoji,
         description: null,
         packId,
         createdBy: importedBy,
@@ -178,15 +202,48 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed));
   }
 
+  // Stickers previously imported into this pack but no longer part of the Telegram set
+  const staleStickers = await db.sticker.findMany({
+    where: {
+      packId,
+      deletedAt: null,
+      telegramFileUniqueId: { not: null, notIn: telegramStickers.map(s => s.file_unique_id) },
+    },
+  });
+
   // Finalize: write sticker records and update pack
   await db.importJob.update({ where: { id: importJobId }, data: { status: 'FINALIZING' } });
   await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed, false, true));
   logger.info('Creating sticker records and updating pack…');
 
   let createdStickers: Sticker[] | null = null;
+  let updatedPack: Pack;
   try {
-    createdStickers = await db.$transaction(createStickerRecords.map(args => db.sticker.create(args)));
-    await db.pack.update({ where: { id: packId }, data: { telegramPackName } });
+    [createdStickers, updatedPack] = await db.$transaction(async (tx) => {
+      const created: Sticker[] = [];
+      for (const args of createStickerRecords) {
+        created.push(await tx.sticker.create(args));
+      }
+      for (const args of updateStickerRecords) {
+        await tx.sticker.update(args);
+      }
+      if (staleStickers.length > 0) {
+        await tx.sticker.updateMany({
+          where: { id: { in: staleStickers.map(s => s.id) } },
+          data: { deletedAt: new Date(), deletedBy: importedBy },
+        });
+      }
+      const packUpdate = await tx.pack.update({
+        where: { id: packId },
+        data: {
+          name: packTitle,
+          public: true,
+          telegramPackName,
+          lastImportedAt: new Date(),
+        },
+      });
+      return [created, packUpdate] as const;
+    });
   } catch (e) {
     logger.error('Failed to create sticker records', e);
 
@@ -206,8 +263,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       logger.info(`Rolled back ${fileList.length} files`);
     }
 
-    await db.importJob.update({ where: { id: importJobId }, data: { status: 'FAILED', errorMessage: String(e) } });
-    await updateDiscordProgress(`${EmojiCharacters.OCTAGONAL_SIGN} Import failed. Please try again.`);
+    await failJob(String(e), 'Import failed. Please try again.');
     return;
   }
 
@@ -217,12 +273,17 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   });
 
   const importedCount = createdStickers.length;
-  await updateDiscordProgress(`${EmojiCharacters.GREEN_CHECK} Imported ${importedCount} sticker${importedCount !== 1 ? 's' : ''}.`);
-  logger.info(`Import job ${importJobId} completed: ${importedCount} stickers imported into pack ${packId}`);
+  const summaryParts = [
+    `${importedCount} new sticker${importedCount !== 1 ? 's' : ''} imported`,
+    ...(updateStickerRecords.length > 0 ? [`${updateStickerRecords.length} updated`] : []),
+    ...(staleStickers.length > 0 ? [`${staleStickers.length} removed`] : []),
+  ];
+  await updateDiscordProgress(`${EmojiCharacters.GREEN_CHECK} ${summaryParts.join(', ')}.`);
+  logger.info(`Import job ${importJobId} completed: ${importedCount} created, ${updateStickerRecords.length} updated, ${staleStickers.length} removed in pack ${packId}`);
 
-  // Post each sticker to the feed
+  // Post each new sticker to the feed
   if (env.DISCORD_FEED_WEBHOOK_URL !== null && createdStickers.length > 0) {
-    await postImportedStickersToFeed({ db, stickers: createdStickers, pack, importedBy: String(importedBy), logger });
+    await postImportedStickersToFeed({ db, stickers: createdStickers, pack: updatedPack, importedBy: String(importedBy), logger });
   }
 };
 
@@ -244,9 +305,9 @@ const postImportedStickersToFeed = async ({ db, stickers, pack, importedBy, logg
         flags: MessageFlags.SuppressNotifications,
         content: [
           '# Sticker imported',
-          `**Name:** \`${sticker.name}\` (\`${sticker.id}\`)`,
+          `**Name:** \`${getFormattedStickerName(sticker)}\` (\`${sticker.id}\`)`,
           '**Description:** _(empty)_',
-          `**Pack:** \`${pack.name}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
+          `**Pack:** \`${wrapUrlsInAngleBrackets(pack.name)}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
           `**Imported by:** ${userMention(importedBy)} (\`${importedBy}\`)`,
           `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => pack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,
         ].join('\n'),

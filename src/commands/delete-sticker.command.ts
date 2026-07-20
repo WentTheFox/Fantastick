@@ -7,6 +7,7 @@ import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
+import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -56,12 +57,12 @@ export const deleteStickerCommand: BotChatInputCommand = {
 
     await interaction.showModal({
       customId: `${BotModalId.DELETE_STICKER}:${sticker.id}`,
-      title: t('commands.delete-sticker.components.deleteStickerModalTitle', { name: sticker.name }),
+      title: t('commands.delete-sticker.components.deleteStickerModalTitle', { name: getFormattedStickerName(sticker) }),
       components: [
         {
           type: ComponentType.TextDisplay,
           content: t('commands.delete-sticker.components.deletingText', {
-            name: `\`${sticker.name}\``,
+            name: `\`${getFormattedStickerName(sticker)}\``,
             pack: getFormattedPackName(sticker.pack),
           }),
         },

@@ -2,6 +2,7 @@ import { MessageFlags } from 'discord-api-types/v10';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
 import { QueueType } from '../../types/queue.js';
+import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed, StickerSnapshot } from '../../utils/post-sticker-to-feed.js';
@@ -107,7 +108,7 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
 
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.delete-sticker.responses.deleted', {
-      name: `\`${sticker.name}\``,
+      name: `\`${getFormattedStickerName(sticker)}\``,
     })}`,
     flags: MessageFlags.Ephemeral,
   });

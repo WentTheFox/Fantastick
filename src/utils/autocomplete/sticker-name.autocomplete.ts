@@ -1,5 +1,6 @@
 import { AutocompleteHandler } from '../../types/bot-interaction.js';
 import { findAvailableStickerPacks } from '../find-available-sticker-packs.js';
+import { getFormattedStickerName } from '../get-formatted-sticker-name.js';
 import { truncateToMaximumLength } from '../messaging.js';
 
 export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHandler => async (interaction, context, optionName) => {
@@ -16,7 +17,7 @@ export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHan
     [pack.id]: pack.name,
   }), {} as Record<string, string>);
   const userStickers = await db.sticker.findMany({
-    select: { id: true, name: true, packId: true },
+    select: { id: true, name: true, packId: true, emoji: true, order: true, telegramFileUniqueId: true },
     where: {
       deletedAt: null,
       packId: {
@@ -25,8 +26,12 @@ export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHan
     },
   });
 
-  await interaction.respond(userStickers.filter(sticker => sticker.name.toLowerCase().includes(value)).slice(0, 25).map(sticker => {
-    const name = truncateToMaximumLength(`${sticker.name} (${packNameIndex[sticker.packId]})`, 100);
-    return ({ name, value: sticker.id });
-  }));
+  await interaction.respond(userStickers
+    .map(sticker => ({ id: sticker.id, packId: sticker.packId, displayName: getFormattedStickerName(sticker) }))
+    .filter(sticker => sticker.displayName.toLowerCase().includes(value))
+    .slice(0, 25)
+    .map(sticker => {
+      const name = truncateToMaximumLength(`${sticker.displayName} (${packNameIndex[sticker.packId]})`, 100);
+      return ({ name, value: sticker.id });
+    }));
 };

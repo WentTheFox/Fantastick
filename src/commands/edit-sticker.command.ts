@@ -1,5 +1,6 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { TextInputComponentData } from 'discord.js';
+import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { getEditStickerOptions } from '../options/edit-sticker.options.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
@@ -10,6 +11,7 @@ import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
+import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -56,31 +58,55 @@ export const editStickerCommand: BotChatInputCommand = {
       return;
     }
 
+    const isImportedSticker = sticker.telegramFileUniqueId !== null;
+    const formattedStickerName = getFormattedStickerName(sticker);
     await interaction.showModal({
       customId: `${BotModalId.EDIT_STICKER}:${sticker.id}`,
-      title: t('commands.edit-sticker.components.editStickerModalTitle', { name: sticker.name }),
+      title: t('commands.edit-sticker.components.editStickerModalTitle', { name: formattedStickerName }),
       components: [
         {
           type: ComponentType.TextDisplay,
           content: t('commands.edit-sticker.components.editingText', {
-            name: `\`${sticker.name}\``,
+            name: `\`${formattedStickerName}\``,
             pack: getFormattedPackName(sticker.pack),
           }),
         },
-        {
-          type: ComponentType.Label,
-          label: t('commands.create-sticker.components.nameLabel'),
-          description: t('commands.create-sticker.components.nameDescription'),
-          component: {
-            type: ComponentType.TextInput,
-            customId: EditStickerModalCustomIds.NEW_NAME_INPUT,
-            style: TextInputStyle.Short,
-            minLength: stickerNameOptionMeta.min_length,
-            maxLength: stickerNameOptionMeta.max_length,
-            required: true,
-            value: sticker.name,
-          } as TextInputComponentData,
-        },
+        // Imported stickers only carry an optional label; their emoji, position and image
+        // are managed by the Telegram import and cannot be edited
+        ...(isImportedSticker ? [
+          {
+            type: ComponentType.TextDisplay as const,
+            content: `${EmojiCharacters.INFO} ${t('commands.edit-sticker.components.importedStickerNote')}`,
+          } as const,
+          {
+            type: ComponentType.Label as const,
+            label: t('commands.edit-sticker.components.importedNameLabel'),
+            description: t('commands.edit-sticker.components.importedNameDescription'),
+            component: {
+              type: ComponentType.TextInput,
+              customId: EditStickerModalCustomIds.NEW_NAME_INPUT,
+              style: TextInputStyle.Short,
+              maxLength: stickerNameOptionMeta.max_length,
+              required: false,
+              value: sticker.name || undefined,
+            } as TextInputComponentData,
+          },
+        ] : [
+          {
+            type: ComponentType.Label as const,
+            label: t('commands.create-sticker.components.nameLabel'),
+            description: t('commands.create-sticker.components.nameDescription'),
+            component: {
+              type: ComponentType.TextInput,
+              customId: EditStickerModalCustomIds.NEW_NAME_INPUT,
+              style: TextInputStyle.Short,
+              minLength: stickerNameOptionMeta.min_length,
+              maxLength: stickerNameOptionMeta.max_length,
+              required: true,
+              value: sticker.name,
+            } as TextInputComponentData,
+          },
+        ]),
         {
           type: ComponentType.Label,
           label: t('commands.create-sticker.components.altLabel'),
@@ -95,32 +121,34 @@ export const editStickerCommand: BotChatInputCommand = {
             value: sticker.description ?? undefined,
           } as TextInputComponentData,
         },
-        {
-          type: ComponentType.Label,
-          label: t('commands.edit-sticker.components.newFileLabel'),
-          description: t('commands.edit-sticker.components.newFileDescription'),
-          component: {
-            type: ComponentType.FileUpload,
-            customId: EditStickerModalCustomIds.NEW_FILE_INPUT,
-            minValues: 1,
-            maxValues: 1,
-            required: false,
+        ...(isImportedSticker ? [] : [
+          {
+            type: ComponentType.Label as const,
+            label: t('commands.edit-sticker.components.newFileLabel'),
+            description: t('commands.edit-sticker.components.newFileDescription'),
+            component: {
+              type: ComponentType.FileUpload as const,
+              customId: EditStickerModalCustomIds.NEW_FILE_INPUT,
+              minValues: 1,
+              maxValues: 1,
+              required: false,
+            },
           },
-        },
-        {
-          type: ComponentType.Label,
-          label: t('commands.edit-sticker.components.newUrlLabel'),
-          description: t('commands.edit-sticker.components.newUrlDescription'),
-          component: {
-            type: ComponentType.TextInput,
-            customId: EditStickerModalCustomIds.NEW_URL_INPUT,
-            style: TextInputStyle.Short,
-            minLength: stickerUrlOptionMeta.min_length,
-            maxLength: stickerUrlOptionMeta.max_length,
-            required: false,
-            placeholder: t('commands.create-sticker.components.urlPlaceholder'),
-          } as TextInputComponentData,
-        },
+          {
+            type: ComponentType.Label as const,
+            label: t('commands.edit-sticker.components.newUrlLabel'),
+            description: t('commands.edit-sticker.components.newUrlDescription'),
+            component: {
+              type: ComponentType.TextInput,
+              customId: EditStickerModalCustomIds.NEW_URL_INPUT,
+              style: TextInputStyle.Short,
+              minLength: stickerUrlOptionMeta.min_length,
+              maxLength: stickerUrlOptionMeta.max_length,
+              required: false,
+              placeholder: t('commands.create-sticker.components.urlPlaceholder'),
+            } as TextInputComponentData,
+          },
+        ]),
       ],
     });
   },

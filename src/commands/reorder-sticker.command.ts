@@ -9,6 +9,7 @@ import {
   getReorderStickerTargetAutocompleteHandler,
 } from '../utils/autocomplete/reorder-sticker-target.autocomplete.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
+import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -73,6 +74,15 @@ export const reorderStickerCommand: BotChatInputCommand = {
       return;
     }
 
+    // Imported sticker ordering is dictated by Telegram and would be reverted on re-import
+    if (sticker.telegramFileUniqueId !== null) {
+      await interactionReply(context, interaction, {
+        content: t('commands.reorder-sticker.responses.importedStickerImmutable'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     const target = await db.sticker.findUnique({
       where: { id: targetId, deletedAt: null, createdBy: user.id, packId: sticker.packId },
     });
@@ -120,9 +130,9 @@ export const reorderStickerCommand: BotChatInputCommand = {
 
     await interactionReply(context, interaction, {
       content: t(moveBefore ? 'commands.reorder-sticker.responses.movedBefore' : 'commands.reorder-sticker.responses.movedAfter', {
-        name: `\`${sticker.name}\``,
+        name: `\`${getFormattedStickerName(sticker)}\``,
         pack: getFormattedPackName(sticker.pack),
-        target: `\`${target.name}\``,
+        target: `\`${getFormattedStickerName(target)}\``,
       }),
       flags: MessageFlags.Ephemeral,
     });

@@ -77,9 +77,11 @@
     },
     "import": {
       "name": "import",
-      "description": "Import static stickers from a Telegram pack (animated stickers are skipped)",
+      "description": "Import or update static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
-        "packNotFound": "The provided pack could not be found",
+        "packOwnedByAnotherUser": "This Telegram pack was already imported by another user, so you cannot import it",
+        "nsfwRequiredForNewPack": "This Telegram pack has not been imported yet, please specify the nsfw option to create it",
+        "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",
         "invalidUrl": "The provided Telegram pack URL is invalid",
         "importFailed": "The import failed, please try again later",
         "importProgress": "Importing stickers… ({{current}}/{{total}})",
@@ -90,13 +92,13 @@
         "importAlreadyRunning": "You already have an import in progress. Please wait for it to finish before starting another."
       },
       "options": {
-        "pack": {
-          "name": "pack",
-          "description": "Name of the existing sticker pack within the app"
-        },
         "url": {
           "name": "url",
           "description": "URL of the Telegram sticker pack"
+        },
+        "nsfw": {
+          "name": "nsfw",
+          "description": "Whether the imported pack is age-restricted (required when importing a pack for the first time)"
         }
       }
     },
@@ -171,7 +173,10 @@
         "newFileLabel": "Update sticker file",
         "newFileDescription": "Upload a new file to change the sticker image. Leave blank to keep the image unchanged.",
         "newUrlLabel": "Update sticker URL",
-        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged."
+        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged.",
+        "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
+        "importedNameLabel": "Sticker name (optional)",
+        "importedNameDescription": "Enter an optional name to make this sticker easier to find when sending. Leave blank to only search by emojis and position."
       },
       "options": {
         "name": {
@@ -212,6 +217,7 @@
       },
       "components": {
         "editPackModalTitle": "Edit pack {{name}}",
+        "importedNameNote": "This pack was imported from Telegram, so its name is managed by the import and cannot be changed here. Re-run the import to refresh it.",
         "nameLabel": "Pack name",
         "nameDescription": "Enter a unique name for the sticker pack. Two packs cannot have the same name within the app.",
         "publicChoiceLabel": "Pack visibility",
@@ -244,7 +250,8 @@
         "noneProvided": "You must specify either a before or an after sticker",
         "conflict": "The pack's stickers were changed while reordering, please try again",
         "movedBefore": "Moved {{name}} to before {{target}} in pack {{pack}}",
-        "movedAfter": "Moved {{name}} to after {{target}} in pack {{pack}}"
+        "movedAfter": "Moved {{name}} to after {{target}} in pack {{pack}}",
+        "importedStickerImmutable": "Imported stickers cannot be reordered because their order is managed by the Telegram pack they come from"
       },
       "options": {
         "sticker": {

@@ -2,6 +2,7 @@ import { ApplicationCommandType, MessageFlags } from 'discord-api-types/v10';
 import { AttachmentBuilder, userMention } from 'discord.js';
 import { BotMessageContextMenuCommand, BotMessageContextMenuCommandName } from '../types/bot-interaction.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
+import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-items.js';
@@ -60,7 +61,7 @@ export const stickerDetailsCommand: BotMessageContextMenuCommand = {
 
     const lines = stickers.map(sticker => {
       if (sticker.deletedAt !== null) {
-        return `~~**\`${sticker.name}\`**~~ (\`${sticker.id}\`) - ${t('commands.Sticker Details.responses.alreadyDeleted')}`;
+        return `~~**\`${getFormattedStickerName(sticker)}\`**~~ (\`${sticker.id}\`) - ${t('commands.Sticker Details.responses.alreadyDeleted')}`;
       }
 
       const sm = stickerMessageByStickerId.get(sticker.id);
@@ -81,7 +82,7 @@ export const stickerDetailsCommand: BotMessageContextMenuCommand = {
       }
 
       return [
-        `**${t('commands.Sticker Details.responses.name')}:** \`${sticker.name}\` (\`${sticker.id}\`)`,
+        `**${t('commands.Sticker Details.responses.name')}:** \`${getFormattedStickerName(sticker)}\` (\`${sticker.id}\`)`,
         `**${t('commands.Sticker Details.responses.pack')}:** ${getFormattedPackName(sticker.pack)}`,
         `**${t('commands.Sticker Details.responses.uploadedBy')}:** ${userMention(String(sticker.createdBy))} (\`${sticker.createdBy}\`)`,
         ...outdatedLines,

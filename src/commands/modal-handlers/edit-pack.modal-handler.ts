@@ -51,8 +51,10 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
 
   const { data } = collectModalSubmittedData(interaction, EditPackModalCustomIds);
 
+  // Imported pack names come from Telegram and cannot be edited; the modal omits the name input
+  const isImportedPack = pack.telegramPackName !== null;
   const packName = data[EditPackModalCustomIds.NAME_INPUT];
-  if (packName !== pack.name) {
+  if (!isImportedPack && packName !== pack.name) {
     if (packName === null || packName.length < packNameOptionMeta.min_length) {
       await interactionReply(context, interaction, {
         content: t('commands.edit-pack.responses.nameTooShort'),
@@ -63,6 +65,16 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
     if (packName.length > packNameOptionMeta.max_length) {
       await interactionReply(context, interaction, {
         content: t('commands.edit-pack.responses.nameTooLong'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+    // The paper plane marks imported packs and must never appear in user-provided names
+    if (packName.includes(EmojiCharacters.PAPER_PLANE)) {
+      await interactionReply(context, interaction, {
+        content: t('commands.edit-pack.responses.invalidName', {
+          chars: '```\n' + EmojiCharacters.PAPER_PLANE + '\n```',
+        }),
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -80,7 +92,7 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
     const otherPacksWithSameNameCount = await db.pack.count({
       where: {
         AND: [
-          { name: packName, deletedAt: null },
+          { name: packName, deletedAt: null, telegramPackName: null },
           { NOT: { id: pack.id } },
         ],
       },
@@ -97,7 +109,7 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
   pack = await db.pack.update({
     where: { id: pack.id },
     data: {
-      name: packName,
+      ...(!isImportedPack && packName !== null ? { name: packName } : undefined),
       public: data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE,
       nsfw: data[EditPackModalCustomIds.NSFW_INPUT] === EditPackModalBooleanOption.TRUE,
     },

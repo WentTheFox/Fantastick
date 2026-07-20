@@ -8,6 +8,7 @@ import {
 } from '../../options/metadata/sticker-name.option-meta.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
+import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
 import {
@@ -56,9 +57,14 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
     data,
   } = collectModalSubmittedData(interaction, EditStickerModalCustomIds);
 
-  const stickerName = data[EditStickerModalCustomIds.NEW_NAME_INPUT];
+  // Imported stickers only carry an optional user-provided label; a blank name is
+  // acceptable and their display name is derived from the emoji and order instead
+  const isImportedSticker = sticker.telegramFileUniqueId !== null;
+  const stickerName = isImportedSticker
+    ? (data[EditStickerModalCustomIds.NEW_NAME_INPUT] ?? '')
+    : data[EditStickerModalCustomIds.NEW_NAME_INPUT];
   if (stickerName !== sticker.name) {
-    if (stickerName === null || stickerName.length < stickerNameOptionMeta.min_length) {
+    if (stickerName === null || (!isImportedSticker && stickerName.length < stickerNameOptionMeta.min_length)) {
       await interactionReply(context, interaction, {
         content: t('commands.create-sticker.responses.nameTooShot'),
         flags: MessageFlags.Ephemeral,
@@ -82,25 +88,28 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
       });
       return;
     }
-    const otherStickersWithSameNameInPackCount = await db.sticker.count({
-      where: {
-        AND: [
-          { packId: sticker.packId, name: stickerName },
-          { NOT: { id: sticker.id } },
-        ],
-      },
-    });
-    if (otherStickersWithSameNameInPackCount !== 0) {
-      await interactionReply(context, interaction, {
-        content: t('commands.create-sticker.responses.duplicateName'),
-        flags: MessageFlags.Ephemeral,
+    if (!isImportedSticker) {
+      const otherStickersWithSameNameInPackCount = await db.sticker.count({
+        where: {
+          AND: [
+            { packId: sticker.packId, name: stickerName },
+            { NOT: { id: sticker.id } },
+          ],
+        },
       });
-      return;
+      if (otherStickersWithSameNameInPackCount !== 0) {
+        await interactionReply(context, interaction, {
+          content: t('commands.create-sticker.responses.duplicateName'),
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
     }
   }
 
-  let stickerUrl = data[EditStickerModalCustomIds.NEW_URL_INPUT];
-  const stickerFileId = data[EditStickerModalCustomIds.NEW_FILE_INPUT];
+  // Imported sticker images are managed by the Telegram import and cannot be replaced
+  let stickerUrl = isImportedSticker ? null : data[EditStickerModalCustomIds.NEW_URL_INPUT];
+  const stickerFileId = isImportedSticker ? null : data[EditStickerModalCustomIds.NEW_FILE_INPUT];
   const source = stickerUrl ? EditStickerModalCustomIds.NEW_URL_INPUT : (stickerFileId ? EditStickerModalCustomIds.NEW_FILE_INPUT : null);
   switch (source) {
     case EditStickerModalCustomIds.NEW_URL_INPUT: {
@@ -160,7 +169,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
   sticker = await db.sticker.update({
     where: { id: sticker.id },
     data: {
-      name: stickerName,
+      name: stickerName ?? sticker.name,
       description,
       url: stickerUrl,
     },
@@ -169,7 +178,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.edit-sticker.responses.updated', {
-      name: `\`${sticker.name}\``,
+      name: `\`${getFormattedStickerName(sticker)}\``,
     })}`,
     flags: MessageFlags.Ephemeral,
   });

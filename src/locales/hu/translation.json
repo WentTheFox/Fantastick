@@ -175,7 +175,7 @@
         "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
         "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
         "importedNameLabel": "Sticker name (optional)",
-        "importedNameDescription": "Enter an optional name to make this sticker easier to find when sending. Leave blank to only search by emojis and position."
+        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position."
       },
       "options": {
         "name": {
@@ -264,6 +264,35 @@
         "after": {
           "name": "mögé",
           "description": "A matrica áthelyezése ez mögé a matrica mögé"
+        }
+      }
+    },
+    "mass-rename-stickers": {
+      "name": "mass-rename-stickers",
+      "description": "Rename all stickers in a pack one at a time",
+      "responses": {
+        "packNotFound": "The specified pack could not be found",
+        "emptyPack": "The specified pack does not contain any stickers",
+        "stickerNotFound": "The specified sticker could not be found"
+      },
+      "components": {
+        "renamingText": "Renaming stickers in pack {{pack}}\nSticker {{position}} of {{total}}{{identifier}}",
+        "currentNameText": "Current name: {{name}}",
+        "renamingModalText": "You are renaming sticker {{name}} from pack {{pack}}.",
+        "renameButton": "Rename",
+        "previousButton": "Previous",
+        "nextButton": "Next",
+        "renameModalTitle": "Rename sticker {{name}}",
+        "allDoneText": "All stickers in pack {{pack}} have been shown"
+      },
+      "options": {
+        "pack": {
+          "name": "pack",
+          "description": "The pack whose stickers you want to rename"
+        },
+        "start": {
+          "name": "start",
+          "description": "Position of the sticker to start from (defaults to 1, the first sticker)"
         }
       }
     },

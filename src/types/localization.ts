@@ -265,6 +265,7 @@ interface ComponentsMap {
   ],
   [BotChatInputCommandName.MASS_RENAME_STICKERS]: [
     'renamingText',
+    'currentNameText',
     'renamingModalText',
     'renameButton',
     'previousButton',

@@ -31,12 +31,17 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
   const components: APIMessageTopLevelComponent[] = [
     {
       type: ComponentType.TextDisplay,
-      content: t('commands.mass-rename-stickers.components.renamingText', {
-        pack: getFormattedPackName(pack),
-        position: index + 1,
-        total,
-        name: `\`${getFormattedStickerName(sticker)}\``,
-      }),
+      content: [
+        t('commands.mass-rename-stickers.components.renamingText', {
+          pack: getFormattedPackName(pack),
+          position: index + 1,
+          total,
+          name: `\`${getFormattedStickerName(sticker)}\``,
+        }),
+        ...(sticker.name ? [t('commands.mass-rename-stickers.components.currentNameText', {
+          name: `\`${sticker.name}\``,
+        })] : []),
+      ].join('\n'),
     },
     {
       type: ComponentType.MediaGallery,

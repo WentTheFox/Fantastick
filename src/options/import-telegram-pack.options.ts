@@ -17,10 +17,5 @@ export const getImportTelegramPackOptions = (t: TFunction): APIApplicationComman
     required: false,
     type: ApplicationCommandOptionType.Boolean,
   },
-  {
-    ...getCommonOptionMeta(t, BotChatInputCommandName.IMPORT_TELEGRAM_PACK, ImportCommandOptionName.PUBLIC),
-    required: false,
-    type: ApplicationCommandOptionType.Boolean,
-  },
   ...getGlobalOptions(t),
 ];

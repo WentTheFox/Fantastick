@@ -33,7 +33,6 @@ export const importTelegramPackCommand: BotChatInputCommand = {
 
     const url = interaction.options.getString(ImportCommandOptionName.URL, true);
     const nsfw = interaction.options.getBoolean(ImportCommandOptionName.NSFW);
-    const isPublic = interaction.options.getBoolean(ImportCommandOptionName.PUBLIC);
 
     const telegramPackName = parseTelegramPackName(url);
     if (!telegramPackName) {
@@ -50,20 +49,12 @@ export const importTelegramPackCommand: BotChatInputCommand = {
     const userPack = telegramPack ? await db.pack.findFirst({
       where: { telegramPackId: telegramPack.id, createdBy: user.id, deletedAt: null },
     }) : null;
-    if (!userPack) {
-      const missingOptions = [
-        ...(nsfw === null ? [ImportCommandOptionName.NSFW] : []),
-        ...(isPublic === null ? [ImportCommandOptionName.PUBLIC] : []),
-      ];
-      if (missingOptions.length > 0) {
-        await interactionReply(context, interaction, {
-          content: t('commands.import-telegram-pack.responses.optionsRequiredForNewPack', {
-            options: missingOptions.map(option => `\`${t(`commands.import-telegram-pack.options.${option}.name`)}\``).join(', '),
-          }),
-          flags: MessageFlags.Ephemeral,
-        });
-        return;
-      }
+    if (!userPack && nsfw === null) {
+      await interactionReply(context, interaction, {
+        content: t('commands.import-telegram-pack.responses.nsfwRequiredForNewPack'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
     }
 
     const activeImport = await db.importJob.findFirst({
@@ -104,7 +95,8 @@ export const importTelegramPackCommand: BotChatInputCommand = {
       data: {
         name: '',
         nsfw: nsfw === true,
-        public: isPublic === true,
+        // Imported packs always stay private; each user maintains their own copy
+        public: false,
         createdBy: user.id,
         telegramPackId: packTelegramPack.id,
       },

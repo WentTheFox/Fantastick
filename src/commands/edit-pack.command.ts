@@ -82,29 +82,32 @@ export const editPackCommand: BotChatInputCommand = {
             } as TextInputComponentData,
           },
         ]),
-        {
-          type: ComponentType.Label,
-          label: t('commands.edit-pack.components.publicChoiceLabel'),
-          description: t('commands.edit-pack.components.publicChoiceDescription'),
-          component: {
-            type: ComponentType.RadioGroup,
-            customId: EditPackModalCustomIds.PUBLIC_INPUT,
-            options: [
-              {
-                value: EditPackModalBooleanOption.TRUE,
-                label: `${getPackVisibilityEmoji({ public: true })} ${t('commands.edit-pack.components.publicTrueLabel')}`,
-                description: t('commands.edit-pack.components.publicTrueDescription'),
-                default: pack.public,
-              },
-              {
-                value: EditPackModalBooleanOption.FALSE,
-                label: `${getPackVisibilityEmoji({ public: false })} ${t('commands.edit-pack.components.publicFalseLabel')}`,
-                description: t('commands.edit-pack.components.publicFalseDescription'),
-                default: !pack.public,
-              },
-            ],
-          } as unknown as ComponentInLabelData,
-        },
+        // Imported packs always stay private, so no visibility choice is offered for them
+        ...(pack.telegramPackId !== null ? [] : [
+          {
+            type: ComponentType.Label as const,
+            label: t('commands.edit-pack.components.publicChoiceLabel'),
+            description: t('commands.edit-pack.components.publicChoiceDescription'),
+            component: {
+              type: ComponentType.RadioGroup,
+              customId: EditPackModalCustomIds.PUBLIC_INPUT,
+              options: [
+                {
+                  value: EditPackModalBooleanOption.TRUE,
+                  label: `${getPackVisibilityEmoji({ public: true })} ${t('commands.edit-pack.components.publicTrueLabel')}`,
+                  description: t('commands.edit-pack.components.publicTrueDescription'),
+                  default: pack.public,
+                },
+                {
+                  value: EditPackModalBooleanOption.FALSE,
+                  label: `${getPackVisibilityEmoji({ public: false })} ${t('commands.edit-pack.components.publicFalseLabel')}`,
+                  description: t('commands.edit-pack.components.publicFalseDescription'),
+                  default: !pack.public,
+                },
+              ],
+            } as unknown as ComponentInLabelData,
+          },
+        ]),
         {
           type: ComponentType.Label,
           label: t('commands.edit-pack.components.nsfwChoiceLabel'),

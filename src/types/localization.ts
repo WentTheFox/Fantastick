@@ -16,7 +16,6 @@ export const enum CreatePackCommandOptionName {
 export const enum ImportCommandOptionName {
   URL = 'url',
   NSFW = 'nsfw',
-  PUBLIC = 'public',
 }
 
 export const enum PackCommandOptionName {
@@ -98,7 +97,7 @@ export const enum CreateStickerCommandResponse {
 }
 
 export const enum ImportCommandResponse {
-  optionsRequiredForNewPack = 'optionsRequiredForNewPack',
+  nsfwRequiredForNewPack = 'nsfwRequiredForNewPack',
   packImportAlreadyRunning = 'packImportAlreadyRunning',
   invalidUrl = 'invalidUrl',
   importFailed = 'importFailed',

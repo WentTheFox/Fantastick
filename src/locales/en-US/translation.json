@@ -79,7 +79,7 @@
       "name": "import-telegram-pack",
       "description": "Import or update static stickers from a Telegram pack (animated stickers are skipped)",
       "responses": {
-        "optionsRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the following option(s) to create your copy: {{options}}",
+        "nsfwRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the nsfw option to create your copy",
         "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",
         "invalidUrl": "The provided Telegram pack URL is invalid",
         "importFailed": "The import failed, please try again later",
@@ -98,10 +98,6 @@
         "nsfw": {
           "name": "nsfw",
           "description": "Whether your copy of the pack is age-restricted (required when importing it for the first time)"
-        },
-        "public": {
-          "name": "public",
-          "description": "Whether your copy of the pack is visible to everyone (required when importing it for the first time)"
         }
       }
     },
@@ -221,7 +217,7 @@
       },
       "components": {
         "editPackModalTitle": "Edit pack {{name}}",
-        "importedNameNote": "This pack was imported from Telegram, so its name is managed by the import and cannot be changed here. Re-run the import to refresh it.",
+        "importedNameNote": "This pack was imported from Telegram: its name is managed by the import and cannot be changed here, and imported packs always stay private. Re-run the import to refresh the name.",
         "nameLabel": "Pack name",
         "nameDescription": "Enter a unique name for the sticker pack. Two packs cannot have the same name within the app.",
         "publicChoiceLabel": "Pack visibility",

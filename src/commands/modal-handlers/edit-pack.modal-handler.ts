@@ -112,7 +112,8 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
     where: { id: pack.id },
     data: {
       ...(!isImportedPack && packName !== null ? { name: packName } : undefined),
-      public: data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE,
+      // Imported packs always stay private
+      public: !isImportedPack && data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE,
       nsfw: data[EditPackModalCustomIds.NSFW_INPUT] === EditPackModalBooleanOption.TRUE,
     },
     include: { telegramPack: true },

@@ -45,7 +45,7 @@
       "responses": {
         "nameTooShort": "A megadott matricacsomag név túl rövid (minimum {{min}} karakter)",
         "nameTooLong": "A megadott matricacsomag név túl hosszú (maximum {{max}} karakter)",
-        "invalidName": "The provided sticker pack name contains the following invalid character(s): {{chars}}",
+        "invalidName": "A megadott matricacsomag név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
         "duplicateName": "Már létezik egy ilyen nevű matricacsomag, kérlek válassz másik nevet",
         "tooManyPacks": "Legfeljebb {{maxPacks}} matricacsomagot hozhatsz létre. Kérlek töröld az egyik matrica csomagod mielőtt újat hoznál létre.",
         "createdPublic": "Új **publikus** matricacsomag létrehozva {{name}} néven",
@@ -75,11 +75,12 @@
         }
       }
     },
-    "import": {
+    "import-telegram-pack": {
       "name": "importálás",
-      "description": "Import static stickers from a Telegram pack (animated stickers are skipped)",
+      "description": "Matricák importálása egy Telegram csomagból",
       "responses": {
-        "packNotFound": "A megadott csomag nem található",
+        "nsfwRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the nsfw option to create your copy",
+        "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",
         "invalidUrl": "A megadott Telegram csomag URL érvénytelen",
         "importFailed": "Az importálás nem sikerült, kérlek próbálkozz újra később",
         "importProgress": "Matricák importálása… ({{current}}/{{total}})",
@@ -90,13 +91,13 @@
         "importAlreadyRunning": "You already have an import in progress. Please wait for it to finish before starting another."
       },
       "options": {
-        "pack": {
-          "name": "csomag",
-          "description": "Meglevő matricacsomag neve az appban"
-        },
         "url": {
           "name": "url",
           "description": "A Telegram matricacsomag URL-js"
+        },
+        "nsfw": {
+          "name": "nsfw",
+          "description": "Whether your copy of the pack is age-restricted (required when importing it for the first time)"
         }
       }
     },
@@ -108,7 +109,7 @@
         "invalidPack": "Nem található matricacsomag a megadott néven",
         "nameTooShort": "A megadott matrica név túl rövid (minimum {{min}} karakter)",
         "nameTooLong": "A megadott matrica név túl hosszú (maximum {{max}} karakter)",
-        "invalidName": "The provided sticker name contains the following invalid character(s): {{chars}}",
+        "invalidName": "A megadott matrica név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
         "duplicateName": "Már létezik egy ilyen nevű matrica ebben a matricacsomagban, kérlek válassz másik nevet",
         "missingFile": "Fel kell töltened egy fájlt a matricához",
         "invalidUrl": "A megadott URL érvénytelen",
@@ -144,6 +145,7 @@
       "components": {
         "emptyPack": "Ebben a csomagban még nincs matrica",
         "packPreview": "Alább láthatsz egy előnézetet a csomagban található matricákból",
+        "importedFrom": "Imported from Telegram: {{url}}",
         "firstPageButton": "First",
         "previousPageButton": "Previous",
         "nextPageButton": "Next",
@@ -170,7 +172,10 @@
         "newFileLabel": "Matricafájl frissítése",
         "newFileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
         "newUrlLabel": "Matrica URL frissítése",
-        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen."
+        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
+        "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
+        "importedNameLabel": "Sticker name (optional)",
+        "importedNameDescription": "Enter an optional name to make this sticker easier to find when sending. Leave blank to only search by emojis and position."
       },
       "options": {
         "name": {
@@ -211,6 +216,7 @@
       },
       "components": {
         "editPackModalTitle": "Edit pack {{name}}",
+        "importedNameNote": "This pack was imported from Telegram: its name is managed by the import and cannot be changed here, and imported packs always stay private. Re-run the import to refresh the name.",
         "nameLabel": "Pack name",
         "nameDescription": "Enter a unique name for the sticker pack. Two packs cannot have the same name within the app.",
         "publicChoiceLabel": "Pack visibility",
@@ -233,11 +239,40 @@
         }
       }
     },
+    "reorder-sticker": {
+      "name": "matrica-átrendezés",
+      "description": "Egy matrica sorrendjének módosítása a csomagon belül",
+      "responses": {
+        "stickerNotFound": "A megadott matrica nem található",
+        "targetNotFound": "A megadott matrica nem található ugyanabban a csomagban",
+        "bothProvided": "Nem adhatsz meg egyszerre elé és mögé kerülő matricát is",
+        "noneProvided": "Meg kell adnod egy elé vagy egy mögé kerülő matricát",
+        "conflict": "A csomag matricái megváltoztak átrendezés közben, kérjük, próbáld újra",
+        "movedBefore": "A(z) {{name}} matrica áthelyezve a(z) {{target}} elé a(z) {{pack}} csomagban",
+        "movedAfter": "A(z) {{name}} matrica áthelyezve a(z) {{target}} mögé a(z) {{pack}} csomagban",
+        "importedStickerImmutable": "Imported stickers cannot be reordered because their order is managed by the Telegram pack they come from"
+      },
+      "options": {
+        "sticker": {
+          "name": "matrica",
+          "description": "Az átrendezni kívánt matrica neve"
+        },
+        "before": {
+          "name": "elé",
+          "description": "A matrica áthelyezése ez elé a matrica elé"
+        },
+        "after": {
+          "name": "mögé",
+          "description": "A matrica áthelyezése ez mögé a matrica mögé"
+        }
+      }
+    },
     "delete-sticker": {
       "name": "matrica-törlés",
       "description": "Létező matrica törlése",
       "responses": {
         "stickerNotFound": "A megadott matrica nem található",
+        "importedSticker": "Imported stickers cannot be deleted individually. They disappear when removed from the Telegram pack, or you can delete your copy of the whole pack.",
         "deleteFailed": "Váratlan hiba miatt nem sikerült törölni a matricát, kérjük, próbáld újra később.",
         "unsupportedMethod": "A megadott törlési módszer ({{method}}) nem támogatott (még).",
         "deleted": "A(z) {{name}} nevű matrica sikeresen törölve"

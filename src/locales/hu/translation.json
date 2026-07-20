@@ -143,7 +143,12 @@
       },
       "components": {
         "emptyPack": "Ebben a csomagban még nincs matrica",
-        "packPreview": "Alább láthatsz egy előnézetet a csomagban található matricákból"
+        "packPreview": "Alább láthatsz egy előnézetet a csomagban található matricákból",
+        "firstPageButton": "First",
+        "previousPageButton": "Previous",
+        "nextPageButton": "Next",
+        "lastPageButton": "Last",
+        "pageIndicator": "Page {{page}} of {{totalPages}}"
       },
       "options": {
         "name": {

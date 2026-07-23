@@ -35,6 +35,13 @@ FROM node:24-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 
+# chromium: headless rendering of animated (.tgs/Lottie) stickers via puppeteer-core
+# ffmpeg: GIF encoding for both .tgs frame sequences and .webm (VP9+alpha) stickers
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends chromium ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 COPY --from=pruned --chown=node:node /app/node_modules ./node_modules
 COPY --from=pruned --chown=node:node /app/build ./build
 COPY --from=pruned --chown=node:node /app/package.json ./package.json

@@ -52,11 +52,16 @@ $ docker compose up -d
 
 ### Option B: Bare metal (pm2)
 
+Prerequisites: [ffmpeg](https://ffmpeg.org/download.html) and a Chromium/Chrome browser must be installed, since importing animated Telegram stickers converts them to GIF using ffmpeg and headless Chromium (the Docker Compose path installs both automatically, but bare-metal hosting needs them installed manually). For example, on Debian/Ubuntu:
+```
+$ sudo apt install ffmpeg chromium
+```
+
 ```
 $ sudo npm install -g pm2
 $ pnpm install
 $ cp .env.example .env
-$ nano .env # Fill in the neccessary environment variables
+$ nano .env # Fill in the neccessary environment variables, including PUPPETEER_EXECUTABLE_PATH (e.g. /usr/bin/chromium)
 $ pnpm exec prisma generate
 $ pnpm run build
 $ pnpm exec prisma migrate deploy

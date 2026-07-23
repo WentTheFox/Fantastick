@@ -77,7 +77,7 @@
     },
     "import-telegram-pack": {
       "name": "import-telegram-pack",
-      "description": "Import or update static stickers from a Telegram pack (animated stickers are skipped)",
+      "description": "Import or update stickers from a Telegram pack",
       "responses": {
         "nsfwRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the nsfw option to create your copy",
         "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",

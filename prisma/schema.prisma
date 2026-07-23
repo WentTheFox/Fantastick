@@ -47,6 +47,7 @@ model TelegramSticker {
   emoji                String
   order                Int          @default(0)
   url                  String       @db.VarChar(255)
+  deleteUrl            String?      @db.VarChar(255)
   createdAt            DateTime     @default(now()) @db.Timestamptz(0)
   updatedAt            DateTime?    @updatedAt @db.Timestamptz(0)
   deletedAt            DateTime?    @db.Timestamptz(0)
@@ -85,6 +86,7 @@ model Sticker {
   name              String
   description       String?          @db.VarChar(255)
   url               String?          @db.VarChar(255)
+  deleteUrl         String?          @db.VarChar(255)
   createdBy         BigInt
   creator           DiscordUser      @relation("CreatedStickers", fields: [createdBy], references: [id])
   createdAt         DateTime         @default(now()) @db.Timestamptz(0)

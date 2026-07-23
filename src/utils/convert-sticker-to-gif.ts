@@ -191,8 +191,7 @@ export const convertWebmToGif = async (context: LoggerContext, webmBuffer: Buffe
     const palettePath = path.join(tmpDir, 'palette.png');
     const outPath = path.join(tmpDir, 'out.gif');
     const durationSeconds = String(MAX_STICKER_DURATION_MS / 1000);
-    // tpad defends against a >1-frame clip that's still shorter than one output frame period.
-    const scaleFilter = `format=yuva420p,tpad=stop_mode=clone:stop_duration=1,fps=${TARGET_GIF_FPS},scale=${MAX_STICKER_DIMENSION}:${MAX_STICKER_DIMENSION}:force_original_aspect_ratio=decrease`;
+    const scaleFilter = `format=yuva420p,fps=${TARGET_GIF_FPS},scale=${MAX_STICKER_DIMENSION}:${MAX_STICKER_DIMENSION}:force_original_aspect_ratio=decrease`;
 
     await execFileAsync('ffmpeg', [
       '-y', ...vp9DecoderArgs, '-t', durationSeconds, '-i', inPath,

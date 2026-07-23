@@ -39,7 +39,7 @@ Stop the stack:
 ```
 $ docker compose down
 ```
-Only add `-v` if you intentionally want to wipe the database and any stored sticker files — the Postgres data and uploaded sticker files both live in named Docker volumes that persist across restarts and rebuilds.
+Only add `-v` if you intentionally want to wipe the database — Postgres data lives in a named Docker volume that persists across restarts and rebuilds. The same is true of sticker files, but only when `UPLOAD_API_ENABLED=false` (the default). Set it to `true` and sticker files live on the remote upload API instead of a local volume, unaffected by `-v`.
 
 Update to a new version:
 ```

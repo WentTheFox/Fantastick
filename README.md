@@ -68,6 +68,23 @@ $ pnpm exec prisma migrate deploy
 $ pm2 start pm2.json
 ```
 
+## Development
+
+For local development against a bot account you control, follow the bare
+metal steps above through `pnpm exec prisma generate`, then run:
+
+```
+$ pnpm dev
+```
+
+This runs the bot directly from TypeScript source via `tsx`, skipping the
+`tsc` build step. Set `DEV_WATCH=true` in `.env` to additionally hot-reload
+command/component handler implementations as you edit them, without
+restarting the process or re-registering slash commands with Discord — see
+`@wentthefox-org/discord-bot-framework`'s `/dev` docs for how this works and
+its limitations (e.g. changing a command's name/options/description still
+needs a restart).
+
 ## Frequently Asked Questions
 
 ### 1) What is this sorcery?

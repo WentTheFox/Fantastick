@@ -37,13 +37,18 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
 (async function createShards() {
   const logger = createAppLogger('ShardingManager');
   const currentFolder = dirname(fileURLToPath(import.meta.url));
-  const botScriptPath = `${currentFolder}/bot.js`;
+  // Running via `tsx` from source (e.g. `pnpm dev`) rather than the compiled build/ output.
+  const isTsDevMode = process.env.npm_lifecycle_script?.includes('.ts') ?? false;
+  const botScriptPath = `${currentFolder}/bot.${isTsDevMode ? 'ts' : 'js'}`;
 
   await createShardManager({
     token: env.DISCORD_BOT_TOKEN,
     botScriptPath,
     logger,
-    mode: process.env.npm_lifecycle_script?.includes('.ts') ? 'worker' : 'process',
+    mode: isTsDevMode ? 'worker' : 'process',
+    // Worker threads don't inherit CLI flags by default - forward tsx's own loader
+    // flags so shards spawned from `bot.ts` can be loaded without a separate build.
+    execArgv: isTsDevMode ? process.execArgv : undefined,
     beforeSpawn: () => startupCommandsUpdate(logger),
   });
 })();

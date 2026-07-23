@@ -53,6 +53,7 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
     name: sticker.name,
     description: sticker.description,
     url: sticker.url,
+    nsfwOverride: sticker.nsfwOverride,
   };
 
   const {

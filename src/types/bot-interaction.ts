@@ -27,6 +27,7 @@ export const enum BotChatInputCommandName {
   EDIT_PACK = 'edit-pack',
   REORDER_STICKER = 'reorder-sticker',
   MASS_RENAME_STICKERS = 'mass-rename-stickers',
+  PUBLISH_IMPORTED_PACK = 'publish-imported-pack',
 }
 
 export const enum BotMessageContextMenuCommandName {
@@ -42,6 +43,7 @@ export const enum BotModalId {
   DELETE_PACK = 'deletePackModal',
   EDIT_PACK = 'editPackModal',
   MASS_RENAME_STICKER = 'massRenameStickerModal',
+  PUBLISH_EDIT_STICKER = 'publishEditStickerModal',
 }
 
 export const enum BotMessageComponentCustomId {
@@ -54,6 +56,11 @@ export const enum BotMessageComponentCustomId {
   MASS_RENAME_OPEN = 'mass-rename-open',
   MASS_RENAME_PREV = 'mass-rename-prev',
   MASS_RENAME_NEXT = 'mass-rename-next',
+  PUBLISH_OPEN = 'publish-open',
+  PUBLISH_PREV = 'publish-prev',
+  PUBLISH_NEXT = 'publish-next',
+  PUBLISH_CONFIRM = 'publish-confirm',
+  PUBLISH_JUMP_INVALID = 'publish-jump-invalid',
 }
 
 export type CommandHandler = FrameworkCommandHandler<UserInteractionContext>;

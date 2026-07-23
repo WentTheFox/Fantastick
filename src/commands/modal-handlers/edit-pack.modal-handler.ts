@@ -112,8 +112,12 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
     where: { id: pack.id },
     data: {
       ...(!isImportedPack && packName !== null ? { name: packName } : undefined),
-      // Imported packs always stay private
-      public: !isImportedPack && data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE,
+      // Imported packs can only become public via /publish-imported-pack; the visibility
+      // radio is only shown here once a pack is already published, letting the owner
+      // unpublish it again (private → public is never accepted through this modal)
+      public: isImportedPack
+        ? (pack.public && data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE)
+        : data[EditPackModalCustomIds.PUBLIC_INPUT] === EditPackModalBooleanOption.TRUE,
       nsfw: data[EditPackModalCustomIds.NSFW_INPUT] === EditPackModalBooleanOption.TRUE,
     },
     include: { telegramPack: true },

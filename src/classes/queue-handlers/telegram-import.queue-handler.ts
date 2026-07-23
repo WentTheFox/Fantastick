@@ -25,6 +25,7 @@ import { getPackNsfwEmoji } from '../../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../../utils/get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
 import { emoji } from '../../utils/messaging.js';
+import { resolveStickerNsfw } from '../../utils/resolve-sticker-nsfw.js';
 import { rest } from '../../utils/rest.js';
 import {
   createTelegramApiClient,
@@ -329,6 +330,20 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       const liveTelegramStickerIds = new Set(liveTelegramStickers.map(ts => ts.id));
       const staleTelegramStickerIds = staleTelegramStickers.map(s => s.id);
 
+      // If this Telegram pack already has a published (public) copy, seed brand-new
+      // sticker rows for every other subscriber from its names/ratings instead of
+      // leaving them blank; existing rows are never touched, so nobody's own edits
+      // are overwritten
+      const publishedPack = await tx.pack.findFirst({
+        where: { telegramPackId: telegramPack.id, public: true, deletedAt: null },
+      });
+      const publishedStickers = publishedPack
+        ? await tx.sticker.findMany({
+          where: { packId: publishedPack.id, telegramStickerId: { not: null }, deletedAt: null },
+        })
+        : [];
+      const publishedByTelegramStickerId = new Map(publishedStickers.map(s => [s.telegramStickerId as string, s]));
+
       // Every user's view of this Telegram pack mirrors the shared rows
       const subscriberPacks = await tx.pack.findMany({
         where: { telegramPackId: telegramPack.id, deletedAt: null },
@@ -343,13 +358,15 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         for (const telegramStickerId of liveTelegramStickerIds) {
           const row = rowsByTelegramStickerId.get(telegramStickerId);
           if (!row) {
+            const publishedSticker = publishedByTelegramStickerId.get(telegramStickerId);
             const created = await tx.sticker.create({
               data: {
-                name: '',
+                name: publishedSticker?.name ?? '',
                 description: null,
                 packId: subscriberPack.id,
                 createdBy: subscriberPack.createdBy,
                 telegramStickerId,
+                nsfwOverride: publishedSticker?.nsfwOverride ?? null,
               },
             });
             if (subscriberPack.id === packId) {
@@ -449,7 +466,8 @@ const postImportedStickersToFeed = async ({ db, stickers, pack, telegramPack, im
 
   for (const sticker of stickers) {
     try {
-      const { items, files } = mapStickersToGalleryItems([sticker], pack.nsfw);
+      const spoiler = resolveStickerNsfw(sticker, pack);
+      const { items, files } = mapStickersToGalleryItems([sticker], spoiler);
       const replyMessage = await webhookClient.send({
         flags: MessageFlags.SuppressNotifications,
         content: [
@@ -458,7 +476,7 @@ const postImportedStickersToFeed = async ({ db, stickers, pack, telegramPack, im
           '**Description:** _(empty)_',
           `**Pack:** \`${wrapUrlsInAngleBrackets(telegramPack.title)}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
           `**Imported by:** ${userMention(importedBy)} (\`${importedBy}\`)`,
-          `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => pack.nsfw ? `||${item.media.url}||` : item.media.url).join(' ')}`,
+          `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => spoiler ? `||${item.media.url}||` : item.media.url).join(' ')}`,
         ].join('\n'),
         files,
       });

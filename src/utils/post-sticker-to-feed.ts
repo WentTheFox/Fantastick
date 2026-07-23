@@ -16,13 +16,22 @@ import { getPackNsfwEmoji } from './get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from './get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
 import { recordStickerMessages } from './record-sticker-messages.js';
+import { resolveStickerNsfw } from './resolve-sticker-nsfw.js';
 import { wrapUrlsInAngleBrackets } from './wrap-urls-in-angle-brackets.js';
 
 export interface StickerSnapshot {
   name: string;
   description: string | null;
   url: string | null;
+  nsfwOverride: boolean | null;
 }
+
+const formatRating = (nsfwOverride: boolean | null) => {
+  if (nsfwOverride === null) return 'pack default';
+  return nsfwOverride ? 'NSFW' : 'SFW';
+};
+
+const formatName = (name: string) => name ? `\`${name}\`` : '_(empty)_';
 
 const mapDescription = (description: string | null, prefix: string) => (
   description ? [
@@ -32,8 +41,8 @@ const mapDescription = (description: string | null, prefix: string) => (
     `**${prefix}:** _(empty)_`,
   ]
 );
-const wrapUrlInSpoiler = (userPack: Pick<Pack, 'nsfw'>, url: string) => {
-  return userPack.nsfw ? `||${url}||` : url;
+const wrapUrlInSpoiler = (spoiler: boolean, url: string) => {
+  return spoiler ? `||${url}||` : url;
 };
 
 interface PostStickerToFeedParams {
@@ -59,29 +68,32 @@ export const postStickerToFeed = async ({
 
   const webhookClient = new WebhookClient({ url: env.DISCORD_FEED_WEBHOOK_URL });
   const urlChanged = snapshot && snapshot.url !== sticker.url;
+  const spoiler = resolveStickerNsfw(sticker, userPack);
   const {
     items,
     files,
-  } = mapStickersToGalleryItems(urlChanged ? [snapshot, sticker] : [sticker], userPack.nsfw);
+  } = mapStickersToGalleryItems(urlChanged ? [snapshot, sticker] : [sticker], spoiler);
 
   const nameChanged = snapshot && snapshot.name !== sticker.name;
   const descriptionChanged = snapshot && snapshot.description !== sticker.description;
+  const ratingChanged = snapshot && snapshot.nsfwOverride !== sticker.nsfwOverride;
   const replyMessage = await webhookClient.send({
     flags: MessageFlags.SuppressNotifications,
     content: [
       `# Sticker ${action.replace(/e?$/, 'ed')}`,
-      ...(nameChanged ? [`**Old name:** \`${snapshot.name}\``] : []),
-      `**${nameChanged ? 'New name' : 'Name'}:** \`${getFormattedStickerName(sticker)}\` (\`${sticker.id}\`)`,
+      ...(nameChanged ? [`**Old name:** ${formatName(snapshot.name)}`] : []),
+      `**${nameChanged ? 'New name' : 'Name'}:** ${formatName(getFormattedStickerName(sticker))} (\`${sticker.id}\`)`,
       ...(descriptionChanged ? mapDescription(snapshot.description, 'Old description') : []),
       ...(mapDescription(sticker.description, descriptionChanged ? 'New description' : 'Description')),
+      `**Rating:** \`${formatRating(sticker.nsfwOverride)}\`${ratingChanged ? ` (was \`${formatRating(snapshot.nsfwOverride)}\`)` : ''}`,
       `**Created at:** ${time(sticker.createdAt, TimestampStyles.FullDateShortTime)} (${time(sticker.createdAt, TimestampStyles.RelativeTime)})`,
       ...(sticker.updatedAt ? [`**Updated at:** ${time(sticker.updatedAt, TimestampStyles.FullDateShortTime)} (${time(sticker.updatedAt, TimestampStyles.RelativeTime)})`] : []),
       ...(sticker.deletedAt ? [`**Deleted at:** ${time(sticker.deletedAt, TimestampStyles.FullDateShortTime)} (${time(sticker.deletedAt, TimestampStyles.RelativeTime)})`] : []),
       `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
       ...(sticker.deletedBy ? [`**Deleted by:** ${userMention(String(sticker.deletedBy))} (\`${sticker.deletedBy}\`)`] : []),
       `**Pack:** \`${wrapUrlsInAngleBrackets(userPack.telegramPack?.title ?? userPack.name)}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
-      ...(urlChanged ? [`**Old URL:** ${snapshot.url ? wrapUrlInSpoiler(userPack, snapshot.url) : '_(none)_'}`, `**New URL:** \`${getStickerUrl(sticker)}\``] : []),
-      `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => wrapUrlInSpoiler(userPack, item.media.url)).join(' ')}`,
+      ...(urlChanged ? [`**Old URL:** ${snapshot.url ? wrapUrlInSpoiler(spoiler, snapshot.url) : '_(none)_'}`, `**New URL:** \`${getStickerUrl(sticker)}\``] : []),
+      `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => wrapUrlInSpoiler(spoiler, item.media.url)).join(' ')}`,
     ].join('\n'),
     files,
   });

@@ -1,5 +1,5 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
-import { TextInputComponentData } from 'discord.js';
+import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { getEditStickerOptions } from '../options/edit-sticker.options.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
@@ -17,6 +17,7 @@ import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import {
   EditStickerModalCustomIds,
+  EditStickerRatingOption,
   editStickerModalHandler,
 } from './modal-handlers/edit-sticker.modal-handler.js';
 
@@ -120,6 +121,35 @@ export const editStickerCommand: BotChatInputCommand = {
             required: false,
             value: sticker.description ?? undefined,
           } as TextInputComponentData,
+        },
+        {
+          type: ComponentType.Label,
+          label: t('commands.edit-sticker.components.ratingChoiceLabel'),
+          description: t('commands.edit-sticker.components.ratingChoiceDescription'),
+          component: {
+            type: ComponentType.RadioGroup,
+            customId: EditStickerModalCustomIds.RATING_INPUT,
+            options: [
+              {
+                value: EditStickerRatingOption.DEFAULT,
+                label: t('commands.edit-sticker.components.ratingDefaultLabel'),
+                description: t('commands.edit-sticker.components.ratingDefaultDescription'),
+                default: sticker.nsfwOverride === null,
+              },
+              {
+                value: EditStickerRatingOption.SFW,
+                label: t('commands.edit-sticker.components.ratingSfwLabel'),
+                description: t('commands.edit-sticker.components.ratingSfwDescription'),
+                default: sticker.nsfwOverride === false,
+              },
+              {
+                value: EditStickerRatingOption.NSFW,
+                label: t('commands.edit-sticker.components.ratingNsfwLabel'),
+                description: t('commands.edit-sticker.components.ratingNsfwDescription'),
+                default: sticker.nsfwOverride === true,
+              },
+            ],
+          } as unknown as ComponentInLabelData,
         },
         ...(isImportedSticker ? [] : [
           {

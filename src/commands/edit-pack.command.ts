@@ -66,6 +66,13 @@ export const editPackCommand: BotChatInputCommand = {
             type: ComponentType.TextDisplay as const,
             content: `${EmojiCharacters.INFO} ${t('commands.edit-pack.components.importedNameNote')}`,
           } as const,
+          // Unpublished imported packs can only become public via /publish-imported-pack
+          ...(pack.public ? [] : [
+            {
+              type: ComponentType.TextDisplay as const,
+              content: `${EmojiCharacters.INFO} ${t('commands.edit-pack.components.importedUnpublishedNote')}`,
+            } as const,
+          ]),
         ] : [
           {
             type: ComponentType.Label as const,
@@ -82,8 +89,11 @@ export const editPackCommand: BotChatInputCommand = {
             } as TextInputComponentData,
           },
         ]),
-        // Imported packs always stay private, so no visibility choice is offered for them
-        ...(pack.telegramPackId !== null ? [] : [
+        // Imported packs can only ever go from public back to private here — becoming
+        // public in the first place requires /publish-imported-pack — so the choice is
+        // only offered once a pack is already published; unpublished imported packs
+        // get the informational note above instead
+        ...(pack.telegramPackId === null || pack.public ? [
           {
             type: ComponentType.Label as const,
             label: t('commands.edit-pack.components.publicChoiceLabel'),
@@ -101,13 +111,15 @@ export const editPackCommand: BotChatInputCommand = {
                 {
                   value: EditPackModalBooleanOption.FALSE,
                   label: `${getPackVisibilityEmoji({ public: false })} ${t('commands.edit-pack.components.publicFalseLabel')}`,
-                  description: t('commands.edit-pack.components.publicFalseDescription'),
+                  description: t(pack.telegramPackId !== null
+                    ? 'commands.edit-pack.components.publicFalseDescriptionImported'
+                    : 'commands.edit-pack.components.publicFalseDescription'),
                   default: !pack.public,
                 },
               ],
             } as unknown as ComponentInLabelData,
           },
-        ]),
+        ] : []),
         {
           type: ComponentType.Label,
           label: t('commands.edit-pack.components.nsfwChoiceLabel'),

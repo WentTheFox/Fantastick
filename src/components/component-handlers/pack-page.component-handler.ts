@@ -9,11 +9,13 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
   }
 
   const { t, db } = context;
-  const separatorIndex = resourceId?.lastIndexOf(':') ?? -1;
-  const packId = separatorIndex === -1 ? undefined : resourceId?.substring(0, separatorIndex);
-  const currentPage = separatorIndex === -1 ? NaN : Number(resourceId?.substring(separatorIndex + 1));
+  // Custom IDs are `<prefix>:<packId>:<page>:<nsfw>`; the pack ID is a UUID so it never
+  // contains a colon itself, making a plain split safe
+  const [packId, currentPageRaw, nsfwFlagRaw] = (resourceId ?? '').split(':');
+  const currentPage = currentPageRaw === undefined ? NaN : Number(currentPageRaw);
+  const nsfw = nsfwFlagRaw === '1';
 
-  const pack = typeof packId === 'string' && !Number.isNaN(currentPage)
+  const pack = typeof packId === 'string' && packId.length > 0 && !Number.isNaN(currentPage)
     ? await db.pack.findFirst({
       where: {
         id: packId,
@@ -32,9 +34,14 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
     return;
   }
 
-  const stickerCount = await db.sticker.count({
-    where: { deletedAt: null, packId: pack.id },
-  });
+  // Stickers explicitly overridden to NSFW never appear in the non-NSFW commands,
+  // even inside an otherwise safe-for-all-audiences pack
+  const stickerWhere = {
+    deletedAt: null,
+    packId: pack.id,
+    ...(nsfw ? {} : { NOT: { nsfwOverride: true } }),
+  };
+  const stickerCount = await db.sticker.count({ where: stickerWhere });
   const totalPages = Math.max(1, Math.ceil(stickerCount / packItemsPerPage));
   const requestedPage = {
     first: 0,
@@ -45,7 +52,7 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
   const page = Math.min(Math.max(requestedPage, 0), totalPages - 1);
 
   const stickers = await db.sticker.findMany({
-    where: { deletedAt: null, packId: pack.id },
+    where: stickerWhere,
     include: { telegramSticker: true },
     take: packItemsPerPage,
     skip: page * packItemsPerPage,
@@ -53,7 +60,7 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
     orderBy: pack.telegramPackId !== null ? { telegramSticker: { order: 'asc' } } : { order: 'asc' },
   });
 
-  const { components, files } = getPackPreviewContent({ t, pack, stickers, page, totalPages });
+  const { components, files } = getPackPreviewContent({ t, pack, stickers, page, totalPages, nsfw });
 
   await interaction.update({ flags: MessageFlags.IsComponentsV2, components, files });
 };

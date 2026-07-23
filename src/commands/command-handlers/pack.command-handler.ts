@@ -29,22 +29,24 @@ export const packCommandHandler = (nsfw: boolean): CommandHandler => async funct
     return;
   }
 
-  const stickerCount = await db.sticker.count({
-    where: { deletedAt: null, packId: pack.id },
-  });
+  // Stickers explicitly overridden to NSFW never appear in the non-NSFW commands,
+  // even inside an otherwise safe-for-all-audiences pack
+  const stickerWhere = {
+    deletedAt: null,
+    packId: pack.id,
+    ...(nsfw ? {} : { NOT: { nsfwOverride: true } }),
+  };
+  const stickerCount = await db.sticker.count({ where: stickerWhere });
   const totalPages = Math.max(1, Math.ceil(stickerCount / packItemsPerPage));
   const stickers = await db.sticker.findMany({
-    where: {
-      deletedAt: null,
-      packId: pack.id,
-    },
+    where: stickerWhere,
     include: { telegramSticker: true },
     take: packItemsPerPage,
     // Imported sticker order lives on the shared TelegramSticker row
     orderBy: pack.telegramPackId !== null ? { telegramSticker: { order: 'asc' } } : { order: 'asc' },
   });
 
-  const { flags, components, files } = getPackPreviewContent({ t, pack, stickers, page: 0, totalPages });
+  const { flags, components, files } = getPackPreviewContent({ t, pack, stickers, page: 0, totalPages, nsfw });
 
   await interactionReply(context, interaction, { flags, components, files });
 };

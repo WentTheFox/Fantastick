@@ -95,6 +95,8 @@ model Sticker {
   order             Int              @default(0)
   telegramSticker   TelegramSticker? @relation(fields: [telegramStickerId], references: [id])
   telegramStickerId String?          @db.Uuid
+  // Tri-state rating override: null = inherit Pack.nsfw, false = force SFW, true = force NSFW
+  nsfwOverride      Boolean?
   stickerMessages   StickerMessage[] @ignore
 
   @@index([deletedAt])

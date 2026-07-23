@@ -6,6 +6,9 @@ import { interactionReply } from '../../utils/interaction-reply.js';
 
 export const packCommandHandler = (nsfw: boolean): CommandHandler => async function handle(interaction, context) {
   const { t, db } = context;
+  // Pack previews attach up to `packItemsPerPage` sticker files, which can take longer than
+  // Discord's 3s interaction-ack window to read from disk and upload (see getPackPreviewContent).
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const packId = interaction.options.getString(PackCommandOptionName.NAME) ?? undefined;
   const pack = await db.pack.findFirst({
     where: {

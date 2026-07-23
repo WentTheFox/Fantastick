@@ -176,7 +176,15 @@
         "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged.",
         "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
         "importedNameLabel": "Sticker name (optional)",
-        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position."
+        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position.",
+        "ratingChoiceLabel": "Sticker content rating",
+        "ratingChoiceDescription": "Overrides the pack's content rating for this sticker only.",
+        "ratingDefaultLabel": "Pack default",
+        "ratingDefaultDescription": "Use the pack's own content rating for this sticker",
+        "ratingSfwLabel": "Safe for all audiences",
+        "ratingSfwDescription": "Always treat this sticker as safe for all audiences, even in an age-restricted pack",
+        "ratingNsfwLabel": "Age-restricted (NSFW)",
+        "ratingNsfwDescription": "Always treat this sticker as age-restricted, even in a safe-for-all-audiences pack"
       },
       "options": {
         "name": {
@@ -217,7 +225,9 @@
       },
       "components": {
         "editPackModalTitle": "Edit pack {{name}}",
-        "importedNameNote": "This pack was imported from Telegram: its name is managed by the import and cannot be changed here, and imported packs always stay private. Re-run the import to refresh the name.",
+        "importedNameNote": "This pack was imported from Telegram: its name is managed by the import and cannot be changed here. Re-run the import to refresh the name.",
+        "importedUnpublishedNote": "This pack hasn't been published yet, so it stays private to you. Use /publish-imported-pack once every sticker has a name and rating to make it the public, canonical copy.",
+        "publicFalseDescriptionImported": "Only you can see and use it. Publish again anytime with /publish-imported-pack.",
         "nameLabel": "Pack name",
         "nameDescription": "Enter a unique name for the sticker pack. Two packs cannot have the same name within the app.",
         "publicChoiceLabel": "Pack visibility",
@@ -294,6 +304,52 @@
         "start": {
           "name": "start",
           "description": "Position of the sticker to start from (defaults to 1, the first sticker)"
+        }
+      }
+    },
+    "publish-imported-pack": {
+      "name": "publish-imported-pack",
+      "description": "Publish your copy of an imported Telegram pack as the public, canonical version",
+      "responses": {
+        "packNotFound": "The specified pack could not be found, or it is not an imported pack you own",
+        "emptyPack": "The specified pack does not contain any stickers",
+        "stickerNotFound": "The specified sticker could not be found",
+        "alreadyPublished": "This pack has already been published",
+        "alreadyPublishedElsewhere": "This Telegram pack has already been published by {{user}}. Ask them to make changes, or use {{user}}'s copy with /pack instead.",
+        "notReady": "Not every sticker in this pack has a name and an explicit content rating yet. Please review them all before publishing.",
+        "published": "The pack {{name}} is now public. Everyone can now see and use it, and anyone importing it fresh will see your names and ratings as the default.",
+        "publishedRatingAllSfw": "**Rating:** 🌐 Safe for all audiences",
+        "publishedRatingAllNsfw": "**Rating:** 🔞 Age-restricted (NSFW), meaning every sticker in this pack is age-restricted and can only be used in age-restricted channels and DMs via /nsfw-pack and /nsfw-sticker.",
+        "publishedRatingMixed": "**Rating:** 🌐 Safe for all audiences overall, but {{count}} sticker(s) inside are individually marked age-restricted (NSFW) and can still only be used in age-restricted channels and DMs via /nsfw-pack and /nsfw-sticker."
+      },
+      "components": {
+        "reviewingText": "Reviewing stickers in pack {{pack}}\nSticker {{position}} of {{total}}{{identifier}}",
+        "currentNameText": "Current name: {{name}}",
+        "currentRatingText": "Current rating: {{rating}}",
+        "ratingUnset": "_(not set)_",
+        "criteriaNameLabel": "Has a short, accurate name",
+        "criteriaRatingLabel": "Has an explicit content rating",
+        "editingModalText": "You are editing sticker {{name}} from pack {{pack}}.",
+        "nameLabel": "Sticker name",
+        "nameDescription": "Enter a short, accurate English name for this sticker",
+        "ratingChoiceLabel": "Content rating",
+        "ratingChoiceDescription": "Choose an explicit rating for this sticker. This cannot be left as \"pack default\" before publishing.",
+        "ratingSfwLabel": "Safe for all audiences",
+        "ratingSfwDescription": "This sticker is safe to show anywhere",
+        "ratingNsfwLabel": "Age-restricted (NSFW)",
+        "ratingNsfwDescription": "This sticker will only be usable in age-restricted channels and DMs",
+        "editButton": "Edit",
+        "previousButton": "Previous",
+        "nextButton": "Next",
+        "publishButton": "Publish",
+        "jumpToInvalidButton": "Jump to first invalid sticker",
+        "editModalTitle": "Edit sticker {{name}}",
+        "allDoneText": "All stickers in pack {{pack}} have been shown"
+      },
+      "options": {
+        "pack": {
+          "name": "pack",
+          "description": "The imported pack you want to publish"
         }
       }
     },

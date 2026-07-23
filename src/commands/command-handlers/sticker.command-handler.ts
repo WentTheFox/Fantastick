@@ -39,8 +39,11 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
       packId: {
         in: availablePacks.map(pack => pack.id),
       },
+      // Stickers explicitly overridden to NSFW never appear in the non-NSFW commands,
+      // even inside an otherwise safe-for-all-audiences pack
+      ...(nsfw ? {} : { NOT: { nsfwOverride: true } }),
     },
-    include: { telegramSticker: true },
+    include: { telegramSticker: true, pack: true },
     take: 1,
   });
   if (!stickers) {

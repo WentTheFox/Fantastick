@@ -63,7 +63,7 @@ export const updateMessageCommand: BotMessageContextMenuCommand = {
         },
         deletedAt: null,
       },
-      include: { telegramSticker: true },
+      include: { telegramSticker: true, pack: true },
     });
 
     const stickerMessageByStickerId = new Map(stickerMessages.map(sm => [sm.stickerId, sm]));

@@ -9,23 +9,26 @@ export interface StickerGalleryItems {
   items: APIMediaGalleryItem[];
 }
 
-export const mapStickersToGalleryItems = (stickers: (Pick<Sticker, 'description'> & StickerUrlSource)[], spoiler = false): StickerGalleryItems => {
-  const { files, galleryStickers } = stickers.reduce((acc, sticker) => {
+export const mapStickersToGalleryItems = (stickers: (Pick<Sticker, 'description'> & StickerUrlSource)[], spoiler: boolean | boolean[] = false): StickerGalleryItems => {
+  const resolveSpoiler = (index: number) => Array.isArray(spoiler) ? spoiler[index] ?? false : spoiler;
+
+  const { files, galleryStickers } = stickers.reduce((acc, sticker, index) => {
     const url = getStickerUrl(sticker);
     const paths = getStickerFilePathFromUrl(url);
+    const stickerSpoiler = resolveSpoiler(index);
     if (paths === null) {
       return {
         ...acc,
-        galleryStickers: [...acc.galleryStickers, { description: sticker.description, url }],
+        galleryStickers: [...acc.galleryStickers, { description: sticker.description, url, spoiler: stickerSpoiler }],
       };
     }
 
     const newFile = new AttachmentBuilder(paths.filePath, {
       name: paths.stickerFileName,
-    }).setSpoiler(spoiler);
+    }).setSpoiler(stickerSpoiler);
     const attachmentUrl = `attachment://${newFile.name}`;
     return {
-      galleryStickers: [...acc.galleryStickers, { description: sticker.description, url: attachmentUrl }],
+      galleryStickers: [...acc.galleryStickers, { description: sticker.description, url: attachmentUrl, spoiler: stickerSpoiler }],
       files: [
         ...acc.files,
         newFile,
@@ -33,7 +36,7 @@ export const mapStickersToGalleryItems = (stickers: (Pick<Sticker, 'description'
     };
   }, {
     files: [] as AttachmentBuilder[],
-    galleryStickers: [] as { description: string | null, url: string }[],
+    galleryStickers: [] as { description: string | null, url: string, spoiler: boolean }[],
   });
 
   return {
@@ -41,7 +44,7 @@ export const mapStickersToGalleryItems = (stickers: (Pick<Sticker, 'description'
     items: galleryStickers.map(sticker => ({
       media: { url: sticker.url },
       description: sticker.description ?? undefined,
-      spoiler,
+      spoiler: sticker.spoiler,
     })),
   };
 };

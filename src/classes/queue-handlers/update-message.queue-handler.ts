@@ -10,6 +10,7 @@ import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';
 import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
+import { resolveStickerNsfw } from '../../utils/resolve-sticker-nsfw.js';
 import { rest } from '../../utils/rest.js';
 import { runAttempts } from '@wentthefox-org/discord-bot-framework/utils';
 
@@ -75,10 +76,16 @@ export const updateMessageQueueHandler = (logger: NestableLogger): QueueHandler<
     case 'update': {
       if (!newUrl) break;
 
+      const db = createDb();
+      const sticker = await db.sticker.findUnique({
+        where: { id: stickerId },
+        include: { pack: true },
+      });
+      const spoiler = sticker ? resolveStickerNsfw(sticker, sticker.pack) : false;
       const { files, items } = mapStickersToGalleryItems([{
         url: newUrl,
         description: description ?? null,
-      }]);
+      }], spoiler);
       const patchRequest: RequestData = {
         body: {
           flags: MessageFlags.IsComponentsV2,

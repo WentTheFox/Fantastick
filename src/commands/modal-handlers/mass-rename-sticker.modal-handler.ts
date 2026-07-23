@@ -95,6 +95,7 @@ export const massRenameStickerModalHandler: ModalHandler = async (interaction, c
     name: sticker.name,
     description: sticker.description,
     url: sticker.url,
+    nsfwOverride: sticker.nsfwOverride,
   };
   if (nameChanged) {
     sticker = await db.sticker.update({

@@ -21,7 +21,22 @@ export enum EditStickerModalCustomIds {
   NEW_ALT_INPUT = 'newAltInput',
   NEW_FILE_INPUT = 'newFileInput',
   NEW_URL_INPUT = 'newUrlInput',
+  RATING_INPUT = 'ratingInput',
 }
+
+export enum EditStickerRatingOption {
+  DEFAULT = 'default',
+  SFW = 'sfw',
+  NSFW = 'nsfw',
+}
+
+const parseRatingOption = (value: string | null): boolean | null => {
+  switch (value) {
+    case EditStickerRatingOption.SFW: return false;
+    case EditStickerRatingOption.NSFW: return true;
+    default: return null;
+  }
+};
 
 export const editStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
   const { t, db } = context;
@@ -50,6 +65,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
     name: sticker.name,
     description: sticker.description,
     url: sticker.url,
+    nsfwOverride: sticker.nsfwOverride,
   };
 
   const {
@@ -166,12 +182,14 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
     }
   }
   const description = normalizeStickerDescriptionInput(data[EditStickerModalCustomIds.NEW_ALT_INPUT]);
+  const nsfwOverride = parseRatingOption(data[EditStickerModalCustomIds.RATING_INPUT]);
   sticker = await db.sticker.update({
     where: { id: sticker.id },
     data: {
       name: stickerName ?? sticker.name,
       description,
       url: stickerUrl,
+      nsfwOverride,
     },
     include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
   });

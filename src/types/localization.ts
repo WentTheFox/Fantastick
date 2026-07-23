@@ -49,6 +49,10 @@ export const enum MassRenameStickersCommandOptionName {
   START = 'start',
 }
 
+export const enum PublishImportedPackCommandOptionName {
+  PACK = 'pack',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
@@ -62,6 +66,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandOptionName,
   [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandOptionName,
+  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -163,6 +168,19 @@ export const enum MassRenameStickersCommandResponse {
   stickerNotFound = 'stickerNotFound',
 }
 
+export const enum PublishImportedPackCommandResponse {
+  packNotFound = 'packNotFound',
+  emptyPack = 'emptyPack',
+  stickerNotFound = 'stickerNotFound',
+  alreadyPublished = 'alreadyPublished',
+  alreadyPublishedElsewhere = 'alreadyPublishedElsewhere',
+  notReady = 'notReady',
+  published = 'published',
+  publishedRatingAllSfw = 'publishedRatingAllSfw',
+  publishedRatingAllNsfw = 'publishedRatingAllNsfw',
+  publishedRatingMixed = 'publishedRatingMixed',
+}
+
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
@@ -176,6 +194,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandResponse,
   [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandResponse,
+  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandResponse,
 }
 
 interface ComponentsMap {
@@ -213,6 +232,14 @@ interface ComponentsMap {
     'importedStickerNote',
     'importedNameLabel',
     'importedNameDescription',
+    'ratingChoiceLabel',
+    'ratingChoiceDescription',
+    'ratingDefaultLabel',
+    'ratingDefaultDescription',
+    'ratingSfwLabel',
+    'ratingSfwDescription',
+    'ratingNsfwLabel',
+    'ratingNsfwDescription',
   ],
   [BotChatInputCommandName.DELETE_STICKER]: [
     'deleteStickerModalTitle',
@@ -248,6 +275,7 @@ interface ComponentsMap {
   [BotChatInputCommandName.EDIT_PACK]: [
     'editPackModalTitle',
     'importedNameNote',
+    'importedUnpublishedNote',
     'nameLabel',
     'nameDescription',
     'publicChoiceLabel',
@@ -256,6 +284,7 @@ interface ComponentsMap {
     'publicTrueDescription',
     'publicFalseLabel',
     'publicFalseDescription',
+    'publicFalseDescriptionImported',
     'nsfwChoiceLabel',
     'nsfwChoiceDescription',
     'nsfwTrueLabel',
@@ -271,6 +300,30 @@ interface ComponentsMap {
     'previousButton',
     'nextButton',
     'renameModalTitle',
+    'allDoneText',
+  ],
+  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: [
+    'reviewingText',
+    'currentNameText',
+    'currentRatingText',
+    'ratingUnset',
+    'criteriaNameLabel',
+    'criteriaRatingLabel',
+    'editingModalText',
+    'nameLabel',
+    'nameDescription',
+    'ratingChoiceLabel',
+    'ratingChoiceDescription',
+    'ratingSfwLabel',
+    'ratingSfwDescription',
+    'ratingNsfwLabel',
+    'ratingNsfwDescription',
+    'editButton',
+    'previousButton',
+    'nextButton',
+    'publishButton',
+    'jumpToInvalidButton',
+    'editModalTitle',
     'allDoneText',
   ],
 }

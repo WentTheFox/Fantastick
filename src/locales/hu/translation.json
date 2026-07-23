@@ -163,7 +163,15 @@
         "newFileLabel": "Matricafájl frissítése",
         "newFileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
         "newUrlLabel": "Matrica URL frissítése",
-        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen."
+        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
+        "ratingChoiceLabel": "Matrica tartalmi besorolása",
+        "ratingChoiceDescription": "Felülbírálja a csomag tartalmi besorolását, kizárólag ennél a matricánál.",
+        "ratingDefaultLabel": "Csomag alapértelmezés",
+        "ratingDefaultDescription": "A csomag saját tartalmi besorolásának használata ennél a matricánál",
+        "ratingSfwLabel": "Mindenki számára biztonságos",
+        "ratingSfwDescription": "Ez a matrica mindig biztonságosnak minősül, még korhatáros csomagban is",
+        "ratingNsfwLabel": "Korhatáros (NSFW)",
+        "ratingNsfwDescription": "Ez a matrica mindig korhatárosnak minősül, még mindenki számára biztonságos csomagban is"
       },
       "options": {
         "name": {

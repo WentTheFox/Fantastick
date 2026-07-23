@@ -6,6 +6,7 @@ import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js'
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-items.js';
+import { resolveStickerNsfw } from '../utils/resolve-sticker-nsfw.js';
 
 export const stickerDetailsCommand: BotMessageContextMenuCommand = {
   name: BotMessageContextMenuCommandName.STICKER_DETAILS,
@@ -70,11 +71,12 @@ export const stickerDetailsCommand: BotMessageContextMenuCommand = {
 
       const outdatedLines: string[] = [];
       if (isOutdated) {
-        const { files, items } = mapStickersToGalleryItems([sticker], sticker.pack.nsfw);
+        const spoiler = resolveStickerNsfw(sticker, sticker.pack);
+        const { files, items } = mapStickersToGalleryItems([sticker], spoiler);
         allFiles.push(...files);
         const externalUrls = items
           .filter(item => !item.media.url.startsWith('attachment://'))
-          .map(item => sticker.pack.nsfw ? `||${item.media.url}||` : item.media.url);
+          .map(item => spoiler ? `||${item.media.url}||` : item.media.url);
         if (externalUrls.length > 0) {
           outdatedLines.push(`**${t('commands.Sticker Details.responses.latestImage')}:** ${externalUrls.join(' ')}`);
         }

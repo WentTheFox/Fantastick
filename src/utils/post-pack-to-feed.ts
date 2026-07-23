@@ -1,6 +1,7 @@
 import { time } from '@discordjs/formatters';
 import { MessageFlags } from 'discord-api-types/v10';
 import {
+  ButtonInteraction,
   ChatInputCommandInteraction,
   ModalSubmitInteraction,
   TimestampStyles,
@@ -19,7 +20,7 @@ export interface PackSnapshot {
 
 interface PostPackToFeedParams {
   context: InteractionContext;
-  interaction: ChatInputCommandInteraction | ModalSubmitInteraction;
+  interaction: ChatInputCommandInteraction | ModalSubmitInteraction | ButtonInteraction;
   pack: Pack & { telegramPack?: TelegramPack | null };
   action: 'create' | 'edit' | 'delete';
   snapshot?: PackSnapshot;

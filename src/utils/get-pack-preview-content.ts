@@ -8,21 +8,26 @@ import { BotMessageComponentCustomId } from '../types/bot-interaction.js';
 import { FormattablePack, getFormattedPackName } from './get-formatted-pack-name.js';
 import { StickerUrlSource } from './get-sticker-url.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
+import { resolveStickerNsfw } from './resolve-sticker-nsfw.js';
 
 export const packItemsPerPage = 9;
 
 interface GetPackPreviewContentOptions {
   t: TFunction;
-  pack: Pick<Pack, 'id'> & FormattablePack & {
+  pack: Pick<Pack, 'id' | 'nsfw'> & FormattablePack & {
     telegramPack: Pick<TelegramPack, 'title' | 'telegramPackName'> | null;
   };
-  stickers: (Pick<Sticker, 'description'> & StickerUrlSource)[];
+  stickers: (Pick<Sticker, 'description' | 'nsfwOverride'> & StickerUrlSource)[];
   page: number;
   totalPages: number;
+  // Whether this preview was opened via the NSFW-flagged command variant (e.g. /nsfw-pack);
+  // carried through the pagination buttons' custom IDs so paging stays consistent
+  nsfw: boolean;
 }
 
-export const getPackPreviewContent = ({ t, pack, stickers, page, totalPages }: GetPackPreviewContentOptions) => {
-  const { files, items } = mapStickersToGalleryItems(stickers);
+export const getPackPreviewContent = ({ t, pack, stickers, page, totalPages, nsfw }: GetPackPreviewContentOptions) => {
+  const { files, items } = mapStickersToGalleryItems(stickers, stickers.map(sticker => resolveStickerNsfw(sticker, pack)));
+  const pageButtonSuffix = `${pack.id}:${page}:${nsfw ? 1 : 0}`;
 
   const components: APIMessageTopLevelComponent[] = [
     {
@@ -53,7 +58,7 @@ export const getPackPreviewContent = ({ t, pack, stickers, page, totalPages }: G
       components: [
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_FIRST}:${pack.id}:${page}`,
+          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_FIRST}:${pageButtonSuffix}`,
           label: t('commands.pack.components.firstPageButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.SKIP_BACK },
@@ -61,7 +66,7 @@ export const getPackPreviewContent = ({ t, pack, stickers, page, totalPages }: G
         },
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_PREV}:${pack.id}:${page}`,
+          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_PREV}:${pageButtonSuffix}`,
           label: t('commands.pack.components.previousPageButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.ARROW_LEFT },
@@ -76,7 +81,7 @@ export const getPackPreviewContent = ({ t, pack, stickers, page, totalPages }: G
         },
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_NEXT}:${pack.id}:${page}`,
+          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_NEXT}:${pageButtonSuffix}`,
           label: t('commands.pack.components.nextPageButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.ARROW_RIGHT },
@@ -84,7 +89,7 @@ export const getPackPreviewContent = ({ t, pack, stickers, page, totalPages }: G
         },
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_LAST}:${pack.id}:${page}`,
+          custom_id: `${BotMessageComponentCustomId.PACK_PAGE_LAST}:${pageButtonSuffix}`,
           label: t('commands.pack.components.lastPageButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.SKIP_FORWARD },

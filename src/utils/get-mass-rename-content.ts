@@ -6,8 +6,9 @@ import { Pack, PrismaClient, Sticker, TelegramSticker } from '../generated/prism
 import { BotMessageComponentCustomId } from '../types/bot-interaction.js';
 import { FormattablePack, getFormattedPackName } from './get-formatted-pack-name.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
+import { resolveStickerNsfw } from './resolve-sticker-nsfw.js';
 
-export type MassRenamePack = Pick<Pack, 'id' | 'telegramPackId'> & FormattablePack;
+export type MassRenamePack = Pick<Pack, 'id' | 'telegramPackId' | 'nsfw'> & FormattablePack;
 
 export const findOrderedPackStickers = (db: PrismaClient, pack: Pick<Pack, 'id' | 'telegramPackId'>) => db.sticker.findMany({
   where: { deletedAt: null, packId: pack.id },
@@ -25,7 +26,7 @@ interface GetMassRenameStickerContentOptions {
 }
 
 export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: GetMassRenameStickerContentOptions) => {
-  const { files, items } = mapStickersToGalleryItems([sticker], pack.nsfw);
+  const { files, items } = mapStickersToGalleryItems([sticker], resolveStickerNsfw(sticker, pack));
 
   // Imported stickers are identified by their emoji and position on the position line;
   // the current name (if any) gets its own line for both sticker types

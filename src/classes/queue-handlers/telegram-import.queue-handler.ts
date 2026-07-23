@@ -18,6 +18,7 @@ import {
   TgsRenderer,
 } from '../../utils/convert-sticker-to-gif.js';
 import { createDb } from '../../utils/create-db.js';
+import { deleteStickerFile } from '../../utils/delete-sticker-file.js';
 import { saveStickerFile, SaveStickerInput } from '../../utils/filesystem.js';
 import { getEmojiIdMap } from '../../utils/get-emoji-id-map.js';
 import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
@@ -27,6 +28,8 @@ import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-i
 import { emoji } from '../../utils/messaging.js';
 import { resolveStickerNsfw } from '../../utils/resolve-sticker-nsfw.js';
 import { rest } from '../../utils/rest.js';
+import { streamToBuffer } from '../../utils/stream-to-buffer.js';
+import { deleteUploadedFile } from '../../utils/upload-api.js';
 import {
   createTelegramApiClient,
   createTelegramFileClient,
@@ -48,14 +51,6 @@ const buildProgressContent = (emojiIdMap: Record<string, string>, total: number,
     text = `Importing: ${current} / ${total}`;
   }
   return `${icon} ${text}\n-# ${bar}`;
-};
-
-const streamToBuffer = async (stream: Readable): Promise<Buffer> => {
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) {
-    chunks.push(chunk as Buffer);
-  }
-  return Buffer.concat(chunks);
 };
 
 export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler<QueueType.TelegramImport> => async ([job]) => {
@@ -149,7 +144,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   // Phase 1: sync the shared TelegramSticker rows (files are stored exactly once)
   const createTelegramStickerRecords: Parameters<typeof db.telegramSticker.create>[0][] = [];
   const updateTelegramStickerRecords: Parameters<typeof db.telegramSticker.update>[0][] = [];
-  const createdFiles = new Set<string>();
+  const createdFiles: { filePath: string | null; deleteUrl: string | null }[] = [];
   let completed = 0;
   let failedCount = 0;
   let skippedAnimatedCount = 0;
@@ -261,12 +256,12 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         continue;
       }
 
-      const { stickerFileId: telegramStickerId, filePath, stickerUrl } = await saveStickerFile({ logger }, {
+      const { stickerFileId: telegramStickerId, filePath, stickerUrl, deleteUrl } = await saveStickerFile({ logger }, {
         fileId: sticker.file_id,
         fileName,
         data,
       });
-      createdFiles.add(filePath);
+      createdFiles.push({ filePath, deleteUrl });
 
       createTelegramStickerRecords.push({
         data: {
@@ -276,6 +271,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
           emoji: sticker.emoji,
           order,
           url: stickerUrl,
+          deleteUrl,
         },
       });
 
@@ -397,25 +393,30 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   } catch (e) {
     logger.error('Failed to create sticker records', e);
 
-    if (createdFiles.size > 0) {
+    if (createdFiles.length > 0) {
       await db.importJob.update({ where: { id: importJobId }, data: { status: 'ROLLING_BACK' } });
-      const fileList = Array.from(createdFiles);
       let rolled = 0;
-      for (const filePath of fileList) {
+      for (const { filePath, deleteUrl } of createdFiles) {
         try {
-          await fs.promises.unlink(filePath);
-        } catch (unlinkErr) {
-          logger.error(`Failed to delete ${filePath} during rollback`, unlinkErr);
+          if (filePath) {
+            await fs.promises.unlink(filePath);
+          } else if (deleteUrl) {
+            await deleteUploadedFile(logger, deleteUrl);
+          }
+        } catch (deleteErr) {
+          logger.error(`Failed to delete ${filePath ?? deleteUrl} during rollback`, deleteErr);
         }
         rolled++;
         await updateDiscordProgress(buildProgressContent(emojiIdMap, total, total - rolled, true));
       }
-      logger.info(`Rolled back ${fileList.length} files`);
+      logger.info(`Rolled back ${createdFiles.length} files`);
     }
 
     await failJob(String(e), 'Import failed. Please try again.');
     return;
   }
+
+  await Promise.all(staleTelegramStickers.map(s => deleteStickerFile({ logger }, { url: s.url, deleteUrl: s.deleteUrl })));
 
   await db.importJob.update({
     where: { id: importJobId },

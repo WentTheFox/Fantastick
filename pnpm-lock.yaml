@@ -24,8 +24,8 @@ importers:
         specifier: ^7.8.0
         version: 7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3)
       '@wentthefox-org/discord-bot-framework':
-        specifier: ^1.0.0
-        version: 1.0.0(@discordjs/rest@2.6.1)(@prisma/adapter-pg@7.8.0)(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(discord-api-types@0.38.49)(discord.js@14.26.4(bufferutil@4.1.0)(utf-8-validate@6.0.6))(i18next-fs-backend@2.6.6)(i18next@25.10.10(typescript@5.9.3))
+        specifier: ^1.1.0
+        version: 1.1.0(@discordjs/rest@2.6.1)(@prisma/adapter-pg@7.8.0)(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(discord-api-types@0.38.49)(discord.js@14.26.4(bufferutil@4.1.0)(utf-8-validate@6.0.6))(i18next-fs-backend@2.6.6)(i18next@25.10.10(typescript@5.9.3))
       bufferutil:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1374,8 +1374,8 @@ packages:
     resolution: {integrity: sha512-Xfe6rpCTxSxfbswi/W/Pz7zp1WWSNn4A0eW4mLkQUewCrXXtMj31lCg+iQyTkh/CkusZSq9eDflu7tjEDXUY6g==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
 
-  '@wentthefox-org/discord-bot-framework@1.0.0':
-    resolution: {integrity: sha512-DF7Db/rfKVYZLM2jhGXY2sZtGFhf/mK37fE9w8vJo+PrJTPhhudxBpD7b/Lz8iml78dao2wIuNC+rVl60PyUjA==}
+  '@wentthefox-org/discord-bot-framework@1.1.0':
+    resolution: {integrity: sha512-6U368/9U6Cu1uk7em1NTqrQd/a0Nl1FSt349GW3hQMGSdS7F9qNxKrzL04gHJ1hJt+ShU5MDjbOexTJOxfxHcw==}
     engines: {node: 24.x, pnpm: '>=11'}
     peerDependencies:
       '@discordjs/rest': ^2.6.1
@@ -5125,7 +5125,7 @@ snapshots:
 
   '@vladfrangu/async_event_emitter@2.4.7': {}
 
-  '@wentthefox-org/discord-bot-framework@1.0.0(@discordjs/rest@2.6.1)(@prisma/adapter-pg@7.8.0)(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(discord-api-types@0.38.49)(discord.js@14.26.4(bufferutil@4.1.0)(utf-8-validate@6.0.6))(i18next-fs-backend@2.6.6)(i18next@25.10.10(typescript@5.9.3))':
+  '@wentthefox-org/discord-bot-framework@1.1.0(@discordjs/rest@2.6.1)(@prisma/adapter-pg@7.8.0)(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(discord-api-types@0.38.49)(discord.js@14.26.4(bufferutil@4.1.0)(utf-8-validate@6.0.6))(i18next-fs-backend@2.6.6)(i18next@25.10.10(typescript@5.9.3))':
     dependencies:
       '@discordjs/rest': 2.6.1
       discord-api-types: 0.38.49

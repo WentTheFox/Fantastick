@@ -7,6 +7,7 @@ import {
   stickerNameOptionMeta,
 } from '../../options/metadata/sticker-name.option-meta.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
+import { deleteStickerFile } from '../../utils/delete-sticker-file.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
 import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
@@ -125,6 +126,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   // Imported sticker images are managed by the Telegram import and cannot be replaced
   let stickerUrl = isImportedSticker ? null : data[EditStickerModalCustomIds.NEW_URL_INPUT];
+  let stickerDeleteUrl: string | null = sticker.deleteUrl;
   const stickerFileId = isImportedSticker ? null : data[EditStickerModalCustomIds.NEW_FILE_INPUT];
   const source = stickerUrl ? EditStickerModalCustomIds.NEW_URL_INPUT : (stickerFileId ? EditStickerModalCustomIds.NEW_FILE_INPUT : null);
   switch (source) {
@@ -136,6 +138,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
         });
         return;
       }
+      stickerDeleteUrl = null;
     }
       break;
     case EditStickerModalCustomIds.NEW_FILE_INPUT: {
@@ -168,7 +171,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
         return;
       }
 
-      ({ stickerUrl } = await saveStickerFile(context, {
+      ({ stickerUrl, deleteUrl: stickerDeleteUrl } = await saveStickerFile(context, {
         stickerId: sticker.id,
         fileId: stickerFileMeta.id,
         fileName: stickerFileMeta.name,
@@ -183,16 +186,23 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
   }
   const description = normalizeStickerDescriptionInput(data[EditStickerModalCustomIds.NEW_ALT_INPUT]);
   const nsfwOverride = parseRatingOption(data[EditStickerModalCustomIds.RATING_INPUT]);
+  const previousStickerFile = { url: sticker.url, deleteUrl: sticker.deleteUrl };
+  const fileReplaced = source === EditStickerModalCustomIds.NEW_URL_INPUT || source === EditStickerModalCustomIds.NEW_FILE_INPUT;
   sticker = await db.sticker.update({
     where: { id: sticker.id },
     data: {
       name: stickerName ?? sticker.name,
       description,
       url: stickerUrl,
+      deleteUrl: stickerDeleteUrl,
       nsfwOverride,
     },
     include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
   });
+
+  if (fileReplaced) {
+    await deleteStickerFile(context, previousStickerFile);
+  }
 
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.edit-sticker.responses.updated', {

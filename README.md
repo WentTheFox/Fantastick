@@ -39,7 +39,7 @@ Stop the stack:
 ```
 $ docker compose down
 ```
-Only add `-v` if you intentionally want to wipe the database and any stored sticker files — the Postgres data and uploaded sticker files both live in named Docker volumes that persist across restarts and rebuilds.
+Only add `-v` if you intentionally want to wipe the database — Postgres data lives in a named Docker volume that persists across restarts and rebuilds. The same is true of sticker files, but only when `UPLOAD_API_ENABLED=false` (the default). Set it to `true` and sticker files live on the remote upload API instead of a local volume, unaffected by `-v`.
 
 Update to a new version:
 ```
@@ -67,6 +67,23 @@ $ pnpm run build
 $ pnpm exec prisma migrate deploy
 $ pm2 start pm2.json
 ```
+
+## Development
+
+For local development against a bot account you control, follow the bare
+metal steps above through `pnpm exec prisma generate`, then run:
+
+```
+$ pnpm dev
+```
+
+This runs the bot directly from TypeScript source via `tsx`, skipping the
+`tsc` build step. Set `DEV_WATCH=true` in `.env` to additionally hot-reload
+command/component handler implementations as you edit them, without
+restarting the process or re-registering slash commands with Discord — see
+`@wentthefox-org/discord-bot-framework`'s `/dev` docs for how this works and
+its limitations (e.g. changing a command's name/options/description still
+needs a restart).
 
 ## Frequently Asked Questions
 

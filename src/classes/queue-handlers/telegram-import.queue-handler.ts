@@ -87,13 +87,15 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     }
   };
 
-  // Editing the same webhook message once per sticker (as fast as every ~50-100ms for
-  // small, quickly-downloaded stickers) blows through Discord's per-message edit rate
-  // limit almost immediately; discord.js then blocks the whole import loop waiting out
-  // the reset, which is what makes imports feel like they've stalled. Throttling to at
-  // most one edit per interval keeps progress visible without fighting the rate limit;
-  // `force` bypasses it for state transitions that only happen once per import anyway.
-  const progressUpdateIntervalMs = 2000;
+  // Editing the same webhook message on every sticker without any gate can blow through
+  // Discord's per-message edit rate limit if stickers ever download back-to-back fast
+  // enough; discord.js then blocks the whole import loop waiting out the reset. In
+  // practice Telegram's own /getFile latency (tens of ms to several seconds, per
+  // sticker) already paces requests well under that limit, so a light 100ms floor is
+  // enough to guarantee we never fire two edits closer together than that, without
+  // making the progress bar feel throttled. `force` bypasses it for state transitions
+  // that only happen once per import anyway.
+  const progressUpdateIntervalMs = 100;
   let lastProgressUpdateAt = 0;
   const updateDiscordProgressThrottled = async (content: string, force = false) => {
     const now = Date.now();
@@ -179,137 +181,142 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     }
   }
 
-  try {
-    for (const [order, sticker] of telegramStickers.entries()) {
-      // Temporary timing instrumentation to pin down where per-sticker latency comes
-      // from (Telegram API vs. file download vs. upload) — remove once diagnosed.
-      let stepStart = Date.now();
-      const logStep = (step: string) => {
-        const now = Date.now();
-        logger.debug(`[timing] sticker #${order} ${step}: ${now - stepStart}ms`);
-        stepStart = now;
-      };
-      const needsTgsConversion = sticker.is_animated;
-      const needsWebmConversion = sticker.is_video;
-      if ((needsTgsConversion && tgsConversionDisabled) || (needsWebmConversion && webmConversionDisabled)) {
-        skippedAnimatedCount++;
-        completed++;
-        logger.info(`Skipping sticker ${sticker.file_id} (#${order}): animated sticker conversion unavailable`);
-        await db.importJob.update({ where: { id: importJobId }, data: { completed } });
-        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
-        continue;
-      }
+  // Telegram's /getFile response time is the dominant per-sticker cost (tens of ms to
+  // several seconds, seemingly queueing-related on Telegram's end) and dwarfs our own
+  // processing, so running stickers through a small worker pool instead of one at a
+  // time cuts wall-clock import time roughly in proportion to the concurrency below,
+  // without meaningfully increasing how many requests are in flight to Telegram at any
+  // moment — well within what a single bot token can sustain (our ApiClient already
+  // retries individual requests with backoff on 429/5xx, so a transient rate-limit hit
+  // on one sticker doesn't stall the others).
+  const importConcurrency = 5;
 
-      // Includes soft-deleted rows: a sticker re-added to the Telegram set is restored
-      const existing = await db.telegramSticker.findUnique({
-        where: {
-          telegramPackId_telegramFileUniqueId: {
-            telegramPackId: telegramPack.id,
-            telegramFileUniqueId: sticker.file_unique_id,
-          },
-        },
-      });
-      logStep('existing lookup');
-      if (existing) {
-        if (existing.deletedAt !== null || existing.emoji !== sticker.emoji || existing.order !== order) {
-          updateTelegramStickerRecords.push({
-            where: { id: existing.id },
-            data: { emoji: sticker.emoji, order, deletedAt: null },
-          });
-        }
-        completed++;
-        await db.importJob.update({ where: { id: importJobId }, data: { completed } });
-        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
-        continue;
-      }
+  const processSticker = async (order: number, sticker: (typeof telegramStickers)[number]): Promise<void> => {
+    const needsTgsConversion = sticker.is_animated;
+    const needsWebmConversion = sticker.is_video;
+    if ((needsTgsConversion && tgsConversionDisabled) || (needsWebmConversion && webmConversionDisabled)) {
+      skippedAnimatedCount++;
+      completed++;
+      logger.info(`Skipping sticker ${sticker.file_id} (#${order}): animated sticker conversion unavailable`);
+      await db.importJob.update({ where: { id: importJobId }, data: { completed } });
+      await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
+      return;
+    }
 
-      let telegramFilePath: string;
-      try {
-        const getFileRequest = await telegramClient.request({
-          path: '/getFile',
-          query: { file_id: sticker.file_id },
-          validator: typia.createValidate<TelegramApiGetFileResponse>(),
-        });
-        telegramFilePath = getFileRequest.response.result!.file_path;
-        logStep('getFile');
-      } catch (e) {
-        logger.error(`Failed to get file path for sticker ${sticker.file_id} (#${order})`, e);
-        failedCount++;
-        completed++;
-        await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
-        continue;
-      }
-
-      const fileRequest = await telegramFileClient.request({
-        path: `/${telegramFilePath}`,
-        raw: true,
-        validator: typia.createValidate<Readable>(),
-      });
-      logStep('file download request');
-
-      let fileName: string;
-      let data: SaveStickerInput['data'];
-      try {
-        if (sticker.is_animated) {
-          data = await convertTgsToGif({ logger }, renderer!, await streamToBuffer(fileRequest.response));
-          fileName = 'sticker.gif';
-        } else if (sticker.is_video) {
-          const converted = await convertWebmToGif({ logger }, await streamToBuffer(fileRequest.response));
-          data = converted.buffer;
-          fileName = `sticker.${converted.extension}`;
-        } else {
-          data = fileRequest.response;
-          fileName = 'sticker.webp';
-        }
-        logStep('convert/read');
-      } catch (e) {
-        logger.error(`Failed to convert sticker ${sticker.file_id} (#${order}) to GIF`, e);
-        if (isFfmpegUnavailableError(e)) {
-          logger.error('ffmpeg is unavailable, animated/video stickers will be skipped for the rest of this import');
-          tgsConversionDisabled = true;
-          webmConversionDisabled = true;
-          skippedAnimatedCount++;
-        } else if (isChromiumUnavailableError(e)) {
-          logger.error('Chromium is unavailable, animated (.tgs) stickers will be skipped for the rest of this import');
-          tgsConversionDisabled = true;
-          skippedAnimatedCount++;
-        } else {
-          failedCount++;
-        }
-        completed++;
-        await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
-        continue;
-      }
-
-      const { stickerFileId: telegramStickerId, filePath, stickerUrl, deleteUrl } = await saveStickerFile({ logger }, {
-        fileId: sticker.file_id,
-        fileName,
-        data,
-      });
-      logStep('saveStickerFile');
-      createdFiles.push({ filePath, deleteUrl });
-
-      createTelegramStickerRecords.push({
-        data: {
-          id: telegramStickerId,
+    // Includes soft-deleted rows: a sticker re-added to the Telegram set is restored
+    const existing = await db.telegramSticker.findUnique({
+      where: {
+        telegramPackId_telegramFileUniqueId: {
           telegramPackId: telegramPack.id,
           telegramFileUniqueId: sticker.file_unique_id,
-          emoji: sticker.emoji,
-          order,
-          url: stickerUrl,
-          deleteUrl,
         },
-      });
-
+      },
+    });
+    if (existing) {
+      if (existing.deletedAt !== null || existing.emoji !== sticker.emoji || existing.order !== order) {
+        updateTelegramStickerRecords.push({
+          where: { id: existing.id },
+          data: { emoji: sticker.emoji, order, deletedAt: null },
+        });
+      }
       completed++;
-      logger.info(`Downloaded sticker ${sticker.file_id} (#${order}) → ${telegramStickerId}`);
-      await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-      logStep('importJob.update');
+      await db.importJob.update({ where: { id: importJobId }, data: { completed } });
       await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
-      logStep('progress update');
+      return;
     }
+
+    let telegramFilePath: string;
+    try {
+      const getFileRequest = await telegramClient.request({
+        path: '/getFile',
+        query: { file_id: sticker.file_id },
+        validator: typia.createValidate<TelegramApiGetFileResponse>(),
+      });
+      telegramFilePath = getFileRequest.response.result!.file_path;
+    } catch (e) {
+      logger.error(`Failed to get file path for sticker ${sticker.file_id} (#${order})`, e);
+      failedCount++;
+      completed++;
+      await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
+      await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
+      return;
+    }
+
+    const fileRequest = await telegramFileClient.request({
+      path: `/${telegramFilePath}`,
+      raw: true,
+      validator: typia.createValidate<Readable>(),
+    });
+
+    let fileName: string;
+    let data: SaveStickerInput['data'];
+    try {
+      if (sticker.is_animated) {
+        data = await convertTgsToGif({ logger }, renderer!, await streamToBuffer(fileRequest.response));
+        fileName = 'sticker.gif';
+      } else if (sticker.is_video) {
+        const converted = await convertWebmToGif({ logger }, await streamToBuffer(fileRequest.response));
+        data = converted.buffer;
+        fileName = `sticker.${converted.extension}`;
+      } else {
+        data = fileRequest.response;
+        fileName = 'sticker.webp';
+      }
+    } catch (e) {
+      logger.error(`Failed to convert sticker ${sticker.file_id} (#${order}) to GIF`, e);
+      if (isFfmpegUnavailableError(e)) {
+        logger.error('ffmpeg is unavailable, animated/video stickers will be skipped for the rest of this import');
+        tgsConversionDisabled = true;
+        webmConversionDisabled = true;
+        skippedAnimatedCount++;
+      } else if (isChromiumUnavailableError(e)) {
+        logger.error('Chromium is unavailable, animated (.tgs) stickers will be skipped for the rest of this import');
+        tgsConversionDisabled = true;
+        skippedAnimatedCount++;
+      } else {
+        failedCount++;
+      }
+      completed++;
+      await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
+      await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
+      return;
+    }
+
+    const { stickerFileId: telegramStickerId, filePath, stickerUrl, deleteUrl } = await saveStickerFile({ logger }, {
+      fileId: sticker.file_id,
+      fileName,
+      data,
+    });
+    createdFiles.push({ filePath, deleteUrl });
+
+    createTelegramStickerRecords.push({
+      data: {
+        id: telegramStickerId,
+        telegramPackId: telegramPack.id,
+        telegramFileUniqueId: sticker.file_unique_id,
+        emoji: sticker.emoji,
+        order,
+        url: stickerUrl,
+        deleteUrl,
+      },
+    });
+
+    completed++;
+    logger.info(`Downloaded sticker ${sticker.file_id} (#${order}) → ${telegramStickerId}`);
+    await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
+    await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
+  };
+
+  try {
+    const stickerEntries = Array.from(telegramStickers.entries());
+    let nextIndex = 0;
+    const runWorker = async (): Promise<void> => {
+      while (nextIndex < stickerEntries.length) {
+        const [order, sticker] = stickerEntries[nextIndex++];
+        await processSticker(order, sticker);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(importConcurrency, stickerEntries.length) }, runWorker));
   } finally {
     await renderer?.close();
   }

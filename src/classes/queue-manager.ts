@@ -3,7 +3,7 @@ import { PgBoss } from 'pg-boss';
 import { SendOptions, WorkHandler, WorkOptions } from 'pg-boss/dist/types.js';
 import { initI18next } from '../constants/locales.js';
 import { env } from '../env.js';
-import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 import { QueueHandler, QueueReqData, QueueType } from '../types/queue.js';
 import { cleanupOrphanedTelegramPacksQueueHandler } from './queue-handlers/cleanup-orphaned-telegram-packs.queue-handler.js';
 import { hardDeleteOldPacksQueueHandler } from './queue-handlers/hard-delete-old-packs.queue-handler.js';

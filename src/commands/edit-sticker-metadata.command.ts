@@ -1,26 +1,16 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { getEditStickerMetadataOptions } from '../options/edit-sticker-metadata.options.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { EditStickerMetadataCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
 import { getEditStickerMetadataModalContent } from '../utils/get-edit-sticker-metadata-modal-content.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import { editStickerMetadataModalHandler } from './modal-handlers/edit-sticker-metadata.modal-handler.js';
 
 export const editStickerMetadataCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.EDIT_STICKER_METADATA,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.edit-sticker-metadata.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.edit-sticker-metadata.name', { lng })),
-      options: getEditStickerMetadataOptions(t),
-    };
-  },
   autocomplete: {
     [EditStickerMetadataCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),
   },

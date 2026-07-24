@@ -1,4 +1,4 @@
-import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 import { env } from '../env.js';
 
 /**

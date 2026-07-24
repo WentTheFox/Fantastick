@@ -1,4 +1,4 @@
-import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 import { hardDeleteRetentionMs } from '../../constants/retention.js';
 import { QueueHandler, QueueType } from '../../types/queue.js';
 import { createDb } from '../../utils/create-db.js';

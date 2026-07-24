@@ -1,5 +1,5 @@
-import { createHandlerWatcher, createSourceReloader } from '@wentthefox-org/discord-bot-framework/dev';
-import { Registry } from '@wentthefox-org/discord-bot-framework/interactions';
+import { createHandlerWatcher, createSourceReloader } from '@went.tf/discord-bot-framework/dev';
+import { Registry } from '@went.tf/discord-bot-framework/interactions';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { initI18next } from './constants/locales.js';

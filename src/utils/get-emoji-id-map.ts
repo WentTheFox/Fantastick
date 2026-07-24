@@ -1,7 +1,7 @@
 import { rest } from './rest.js';
 import { RESTGetAPIApplicationEmojisResult, Routes } from 'discord-api-types/v10';
 import { env } from '../env.js';
-import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 
 export const getEmojiIdMap = async (context: { logger: NestableLogger }): Promise<Record<string, string>> => {
   const logger = context.logger.nest('getEmojiIdMap');

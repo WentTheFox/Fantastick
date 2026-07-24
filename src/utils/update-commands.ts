@@ -1,13 +1,19 @@
+import { Ajv } from 'ajv';
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 import { filledBar } from 'string-progressbar';
-import { buildApplicationCommandsBody, createCommandRegistrar } from '@wentthefox-org/discord-bot-framework/commands';
+import { buildApplicationCommandsBody, createCommandRegistrar } from '@went.tf/discord-bot-framework/commands';
+import { parseCommandsFile, registerFrameworkSchemas, CommandFileEntry } from '@went.tf/discord-bot-framework/commands/schema';
+import { createCommandLocalizer } from '@went.tf/discord-bot-framework/i18n';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from '../constants/locales.js';
 import { env } from '../env.js';
 
+import commandsSchema from '../commands.schema.json' with { type: 'json' };
+import commandsData from '../commands.json' with { type: 'json' };
 import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
 import { InteractionContext } from '../types/contexts/interaction.context.js';
 import { chatInputCommandRegistry, contextMenuCommandRegistry } from './interactions.js';
@@ -18,14 +24,28 @@ const commonCommandOptions: Pick<RESTPostAPIChatInputApplicationCommandsJSONBody
   contexts: [InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel],
 };
 
+const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+registerFrameworkSchemas(ajv);
+const validateCommandsFile = ajv.compile(commandsSchema);
+
 export type BasicCommandData = Array<{ id: string, name: string }>;
 
 export const updateCommandsFromInteraction = async (interactionContext: InteractionContext, progressReporter?: (progress: string) => Promise<unknown>): Promise<BasicCommandData | undefined> => {
   interactionContext.logger.log(`Application ${env.LOCAL ? 'is' : 'is NOT'} in local mode`);
   const registrar = createCommandRegistrar({ rest, applicationId: env.DISCORD_CLIENT_ID, logger: interactionContext.logger });
+
+  const commandsFile = parseCommandsFile<CommandFileEntry[]>(commandsData, { validate: validateCommandsFile });
+  const localizer = createCommandLocalizer({ locales: SUPPORTED_LANGUAGES, baseLocale: DEFAULT_LANGUAGE, t: interactionContext.t });
+
   const body = buildApplicationCommandsBody(
+    commandsFile,
     { chatInput: chatInputCommandRegistry, contextMenu: contextMenuCommandRegistry },
-    { sharedMetadata: commonCommandOptions, definitionArg: interactionContext.t },
+    {
+      sharedMetadata: commonCommandOptions,
+      resolveDescription: localizer.resolveDescription,
+      localizeNames: localizer.localizeName,
+      localizeDescriptions: localizer.localizeDescription,
+    },
   );
 
   let result: BasicCommandData | undefined;

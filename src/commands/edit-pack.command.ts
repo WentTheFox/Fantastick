@@ -2,13 +2,11 @@ import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
 import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
-import { editPackOptions } from '../options/edit-pack.options.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { EditPackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { getPackDisplayName } from '../utils/get-formatted-pack-name.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { getPackNsfwEmoji } from '../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -21,14 +19,6 @@ import {
 
 export const editPackCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.EDIT_PACK,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.edit-pack.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.edit-pack.name', { lng })),
-      options: editPackOptions(t),
-    };
-  },
   autocomplete: {
     [EditPackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },

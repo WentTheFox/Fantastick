@@ -10,7 +10,17 @@
     },
     "nsfw-sticker": {
       "name": "nsfw-sticker",
-      "description": "Sends a sticker (including from NSFW packs)"
+      "description": "Sends a sticker (including from NSFW packs)",
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Sticker name"
+        },
+        "preview": {
+          "name": "preview",
+          "description": "If True, the sticker will only be visible to you"
+        }
+      }
     },
     "sticker": {
       "name": "sticker",
@@ -137,7 +147,13 @@
     },
     "nsfw-pack": {
       "name": "nsfw-pack",
-      "description": "Displays stickers from a pack (including from NSFW packs)"
+      "description": "Displays stickers from a pack (including from NSFW packs)",
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Pack name"
+        }
+      }
     },
     "pack": {
       "name": "pack",

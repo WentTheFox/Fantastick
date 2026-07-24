@@ -8,7 +8,7 @@ import {
   dispatchModal,
   handleInteractionError,
   parseCustomIdSegments,
-} from '@wentthefox-org/discord-bot-framework/interactions';
+} from '@went.tf/discord-bot-framework/interactions';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
 import { UserInteractionContext } from '../types/contexts/user-interaction.context.js';

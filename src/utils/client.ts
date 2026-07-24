@@ -1,6 +1,6 @@
 import { Client, Partials } from 'discord.js';
-import { createBotClient } from '@wentthefox-org/discord-bot-framework/client';
-import { getGitData } from '@wentthefox-org/discord-bot-framework/utils';
+import { createBotClient } from '@went.tf/discord-bot-framework/client';
+import { getGitData } from '@went.tf/discord-bot-framework/utils';
 import { env } from '../env.js';
 import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
 import { handleInteraction } from './handle-interaction.js';

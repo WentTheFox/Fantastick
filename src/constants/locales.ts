@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { Locale } from 'discord-api-types/v10';
-import { createI18nInitializer } from '@wentthefox-org/discord-bot-framework/i18n';
+import { createI18nInitializer } from '@went.tf/discord-bot-framework/i18n';
 import { env } from '../env.js';
 
 // Type-safe language constants

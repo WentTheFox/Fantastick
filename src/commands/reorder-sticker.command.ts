@@ -1,5 +1,4 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { getReorderStickerOptions } from '../options/reorder-sticker.options.js';
 import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
 import { ReorderStickerCommandOptionName } from '../types/localization.js';
 import {
@@ -10,7 +9,6 @@ import {
 } from '../utils/autocomplete/reorder-sticker-target.autocomplete.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 
@@ -18,14 +16,6 @@ class ReorderConflictError extends Error {}
 
 export const reorderStickerCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.REORDER_STICKER,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.reorder-sticker.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.reorder-sticker.name', { lng })),
-      options: getReorderStickerOptions(t),
-    };
-  },
   autocomplete: {
     [ReorderStickerCommandOptionName.STICKER]: getStickerNameAutocompleteHandler(true),
     [ReorderStickerCommandOptionName.BEFORE]: getReorderStickerTargetAutocompleteHandler(),

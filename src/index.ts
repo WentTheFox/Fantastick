@@ -1,7 +1,7 @@
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createShardManager } from '@wentthefox-org/discord-bot-framework/client';
-import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { createShardManager } from '@went.tf/discord-bot-framework/client';
+import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 import { initI18next } from './constants/locales.js';
 import { env } from './env.js';
 import { InteractionHandlerContext } from './types/contexts/interaction-handler.context.js';

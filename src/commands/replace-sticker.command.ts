@@ -1,11 +1,9 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { getReplaceStickerOptions } from '../options/replace-sticker.options.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { ReplaceStickerCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { getReplaceStickerModalContent } from '../utils/get-replace-sticker-modal-content.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -13,14 +11,6 @@ import { replaceStickerModalHandler } from './modal-handlers/replace-sticker.mod
 
 export const replaceStickerCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.REPLACE_STICKER,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.replace-sticker.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.replace-sticker.name', { lng })),
-      options: getReplaceStickerOptions(t),
-    };
-  },
   autocomplete: {
     // Imported stickers' images are managed by the Telegram import, so they're excluded
     // here rather than offered and then rejected in `handle`

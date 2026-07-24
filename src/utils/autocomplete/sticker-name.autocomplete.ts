@@ -25,7 +25,7 @@ export const getStickerNameAutocompleteHandler = (nsfwOrOptions: boolean | Stick
     [pack.id]: getPackDisplayName(pack),
   }), {} as Record<string, string>);
   const userStickers = await db.sticker.findMany({
-    select: { id: true, name: true, packId: true, telegramSticker: { select: { emoji: true, order: true } } },
+    select: { id: true, name: true, packId: true, order: true, telegramSticker: { select: { emoji: true, order: true } } },
     where: {
       deletedAt: null,
       packId: {
@@ -46,9 +46,13 @@ export const getStickerNameAutocompleteHandler = (nsfwOrOptions: boolean | Stick
   const usageByStickerId = new Map(usageRows.map(row => [row.stickerId, row.count]));
 
   await interaction.respond(userStickers
-    .map(sticker => ({ id: sticker.id, packId: sticker.packId, displayName: getFormattedStickerName(sticker) }))
+    .map(sticker => ({ id: sticker.id, packId: sticker.packId, order: sticker.order, displayName: getFormattedStickerName(sticker) }))
     .filter(sticker => sticker.displayName.toLowerCase().includes(value))
-    .sort((a, b) => (usageByStickerId.get(b.id) ?? 0) - (usageByStickerId.get(a.id) ?? 0))
+    .sort((a, b) => {
+      const usageDiff = (usageByStickerId.get(b.id) ?? 0) - (usageByStickerId.get(a.id) ?? 0);
+      if (usageDiff !== 0) return usageDiff;
+      return a.order - b.order;
+    })
     .slice(0, 25)
     .map(sticker => {
       const name = truncateToMaximumLength(`${sticker.displayName} (${packNameIndex[sticker.packId]})`, 100);

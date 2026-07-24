@@ -2,7 +2,6 @@ import { MessageFlags } from 'discord-api-types/v10';
 import { Readable } from 'node:stream';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { env } from '../../env.js';
-import { packNameOptionMeta } from '../../options/metadata/pack-name.option-meta.js';
 import {
   stickerNameInvalidPattern,
   stickerNameOptionMeta,
@@ -11,18 +10,19 @@ import { ModalHandler } from '../../types/bot-interaction.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
+import { normalizeStickerDescriptionInput } from '../../utils/normalize-sticker-description-input.js';
 import { parseRatingOption } from '../../constants/edit-sticker-modal-fields.js';
 import { postStickerToFeed } from '../../utils/post-sticker-to-feed.js';
 
 export enum CreateStickerModalCustomIds {
-  PACK_INPUT = 'packInput',
   NAME_INPUT = 'nameInput',
+  ALT_INPUT = 'altInput',
   FILE_INPUT = 'fileInput',
   URL_INPUT = 'urlInput',
   RATING_INPUT = 'ratingInput',
 }
 
-export const createStickerModalHandler: ModalHandler = async (interaction, context) => {
+export const createStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
   const { t, db } = context;
   const user = await updateOrCreateUser(context, interaction);
   if (user.readOnly) {
@@ -33,35 +33,27 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     return;
   }
 
-  const {
-    indexedAttachments,
-    data,
-  } = collectModalSubmittedData(interaction, CreateStickerModalCustomIds);
-  const packName = data[CreateStickerModalCustomIds.PACK_INPUT];
-  if (packName === null || packName.length < packNameOptionMeta.min_length || packName.length > packNameOptionMeta.max_length) {
-    context.logger.warn(`Invalid pack name: ${packName}`);
-    await interactionReply(context, interaction, {
-      content: t('commands.create-sticker.responses.invalidPack'),
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-  const userPack = await db.pack.findFirst({
+  const userPack = resourceId ? await db.pack.findFirst({
     where: {
-      name: packName,
+      id: resourceId,
       createdBy: user.id,
       deletedAt: null,
       telegramPackId: null,
     },
-  });
+  }) : null;
   if (!userPack) {
-    context.logger.warn(`Could not find pack with name ${packName} for user ${user.id}`);
+    context.logger.warn(`Could not find pack with id ${resourceId} for user ${user.id}`);
     await interactionReply(context, interaction, {
       content: t('commands.create-sticker.responses.invalidPack'),
       flags: MessageFlags.Ephemeral,
     });
     return;
   }
+
+  const {
+    indexedAttachments,
+    data,
+  } = collectModalSubmittedData(interaction, CreateStickerModalCustomIds);
   const stickerName = data[CreateStickerModalCustomIds.NAME_INPUT];
   if (stickerName == null || stickerName.length < stickerNameOptionMeta.min_length) {
     await interactionReply(context, interaction, {
@@ -165,12 +157,13 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
   }
   const order = await db.sticker.count({ where: { packId: userPack.id } });
   const nsfwOverride = parseRatingOption(data[CreateStickerModalCustomIds.RATING_INPUT]);
+  const description = normalizeStickerDescriptionInput(data[CreateStickerModalCustomIds.ALT_INPUT]);
   const sticker = await db.sticker.create({
     data: {
       id: stickerId,
       name: stickerName,
       packId: userPack.id,
-      description: null,
+      description,
       url: stickerUrl,
       deleteUrl: stickerDeleteUrl,
       createdBy: user.id,

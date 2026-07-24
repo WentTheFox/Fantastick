@@ -1,9 +1,12 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
+import { getCreateStickerOptions } from '../options/create-sticker.options.js';
+import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
-import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
+import { CreateStickerCommandOptionName } from '../types/localization.js';
+import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -20,7 +23,11 @@ export const createStickerCommand: BotChatInputCommand = {
     return {
       ...getLocalizedObject('description', (lng) => t('commands.create-sticker.description', { lng })),
       ...getLocalizedObject('name', (lng) => t('commands.create-sticker.name', { lng })),
+      options: getCreateStickerOptions(t),
     };
+  },
+  autocomplete: {
+    [CreateStickerCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true, excludeImported: true }),
   },
   async handle(interaction, context) {
     const { t, db } = context;
@@ -33,44 +40,29 @@ export const createStickerCommand: BotChatInputCommand = {
       return;
     }
 
+    const packId = interaction.options.getString(CreateStickerCommandOptionName.PACK, true);
     // Imported packs mirror their Telegram set, so manual stickers cannot be added to them
-    const userPacks = await db.pack.findMany({
+    const pack = await db.pack.findFirst({
       where: {
+        id: packId,
         createdBy: user.id,
         deletedAt: null,
         telegramPackId: null,
       },
-      include: { telegramPack: true },
     });
 
-    if (userPacks.length === 0) {
+    if (!pack) {
       await interactionReply(context, interaction, {
-        content: t('commands.create-sticker.responses.noPacks'),
+        content: t('commands.create-sticker.responses.invalidPack'),
         flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
     await interaction.showModal({
-      customId: BotModalId.CREATE_STICKER,
+      customId: `${BotModalId.CREATE_STICKER}:${pack.id}`,
       title: t('commands.create-sticker.components.createStickerModalTitle'),
       components: [
-        {
-          type: ComponentType.Label,
-          label: t('commands.create-sticker.components.packLabel'),
-          description: t('commands.create-sticker.components.packDescription'),
-          component: {
-            type: ComponentType.StringSelect,
-            customId: CreateStickerModalCustomIds.PACK_INPUT,
-            required: true,
-            minValues: 1,
-            maxValues: 1,
-            options: userPacks.map(pack => ({
-              label: getFormattedPackName(pack),
-              value: pack.name,
-            })),
-          },
-        },
         {
           type: ComponentType.Label,
           label: t('commands.create-sticker.components.nameLabel'),
@@ -82,6 +74,19 @@ export const createStickerCommand: BotChatInputCommand = {
             minLength: stickerNameOptionMeta.min_length,
             maxLength: stickerNameOptionMeta.max_length,
             required: true,
+          } as TextInputComponentData,
+        },
+        {
+          type: ComponentType.Label,
+          label: t('commands.create-sticker.components.altLabel'),
+          description: t('commands.create-sticker.components.altDescription'),
+          component: {
+            type: ComponentType.TextInput,
+            customId: CreateStickerModalCustomIds.ALT_INPUT,
+            style: TextInputStyle.Paragraph,
+            minLength: stickerAltOptionMeta.min_length,
+            maxLength: stickerAltOptionMeta.max_length,
+            required: false,
           } as TextInputComponentData,
         },
         {

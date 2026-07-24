@@ -11,6 +11,7 @@ import { hardDeleteOldStickersQueueHandler } from './queue-handlers/hard-delete-
 import { hardDeleteStaleTelegramStickersQueueHandler } from './queue-handlers/hard-delete-stale-telegram-stickers.queue-handler.js';
 import { telegramImportQueueHandler } from './queue-handlers/telegram-import.queue-handler.js';
 import { updateMessageQueueHandler } from './queue-handlers/update-message.queue-handler.js';
+import { updateStickerUsageStatsQueueHandler } from './queue-handlers/update-sticker-usage-stats.queue-handler.js';
 
 // Run daily at 03:00 UTC (low-traffic hours), plus once immediately at startup so a
 // freshly deployed/restarted app doesn't wait a full day for its first sweep
@@ -28,6 +29,14 @@ const dailyMaintenanceCron = '0 3 * * *';
 // alongside itself — an app restart is what actually resumes an interrupted sweep, via
 // the immediate re-send in setupDailyMaintenance() on the next boot.
 const dailyMaintenanceExpireInSeconds = 60 * 60;
+
+// Runs hourly, plus once immediately at startup (same startup rationale as daily
+// maintenance) so usage-based autocomplete ordering doesn't sit stale for up to an hour
+// after a fresh deploy
+const hourlyMaintenanceQueues: QueueType[] = [
+  QueueType.UpdateStickerUsageStats,
+];
+const hourlyMaintenanceCron = '0 * * * *';
 
 export class QueueManager {
   protected readonly boss: PgBoss;
@@ -53,6 +62,7 @@ export class QueueManager {
       [QueueType.HardDeleteOldStickers]: hardDeleteOldStickersQueueHandler,
       [QueueType.HardDeleteOldPacks]: hardDeleteOldPacksQueueHandler,
       [QueueType.HardDeleteStaleTelegramStickers]: hardDeleteStaleTelegramStickersQueueHandler,
+      [QueueType.UpdateStickerUsageStats]: updateStickerUsageStatsQueueHandler,
     };
     this.i18next = initI18next(this.logger);
   }
@@ -79,6 +89,13 @@ export class QueueManager {
   async setupDailyMaintenance(): Promise<void> {
     await Promise.all(dailyMaintenanceQueues.map(async (queueType) => {
       await this.boss.schedule(queueType, dailyMaintenanceCron, {}, this.defaultOptions[queueType]);
+      await this.send(queueType, {});
+    }));
+  }
+
+  async setupHourlyMaintenance(): Promise<void> {
+    await Promise.all(hourlyMaintenanceQueues.map(async (queueType) => {
+      await this.boss.schedule(queueType, hourlyMaintenanceCron, {}, this.defaultOptions[queueType]);
       await this.send(queueType, {});
     }));
   }

@@ -7,6 +7,7 @@ import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter
 import { getStickerMessageContent } from '../../utils/get-sticker-message-content.js';
 import { createCommandMention, interactionReply } from '../../utils/interaction-reply.js';
 import { isUuidV4 } from '../../utils/is-uuid-v4.js';
+import { updateOrCreateUser } from '../../utils/messaging.js';
 import { recordStickerMessages } from '../../utils/record-sticker-messages.js';
 
 export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async function handle(interaction, context) {
@@ -62,6 +63,7 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
 
   if (!preview) {
     const replyMessage = await reply.fetch();
-    await recordStickerMessages({ context, interaction, stickers, replyMessage });
+    const user = await updateOrCreateUser(context, interaction);
+    await recordStickerMessages({ context, interaction, stickers, replyMessage, userId: user.id });
   }
 };

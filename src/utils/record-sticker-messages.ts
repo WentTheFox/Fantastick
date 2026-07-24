@@ -17,6 +17,7 @@ interface RecordStickerMessagesParams {
   stickers: Sticker[];
   replyMessage: MessageType;
   isFeed?: boolean;
+  userId?: bigint | null;
 }
 
 /**
@@ -28,6 +29,7 @@ export const recordStickerMessages = ({
   stickers,
   replyMessage,
   isFeed = false,
+  userId = null,
 }: RecordStickerMessagesParams) => {
   const { db } = context;
   const messageChannelId = 'channelId' in replyMessage ? replyMessage.channelId : replyMessage.channel_id;
@@ -41,6 +43,7 @@ export const recordStickerMessages = ({
       interactionId: interaction.id,
       stickerId: sticker.id,
       isFeed,
+      userId,
     },
   })));
 };

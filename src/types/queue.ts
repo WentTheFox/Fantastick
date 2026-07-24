@@ -7,6 +7,7 @@ export enum QueueType {
   HardDeleteOldStickers = 'hard-delete-old-stickers',
   HardDeleteOldPacks = 'hard-delete-old-packs',
   HardDeleteStaleTelegramStickers = 'hard-delete-stale-telegram-stickers',
+  UpdateStickerUsageStats = 'update-sticker-usage-stats',
 }
 
 export interface QueueReqData {
@@ -29,6 +30,9 @@ export interface QueueReqData {
   [QueueType.HardDeleteOldStickers]: Record<string, never>;
   [QueueType.HardDeleteOldPacks]: Record<string, never>;
   [QueueType.HardDeleteStaleTelegramStickers]: Record<string, never>;
+  // Runs hourly (see QueueManager) and does a full recompute of aggregate counts, so it
+  // needs no job data — it always operates over the entire StickerMessage table
+  [QueueType.UpdateStickerUsageStats]: Record<string, never>;
 }
 
 export type QueueHandler<Type extends QueueType> = WorkHandler<QueueReqData[Type], void>;

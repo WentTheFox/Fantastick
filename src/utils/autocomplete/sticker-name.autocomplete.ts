@@ -36,9 +36,19 @@ export const getStickerNameAutocompleteHandler = (nsfwOrOptions: boolean | Stick
     },
   });
 
+  const usageRows = await db.stickerUsage.findMany({
+    select: { stickerId: true, count: true },
+    where: {
+      userId: BigInt(interaction.user.id),
+      stickerId: { in: userStickers.map(sticker => sticker.id) },
+    },
+  });
+  const usageByStickerId = new Map(usageRows.map(row => [row.stickerId, row.count]));
+
   await interaction.respond(userStickers
     .map(sticker => ({ id: sticker.id, packId: sticker.packId, displayName: getFormattedStickerName(sticker) }))
     .filter(sticker => sticker.displayName.toLowerCase().includes(value))
+    .sort((a, b) => (usageByStickerId.get(b.id) ?? 0) - (usageByStickerId.get(a.id) ?? 0))
     .slice(0, 25)
     .map(sticker => {
       const name = truncateToMaximumLength(`${sticker.displayName} (${packNameIndex[sticker.packId]})`, 100);

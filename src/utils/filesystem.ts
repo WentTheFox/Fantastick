@@ -58,7 +58,7 @@ export const saveStickerFile = async (context: LoggerContext, input: SaveSticker
   await fs.promises.mkdir(folderPath, { recursive: true });
 
   context.logger.info(`[StickerFile#${stickerFileId}] writing file to ${filePath}`);
-  await fs.promises.writeFile(filePath, input.data);
+  await fs.promises.writeFile(filePath, await toBuffer(input.data));
 
   return {
     stickerFileId,

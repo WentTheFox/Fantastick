@@ -3,6 +3,7 @@ import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
 import { BotChatInputCommandName, CommandHandler } from '../../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../../types/localization.js';
 import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
+import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter.js';
 import { getStickerMessageContent } from '../../utils/get-sticker-message-content.js';
 import { createCommandMention, interactionReply } from '../../utils/interaction-reply.js';
 import { isUuidV4 } from '../../utils/is-uuid-v4.js';
@@ -35,13 +36,13 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
   const stickers = await db.sticker.findMany({
     where: {
       deletedAt: null,
-      OR: searchConditions,
+      AND: [
+        { OR: searchConditions },
+        getNonNsfwStickerFilter(nsfw),
+      ],
       packId: {
         in: availablePacks.map(pack => pack.id),
       },
-      // Stickers explicitly overridden to NSFW never appear in the non-NSFW commands,
-      // even inside an otherwise safe-for-all-audiences pack
-      ...(nsfw ? {} : { NOT: { nsfwOverride: true } }),
     },
     include: { telegramSticker: true, pack: true },
     take: 1,

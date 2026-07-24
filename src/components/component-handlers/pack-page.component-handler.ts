@@ -1,5 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { BotMessageComponentHandler } from '../../types/bot-interaction.js';
+import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter.js';
 import { getPackPreviewContent, packItemsPerPage } from '../../utils/get-pack-preview-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 
@@ -34,12 +35,10 @@ export const packPageComponentHandler = (direction: 'first' | 'prev' | 'next' | 
     return;
   }
 
-  // Stickers explicitly overridden to NSFW never appear in the non-NSFW commands,
-  // even inside an otherwise safe-for-all-audiences pack
   const stickerWhere = {
     deletedAt: null,
     packId: pack.id,
-    ...(nsfw ? {} : { NOT: { nsfwOverride: true } }),
+    ...getNonNsfwStickerFilter(nsfw),
   };
   const stickerCount = await db.sticker.count({ where: stickerWhere });
   const totalPages = Math.max(1, Math.ceil(stickerCount / packItemsPerPage));

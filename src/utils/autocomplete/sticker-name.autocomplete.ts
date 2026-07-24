@@ -1,6 +1,7 @@
 import { AutocompleteHandler } from '../../types/bot-interaction.js';
 import { findAvailableStickerPacks } from '../find-available-sticker-packs.js';
 import { getPackDisplayName } from '../get-formatted-pack-name.js';
+import { getNonNsfwStickerFilter } from '../get-non-nsfw-sticker-filter.js';
 import { getFormattedStickerName } from '../get-formatted-sticker-name.js';
 import { truncateToMaximumLength } from '../messaging.js';
 
@@ -24,11 +25,7 @@ export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHan
       packId: {
         in: availablePacks.map(pack => pack.id),
       },
-      // Stickers explicitly overridden to NSFW never appear in the non-NSFW commands,
-      // even inside an otherwise safe-for-all-audiences pack — must match the filtering
-      // the command handlers themselves apply, or autocomplete offers stickers the
-      // command will then refuse to return
-      ...(nsfw ? {} : { NOT: { nsfwOverride: true } }),
+      ...getNonNsfwStickerFilter(nsfw),
     },
   });
 

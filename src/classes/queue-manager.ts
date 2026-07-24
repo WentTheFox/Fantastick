@@ -8,6 +8,7 @@ import { QueueHandler, QueueReqData, QueueType } from '../types/queue.js';
 import { cleanupOrphanedTelegramPacksQueueHandler } from './queue-handlers/cleanup-orphaned-telegram-packs.queue-handler.js';
 import { hardDeleteOldPacksQueueHandler } from './queue-handlers/hard-delete-old-packs.queue-handler.js';
 import { hardDeleteOldStickersQueueHandler } from './queue-handlers/hard-delete-old-stickers.queue-handler.js';
+import { hardDeleteStaleTelegramStickersQueueHandler } from './queue-handlers/hard-delete-stale-telegram-stickers.queue-handler.js';
 import { telegramImportQueueHandler } from './queue-handlers/telegram-import.queue-handler.js';
 import { updateMessageQueueHandler } from './queue-handlers/update-message.queue-handler.js';
 
@@ -17,6 +18,7 @@ const dailyMaintenanceQueues: QueueType[] = [
   QueueType.CleanupOrphanedTelegramPacks,
   QueueType.HardDeleteOldStickers,
   QueueType.HardDeleteOldPacks,
+  QueueType.HardDeleteStaleTelegramStickers,
 ];
 const dailyMaintenanceCron = '0 3 * * *';
 // A large backlog (many files to delete, each a real network call) can run well past
@@ -36,6 +38,7 @@ export class QueueManager {
     [QueueType.CleanupOrphanedTelegramPacks]: { expireInSeconds: dailyMaintenanceExpireInSeconds },
     [QueueType.HardDeleteOldStickers]: { expireInSeconds: dailyMaintenanceExpireInSeconds },
     [QueueType.HardDeleteOldPacks]: { expireInSeconds: dailyMaintenanceExpireInSeconds },
+    [QueueType.HardDeleteStaleTelegramStickers]: { expireInSeconds: dailyMaintenanceExpireInSeconds },
   };
   protected readonly workOptions: Partial<{ [k in QueueType]: WorkOptions }> = {
     [QueueType.UpdateMessage]: { batchSize: 1 },
@@ -49,6 +52,7 @@ export class QueueManager {
       [QueueType.CleanupOrphanedTelegramPacks]: cleanupOrphanedTelegramPacksQueueHandler,
       [QueueType.HardDeleteOldStickers]: hardDeleteOldStickersQueueHandler,
       [QueueType.HardDeleteOldPacks]: hardDeleteOldPacksQueueHandler,
+      [QueueType.HardDeleteStaleTelegramStickers]: hardDeleteStaleTelegramStickersQueueHandler,
     };
     this.i18next = initI18next(this.logger);
   }

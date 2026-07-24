@@ -6,6 +6,7 @@ export enum QueueType {
   CleanupOrphanedTelegramPacks = 'cleanup-orphaned-telegram-packs',
   HardDeleteOldStickers = 'hard-delete-old-stickers',
   HardDeleteOldPacks = 'hard-delete-old-packs',
+  HardDeleteStaleTelegramStickers = 'hard-delete-stale-telegram-stickers',
 }
 
 export interface QueueReqData {
@@ -27,6 +28,7 @@ export interface QueueReqData {
   [QueueType.CleanupOrphanedTelegramPacks]: Record<string, never>;
   [QueueType.HardDeleteOldStickers]: Record<string, never>;
   [QueueType.HardDeleteOldPacks]: Record<string, never>;
+  [QueueType.HardDeleteStaleTelegramStickers]: Record<string, never>;
 }
 
 export type QueueHandler<Type extends QueueType> = WorkHandler<QueueReqData[Type], void>;

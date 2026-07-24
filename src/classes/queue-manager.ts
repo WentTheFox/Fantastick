@@ -6,6 +6,7 @@ import { env } from '../env.js';
 import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueReqData, QueueType } from '../types/queue.js';
 import { cleanupOrphanedTelegramPacksQueueHandler } from './queue-handlers/cleanup-orphaned-telegram-packs.queue-handler.js';
+import { hardDeleteOldPacksQueueHandler } from './queue-handlers/hard-delete-old-packs.queue-handler.js';
 import { hardDeleteOldStickersQueueHandler } from './queue-handlers/hard-delete-old-stickers.queue-handler.js';
 import { telegramImportQueueHandler } from './queue-handlers/telegram-import.queue-handler.js';
 import { updateMessageQueueHandler } from './queue-handlers/update-message.queue-handler.js';
@@ -15,8 +16,16 @@ import { updateMessageQueueHandler } from './queue-handlers/update-message.queue
 const dailyMaintenanceQueues: QueueType[] = [
   QueueType.CleanupOrphanedTelegramPacks,
   QueueType.HardDeleteOldStickers,
+  QueueType.HardDeleteOldPacks,
 ];
 const dailyMaintenanceCron = '0 3 * * *';
+// A large backlog (many files to delete, each a real network call) can run well past
+// pg-boss's default 15-minute job expiry; these only re-query current DB state and every
+// delete they issue is individually idempotent, so a generous expiry just avoids pg-boss
+// prematurely marking a still-legitimately-running sweep as failed and retrying it
+// alongside itself — an app restart is what actually resumes an interrupted sweep, via
+// the immediate re-send in setupDailyMaintenance() on the next boot.
+const dailyMaintenanceExpireInSeconds = 60 * 60;
 
 export class QueueManager {
   protected readonly boss: PgBoss;
@@ -24,6 +33,9 @@ export class QueueManager {
   protected readonly queueWorkers: { [k in QueueType]: (logger: NestableLogger) => QueueHandler<k> };
   protected readonly defaultOptions: Partial<{ [k in QueueType]: SendOptions }> = {
     [QueueType.UpdateMessage]: { group: { id: 'discord-api' } },
+    [QueueType.CleanupOrphanedTelegramPacks]: { expireInSeconds: dailyMaintenanceExpireInSeconds },
+    [QueueType.HardDeleteOldStickers]: { expireInSeconds: dailyMaintenanceExpireInSeconds },
+    [QueueType.HardDeleteOldPacks]: { expireInSeconds: dailyMaintenanceExpireInSeconds },
   };
   protected readonly workOptions: Partial<{ [k in QueueType]: WorkOptions }> = {
     [QueueType.UpdateMessage]: { batchSize: 1 },
@@ -36,6 +48,7 @@ export class QueueManager {
       [QueueType.TelegramImport]: telegramImportQueueHandler,
       [QueueType.CleanupOrphanedTelegramPacks]: cleanupOrphanedTelegramPacksQueueHandler,
       [QueueType.HardDeleteOldStickers]: hardDeleteOldStickersQueueHandler,
+      [QueueType.HardDeleteOldPacks]: hardDeleteOldPacksQueueHandler,
     };
     this.i18next = initI18next(this.logger);
   }
@@ -61,7 +74,7 @@ export class QueueManager {
   // every shard would independently schedule/kick off the same maintenance sweep
   async setupDailyMaintenance(): Promise<void> {
     await Promise.all(dailyMaintenanceQueues.map(async (queueType) => {
-      await this.boss.schedule(queueType, dailyMaintenanceCron, {});
+      await this.boss.schedule(queueType, dailyMaintenanceCron, {}, this.defaultOptions[queueType]);
       await this.send(queueType, {});
     }));
   }

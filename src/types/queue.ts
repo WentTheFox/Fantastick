@@ -5,6 +5,7 @@ export enum QueueType {
   TelegramImport = 'telegram-import',
   CleanupOrphanedTelegramPacks = 'cleanup-orphaned-telegram-packs',
   HardDeleteOldStickers = 'hard-delete-old-stickers',
+  HardDeleteOldPacks = 'hard-delete-old-packs',
 }
 
 export interface QueueReqData {
@@ -25,6 +26,7 @@ export interface QueueReqData {
   // whole table rather than targeting a single record, so neither needs job data
   [QueueType.CleanupOrphanedTelegramPacks]: Record<string, never>;
   [QueueType.HardDeleteOldStickers]: Record<string, never>;
+  [QueueType.HardDeleteOldPacks]: Record<string, never>;
 }
 
 export type QueueHandler<Type extends QueueType> = WorkHandler<QueueReqData[Type], void>;

@@ -7,9 +7,10 @@ interface PackNameAutocompleteOptions {
   nsfw?: boolean;
   ownedOnly?: boolean;
   importedOnly?: boolean;
+  excludeImported?: boolean;
 }
 
-export const getPackNameAutocompleteHandler = ({ nsfw = false, ownedOnly = false, importedOnly = false }: PackNameAutocompleteOptions = {}): AutocompleteHandler => async (interaction, context, optionName) => {
+export const getPackNameAutocompleteHandler = ({ nsfw = false, ownedOnly = false, importedOnly = false, excludeImported = false }: PackNameAutocompleteOptions = {}): AutocompleteHandler => async (interaction, context, optionName) => {
   const value = interaction.options.getString(optionName, true).trim().toLowerCase();
   const availablePacks = await findAvailableStickerPacks(context, interaction, nsfw);
   const scopedPacks = ownedOnly
@@ -17,7 +18,9 @@ export const getPackNameAutocompleteHandler = ({ nsfw = false, ownedOnly = false
     : availablePacks;
   const packs = importedOnly
     ? scopedPacks.filter(pack => pack.telegramPack !== null)
-    : scopedPacks;
+    : excludeImported
+      ? scopedPacks.filter(pack => pack.telegramPack === null)
+      : scopedPacks;
   if (packs.length === 0) {
     await interaction.respond([]);
     return;

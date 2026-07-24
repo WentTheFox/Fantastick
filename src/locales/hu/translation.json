@@ -350,6 +350,34 @@
         }
       }
     },
+    "migrate-to-telegram-sticker": {
+      "name": "migrate-to-telegram-sticker",
+      "description": "Move a sticker's name, description and rating onto a Telegram sticker, deleting the original",
+      "responses": {
+        "sourceStickerNotFound": "The specified source sticker could not be found. Make sure it belongs to a non-imported pack you own.",
+        "targetStickerNotFound": "The specified target sticker could not be found. Make sure it belongs to an imported pack you own.",
+        "sameSticker": "The source and target sticker cannot be the same",
+        "migrated": "Migrated {{source}} onto {{target}}. The original sticker has been deleted and its message history now follows the Telegram sticker."
+      },
+      "options": {
+        "source-pack": {
+          "name": "source-pack",
+          "description": "The non-imported pack containing the sticker to migrate"
+        },
+        "source-sticker": {
+          "name": "source-sticker",
+          "description": "The sticker whose metadata you want to migrate"
+        },
+        "target-pack": {
+          "name": "target-pack",
+          "description": "The imported Telegram pack containing the sticker to migrate to"
+        },
+        "target-sticker": {
+          "name": "target-sticker",
+          "description": "The Telegram sticker to receive the migrated metadata"
+        }
+      }
+    },
     "delete-sticker": {
       "name": "matrica-törlés",
       "description": "Létező matrica törlése",

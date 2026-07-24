@@ -48,4 +48,13 @@ describe('getFormattedPackName', () => {
       telegramPack: { title: 'Visit https://example.com/pack now' },
     })).toEqual(`${EmojiCharacters.LOCKED} ${EmojiCharacters.PAPER_PLANE} Visit <https://example.com/pack> now`);
   });
+
+  it('should expand usernames in Telegram pack names to links', () => {
+    expect(getFormattedPackName({
+      name: '',
+      public: false,
+      nsfw: false,
+      telegramPack: { title: '@ExampleUser\'s sticker stash' },
+    })).toEqual(`${EmojiCharacters.LOCKED} ${EmojiCharacters.PAPER_PLANE} [@ExampleUser](<https://t.me/ExampleUser>)'s sticker stash`);
+  });
 });

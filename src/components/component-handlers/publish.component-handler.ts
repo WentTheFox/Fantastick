@@ -201,7 +201,7 @@ export const publishConfirmComponentHandler: BotMessageComponentHandler = async 
       : t('commands.publish-imported-pack.responses.publishedRatingAllSfw');
   await interactionReply(context, interaction, {
     content: [
-      t('commands.publish-imported-pack.responses.published', { name: `\`${getFormattedPackName(pack)}\`` }),
+      t('commands.publish-imported-pack.responses.published', { name: getFormattedPackName(pack) }),
       ratingNote,
     ].join('\n'),
     flags: MessageFlags.Ephemeral,

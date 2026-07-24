@@ -10,7 +10,9 @@ export type PackNameSource = Pick<Pack, 'name'> & {
 
 export type FormattablePack = PackNameSource & Pick<Pack, 'public' | 'nsfw'>;
 
-export const getPackDisplayName = (pack: PackNameSource) => pack.telegramPack !== null ? pack.telegramPack.title : pack.name;
+export const getPackDisplayName = (pack: PackNameSource) => pack.telegramPack !== null
+  ? pack.telegramPack.title.replace(/(@([a-z_\d]+))/ig, '[$1](https://t.me/$2)')
+  : pack.name;
 
 // `escapeUrls` guards against Discord auto-embedding a link when the name is
 // posted as raw message text; pass false where that can't happen (autocomplete

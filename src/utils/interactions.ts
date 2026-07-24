@@ -23,9 +23,10 @@ import { stickerCommand } from '../commands/sticker.command.js';
 import { stickerDetailsCommand } from '../commands/sticker-details.command.js';
 import { updateMessageCommand } from '../commands/update-message.command.js';
 import { deleteMessageComponent } from '../components/delete-message.component.js';
+import { massEditEditMetadataComponent } from '../components/mass-edit-edit-metadata.component.js';
 import { massEditNextComponent } from '../components/mass-edit-next.component.js';
-import { massEditOpenComponent } from '../components/mass-edit-open.component.js';
 import { massEditPrevComponent } from '../components/mass-edit-prev.component.js';
+import { massEditReplaceComponent } from '../components/mass-edit-replace.component.js';
 import { packPageFirstComponent } from '../components/pack-page-first.component.js';
 import { packPageLastComponent } from '../components/pack-page-last.component.js';
 import { packPageNextComponent } from '../components/pack-page-next.component.js';
@@ -68,7 +69,8 @@ export const componentRegistry = createComponentRegistry([
   packPagePrevComponent,
   packPageNextComponent,
   packPageLastComponent,
-  massEditOpenComponent,
+  massEditEditMetadataComponent,
+  massEditReplaceComponent,
   massEditPrevComponent,
   massEditNextComponent,
   publishOpenComponent,

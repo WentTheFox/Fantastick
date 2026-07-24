@@ -8,8 +8,11 @@ import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import {
-  massEditStickerModalHandler,
-} from './modal-handlers/mass-edit-sticker.modal-handler.js';
+  massEditStickerMetadataModalHandler,
+} from './modal-handlers/mass-edit-sticker-metadata.modal-handler.js';
+import {
+  massEditReplaceStickerModalHandler,
+} from './modal-handlers/mass-edit-replace-sticker.modal-handler.js';
 
 export const massEditStickersCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.MASS_EDIT_STICKERS,
@@ -75,6 +78,7 @@ export const massEditStickersCommand: BotChatInputCommand = {
     });
   },
   modal: {
-    [BotModalId.MASS_EDIT_STICKER]: massEditStickerModalHandler,
+    [BotModalId.MASS_EDIT_STICKER_METADATA]: massEditStickerMetadataModalHandler,
+    [BotModalId.MASS_EDIT_REPLACE_STICKER]: massEditReplaceStickerModalHandler,
   },
 };

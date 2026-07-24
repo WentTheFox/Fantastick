@@ -30,8 +30,9 @@ export const getMassEditStickerContent = ({ t, pack, sticker, index, total }: Ge
 
   // Imported stickers are identified by their emoji and position on the position line;
   // the current name (if any) gets its own line for both sticker types
-  const stickerIdentifier = sticker.telegramSticker !== null
-    ? `: \`${sticker.telegramSticker.emoji}#${sticker.telegramSticker.order + 1}\``
+  const isImportedSticker = sticker.telegramSticker !== null;
+  const stickerIdentifier = isImportedSticker
+    ? `: \`${sticker.telegramSticker!.emoji}#${sticker.telegramSticker!.order + 1}\``
     : '';
   const components: APIMessageTopLevelComponent[] = [
     {
@@ -65,10 +66,19 @@ export const getMassEditStickerContent = ({ t, pack, sticker, index, total }: Ge
         },
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.MASS_EDIT_OPEN}:${sticker.id}`,
-          label: t('commands.mass-edit-stickers.components.editButton'),
+          custom_id: `${BotMessageComponentCustomId.MASS_EDIT_EDIT_METADATA}:${sticker.id}`,
+          label: t('commands.mass-edit-stickers.components.editMetadataButton'),
           style: ButtonStyle.Primary,
           emoji: { name: EmojiCharacters.PENCIL },
+        },
+        {
+          type: ComponentType.Button,
+          custom_id: `${BotMessageComponentCustomId.MASS_EDIT_REPLACE}:${sticker.id}`,
+          label: t('commands.mass-edit-stickers.components.replaceButton'),
+          style: ButtonStyle.Primary,
+          emoji: { name: EmojiCharacters.RELOAD },
+          // Imported stickers' images are managed by the Telegram import and can't be replaced
+          disabled: isImportedSticker,
         },
         {
           type: ComponentType.Button,
@@ -76,6 +86,7 @@ export const getMassEditStickerContent = ({ t, pack, sticker, index, total }: Ge
           label: t('commands.mass-edit-stickers.components.nextButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.ARROW_RIGHT },
+          disabled: index >= total - 1,
         },
       ],
     },

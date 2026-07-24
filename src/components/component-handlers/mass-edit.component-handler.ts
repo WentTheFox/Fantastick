@@ -1,11 +1,12 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { BotMessageComponentHandler, BotModalId } from '../../types/bot-interaction.js';
-import { getEditStickerModalContent } from '../../utils/get-edit-sticker-modal-content.js';
+import { getEditStickerMetadataModalContent } from '../../utils/get-edit-sticker-metadata-modal-content.js';
 import { getMassEditStepContent } from '../../utils/get-mass-edit-content.js';
+import { getReplaceStickerModalContent } from '../../utils/get-replace-sticker-modal-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 
-export const massEditOpenComponentHandler: BotMessageComponentHandler = async (interaction, context, resourceId) => {
+export const massEditEditMetadataComponentHandler: BotMessageComponentHandler = async (interaction, context, resourceId) => {
   if (!interaction.isButton()) {
     throw new Error('Button interaction expected');
   }
@@ -33,9 +34,47 @@ export const massEditOpenComponentHandler: BotMessageComponentHandler = async (i
     return;
   }
 
-  const { title, components } = getEditStickerModalContent(t, sticker);
+  const { title, components } = getEditStickerMetadataModalContent(t, sticker);
   await interaction.showModal({
-    customId: `${BotModalId.MASS_EDIT_STICKER}:${sticker.id}`,
+    customId: `${BotModalId.MASS_EDIT_STICKER_METADATA}:${sticker.id}`,
+    title,
+    components,
+  });
+};
+
+export const massEditReplaceComponentHandler: BotMessageComponentHandler = async (interaction, context, resourceId) => {
+  if (!interaction.isButton()) {
+    throw new Error('Button interaction expected');
+  }
+
+  const { t, db } = context;
+  const user = await updateOrCreateUser(context, interaction);
+  if (user.readOnly) {
+    await interactionReply(context, interaction, {
+      content: t('commands.global.responses.noPermission'),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  // Imported stickers' images are managed by the Telegram import; this button is
+  // disabled for them in getMassEditStickerContent, but guard against a stale click
+  const sticker = resourceId ? await db.sticker.findUnique({
+    where: { id: resourceId, deletedAt: null, createdBy: user.id, telegramStickerId: null },
+    include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
+  }) : null;
+
+  if (!sticker) {
+    await interactionReply(context, interaction, {
+      content: t('commands.mass-edit-stickers.responses.stickerNotFound'),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const { title, components } = getReplaceStickerModalContent(t, sticker);
+  await interaction.showModal({
+    customId: `${BotModalId.MASS_EDIT_REPLACE_STICKER}:${sticker.id}`,
     title,
     components,
   });

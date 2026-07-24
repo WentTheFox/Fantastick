@@ -314,19 +314,11 @@
       "components": {
         "reviewingText": "Editing stickers in pack {{pack}}\nSticker {{position}} of {{total}}{{identifier}}",
         "currentNameText": "Current name: {{name}}",
-        "editButton": "Edit",
+        "editMetadataButton": "Edit metadata",
+        "replaceButton": "Replace image",
         "previousButton": "Previous",
         "nextButton": "Next",
-        "allDoneText": "All stickers in pack {{pack}} have been shown",
-        "editStickerModalTitle": "A(z) {{name}} matrica szerkesztése",
-        "editingText": "A(z) {{name}} matricát szerkeszted a(z) {{pack}} matricacsomagból. ha nem szeretnéd megváltoztatni a matrica képét, akkor ne adj meg URL-t és ne tölts fel fájlt.",
-        "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
-        "importedNameLabel": "Sticker name (optional)",
-        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position.",
-        "newFileLabel": "Matricafájl frissítése",
-        "newFileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
-        "newUrlLabel": "Matrica URL frissítése",
-        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen."
+        "allDoneText": "All stickers in pack {{pack}} have been shown"
       },
       "options": {
         "pack": {
@@ -361,21 +353,11 @@
         "ratingUnset": "_(not set)_",
         "criteriaNameLabel": "Has a short, accurate name",
         "criteriaRatingLabel": "Has an explicit content rating",
-        "editingModalText": "You are editing sticker {{name}} from pack {{pack}}.",
-        "nameLabel": "Sticker name",
-        "nameDescription": "Enter a short, accurate English name for this sticker",
-        "ratingChoiceLabel": "Content rating",
-        "ratingChoiceDescription": "Choose an explicit rating for this sticker. This cannot be left as \"pack default\" before publishing.",
-        "ratingSfwLabel": "Safe for all audiences",
-        "ratingSfwDescription": "This sticker is safe to show anywhere",
-        "ratingNsfwLabel": "Age-restricted (NSFW)",
-        "ratingNsfwDescription": "This sticker will only be usable in age-restricted channels and DMs",
         "editButton": "Edit",
         "previousButton": "Previous",
         "nextButton": "Next",
         "publishButton": "Publish",
         "jumpToInvalidButton": "Jump to first invalid sticker",
-        "editModalTitle": "Edit sticker {{name}}",
         "allDoneText": "All stickers in pack {{pack}} have been shown"
       },
       "options": {

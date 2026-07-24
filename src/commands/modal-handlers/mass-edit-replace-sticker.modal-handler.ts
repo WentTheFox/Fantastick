@@ -1,16 +1,12 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { ModalHandler } from '../../types/bot-interaction.js';
-import { applyStickerMetadataEdit } from '../../utils/apply-sticker-metadata-edit.js';
-import { getPublishStepContent } from '../../utils/get-publish-pack-content.js';
+import { applyStickerFileReplace } from '../../utils/apply-sticker-file-replace.js';
+import { getMassEditStepContent } from '../../utils/get-mass-edit-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed } from '../../utils/post-sticker-to-feed.js';
 
-// Shares the same name/description/rating modal and validation as /edit-sticker-metadata
-// and mass-edit-stickers — publish just adds its own step-forward + readiness-aware
-// feed post afterward. A "Pack default" rating selection is allowed through here too;
-// it simply leaves the rating-readiness criterion unmet, same as an untouched sticker.
-export const publishEditStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
+export const massEditReplaceStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
   const { t, db } = context;
   const user = await updateOrCreateUser(context, interaction);
   if (user.readOnly) {
@@ -22,22 +18,22 @@ export const publishEditStickerModalHandler: ModalHandler = async (interaction, 
   }
 
   const sticker = resourceId ? await db.sticker.findUnique({
-    where: { id: resourceId, deletedAt: null, createdBy: user.id },
+    where: { id: resourceId, deletedAt: null, createdBy: user.id, telegramStickerId: null },
     include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
   }) : null;
 
   if (!sticker) {
     await interactionReply(context, interaction, {
-      content: t('commands.publish-imported-pack.responses.stickerNotFound'),
+      content: t('commands.mass-edit-stickers.responses.stickerNotFound'),
       flags: MessageFlags.Ephemeral,
     });
     return;
   }
 
-  const result = await applyStickerMetadataEdit(interaction, context, sticker);
+  const result = await applyStickerFileReplace(interaction, context, sticker);
   if (!result) return;
 
-  const nextContent = await getPublishStepContent({
+  const nextContent = await getMassEditStepContent({
     t,
     db,
     pack: result.sticker.pack,

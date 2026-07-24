@@ -3,7 +3,7 @@ import { Readable } from 'node:stream';
 import { ReplaceStickerModalCustomIds } from '../constants/edit-sticker-modal-fields.js';
 import { env } from '../env.js';
 import { ModalHandler } from '../types/bot-interaction.js';
-import { EditableSticker } from './apply-sticker-edit.js';
+import { EditableSticker } from '../types/editable-sticker.js';
 import { deleteStickerFile } from './delete-sticker-file.js';
 import { saveStickerFile } from './filesystem.js';
 import { interactionReply } from './interaction-reply.js';

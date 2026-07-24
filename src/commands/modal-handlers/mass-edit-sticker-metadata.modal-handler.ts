@@ -1,12 +1,12 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { ModalHandler } from '../../types/bot-interaction.js';
-import { applyStickerModalEdit } from '../../utils/apply-sticker-edit.js';
+import { applyStickerMetadataEdit } from '../../utils/apply-sticker-metadata-edit.js';
 import { getMassEditStepContent } from '../../utils/get-mass-edit-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed } from '../../utils/post-sticker-to-feed.js';
 
-export const massEditStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
+export const massEditStickerMetadataModalHandler: ModalHandler = async (interaction, context, resourceId) => {
   const { t, db } = context;
   const user = await updateOrCreateUser(context, interaction);
   if (user.readOnly) {
@@ -30,7 +30,7 @@ export const massEditStickerModalHandler: ModalHandler = async (interaction, con
     return;
   }
 
-  const result = await applyStickerModalEdit(interaction, context, sticker);
+  const result = await applyStickerMetadataEdit(interaction, context, sticker);
   if (!result) return;
 
   const nextContent = await getMassEditStepContent({

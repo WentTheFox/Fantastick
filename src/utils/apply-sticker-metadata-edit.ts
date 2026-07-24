@@ -8,7 +8,7 @@ import {
   stickerNameOptionMeta,
 } from '../options/metadata/sticker-name.option-meta.js';
 import { ModalHandler } from '../types/bot-interaction.js';
-import { EditableSticker } from './apply-sticker-edit.js';
+import { EditableSticker } from '../types/editable-sticker.js';
 import { interactionReply } from './interaction-reply.js';
 import { collectModalSubmittedData } from './messaging.js';
 import { normalizeStickerDescriptionInput } from './normalize-sticker-description-input.js';

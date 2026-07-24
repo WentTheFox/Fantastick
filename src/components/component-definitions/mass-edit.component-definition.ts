@@ -6,12 +6,20 @@ import {
   BotMessageComponentDefinitionGetter,
 } from '../../types/bot-interaction.js';
 
-export const massEditOpenComponentDefinition: BotMessageComponentDefinitionGetter = (t) => ({
+export const massEditEditMetadataComponentDefinition: BotMessageComponentDefinitionGetter = (t) => ({
   type: ComponentType.Button,
-  custom_id: BotMessageComponentCustomId.MASS_EDIT_OPEN,
-  label: t('commands.mass-edit-stickers.components.editButton'),
+  custom_id: BotMessageComponentCustomId.MASS_EDIT_EDIT_METADATA,
+  label: t('commands.mass-edit-stickers.components.editMetadataButton'),
   style: ButtonStyle.Primary,
   emoji: { name: EmojiCharacters.PENCIL },
+});
+
+export const massEditReplaceComponentDefinition: BotMessageComponentDefinitionGetter = (t) => ({
+  type: ComponentType.Button,
+  custom_id: BotMessageComponentCustomId.MASS_EDIT_REPLACE,
+  label: t('commands.mass-edit-stickers.components.replaceButton'),
+  style: ButtonStyle.Primary,
+  emoji: { name: EmojiCharacters.RELOAD },
 });
 
 export const massEditPrevComponentDefinition: BotMessageComponentDefinitionGetter = (t) => ({

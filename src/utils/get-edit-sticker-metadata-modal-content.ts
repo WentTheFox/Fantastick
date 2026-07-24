@@ -1,11 +1,13 @@
 import { ComponentType, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
 import { TFunction } from 'i18next';
+import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
-import { EditableSticker } from './apply-sticker-edit.js';
+import { EditableSticker } from '../types/editable-sticker.js';
 import { getFormattedStickerName } from './get-formatted-sticker-name.js';
+import { truncateToMaximumLength } from './messaging.js';
 import { EditStickerMetadataModalCustomIds, EditStickerRatingOption } from '../constants/edit-sticker-modal-fields.js';
 
 // The name/description/rating-only edit modal used by /edit-sticker-metadata — file and
@@ -16,7 +18,7 @@ export const getEditStickerMetadataModalContent = (t: TFunction, sticker: Editab
   const formattedStickerName = getFormattedStickerName(sticker);
 
   return {
-    title: t('commands.edit-sticker-metadata.components.editStickerMetadataModalTitle', { name: formattedStickerName }),
+    title: truncateToMaximumLength(t('commands.edit-sticker-metadata.components.editStickerMetadataModalTitle', { name: formattedStickerName }), MODAL_TITLE_MAX_LENGTH),
     components: [
       // Imported stickers only carry an optional label; their emoji, position and image
       // are managed by the Telegram import and cannot be edited

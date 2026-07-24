@@ -45,7 +45,8 @@ export const enum BotModalId {
   CREATE_PACK = 'createPackModal',
   DELETE_PACK = 'deletePackModal',
   EDIT_PACK = 'editPackModal',
-  MASS_EDIT_STICKER = 'massEditStickerModal',
+  MASS_EDIT_STICKER_METADATA = 'massEditStickerMetadataModal',
+  MASS_EDIT_REPLACE_STICKER = 'massEditReplaceStickerModal',
   PUBLISH_EDIT_STICKER = 'publishEditStickerModal',
 }
 
@@ -56,7 +57,8 @@ export const enum BotMessageComponentCustomId {
   PACK_PAGE_PREV = 'pack-page-prev',
   PACK_PAGE_NEXT = 'pack-page-next',
   PACK_PAGE_LAST = 'pack-page-last',
-  MASS_EDIT_OPEN = 'mass-edit-open',
+  MASS_EDIT_EDIT_METADATA = 'mass-edit-edit-metadata',
+  MASS_EDIT_REPLACE = 'mass-edit-replace',
   MASS_EDIT_PREV = 'mass-edit-prev',
   MASS_EDIT_NEXT = 'mass-edit-next',
   PUBLISH_OPEN = 'publish-open',

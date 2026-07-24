@@ -129,6 +129,7 @@ export const getPublishStickerContent = ({ t, pack, sticker, index, total, allRe
           label: t('commands.publish-imported-pack.components.nextButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.ARROW_RIGHT },
+          disabled: index >= total - 1,
         },
       ],
     },

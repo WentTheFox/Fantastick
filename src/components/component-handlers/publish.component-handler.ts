@@ -1,13 +1,8 @@
-import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
-import { ComponentInLabelData, TextInputComponentData, userMention } from 'discord.js';
-import {
-  PublishEditStickerModalCustomIds,
-  PublishRatingOption,
-} from '../../commands/modal-handlers/publish-edit-sticker.modal-handler.js';
-import { stickerNameOptionMeta } from '../../options/metadata/sticker-name.option-meta.js';
+import { MessageFlags } from 'discord-api-types/v10';
+import { userMention } from 'discord.js';
 import { BotMessageComponentHandler, BotModalId } from '../../types/bot-interaction.js';
+import { getEditStickerMetadataModalContent } from '../../utils/get-edit-sticker-metadata-modal-content.js';
 import { getFormattedPackName, getPackDisplayName } from '../../utils/get-formatted-pack-name.js';
-import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import {
   getPublishJumpToInvalidContent,
   getPublishStepContent,
@@ -17,7 +12,6 @@ import { findOrderedPackStickers } from '../../utils/get-mass-edit-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 import { PackSnapshot, postPackToFeed } from '../../utils/post-pack-to-feed.js';
-import { resolveStickerNsfw } from '../../utils/resolve-sticker-nsfw.js';
 
 export const publishOpenComponentHandler: BotMessageComponentHandler = async (interaction, context, resourceId) => {
   if (!interaction.isButton()) {
@@ -47,59 +41,11 @@ export const publishOpenComponentHandler: BotMessageComponentHandler = async (in
     return;
   }
 
-  const formattedStickerName = getFormattedStickerName(sticker);
-  const currentRating = resolveStickerNsfw(sticker, sticker.pack);
+  const { title, components } = getEditStickerMetadataModalContent(t, sticker);
   await interaction.showModal({
     customId: `${BotModalId.PUBLISH_EDIT_STICKER}:${sticker.id}`,
-    title: t('commands.publish-imported-pack.components.editModalTitle', { name: formattedStickerName }),
-    components: [
-      {
-        type: ComponentType.TextDisplay,
-        content: t('commands.publish-imported-pack.components.editingModalText', {
-          name: `\`${formattedStickerName}\``,
-          pack: getFormattedPackName(sticker.pack),
-        }),
-      },
-      {
-        type: ComponentType.Label,
-        label: t('commands.publish-imported-pack.components.nameLabel'),
-        description: t('commands.publish-imported-pack.components.nameDescription'),
-        component: {
-          type: ComponentType.TextInput,
-          customId: PublishEditStickerModalCustomIds.NEW_NAME_INPUT,
-          style: TextInputStyle.Short,
-          minLength: stickerNameOptionMeta.min_length,
-          maxLength: stickerNameOptionMeta.max_length,
-          required: true,
-          // Discord rejects an explicit empty-string value; omit it entirely for
-          // freshly-imported stickers that don't have a name yet
-          value: sticker.name || undefined,
-        } as TextInputComponentData,
-      },
-      {
-        type: ComponentType.Label,
-        label: t('commands.publish-imported-pack.components.ratingChoiceLabel'),
-        description: t('commands.publish-imported-pack.components.ratingChoiceDescription'),
-        component: {
-          type: ComponentType.RadioGroup,
-          customId: PublishEditStickerModalCustomIds.RATING_INPUT,
-          options: [
-            {
-              value: PublishRatingOption.SFW,
-              label: t('commands.publish-imported-pack.components.ratingSfwLabel'),
-              description: t('commands.publish-imported-pack.components.ratingSfwDescription'),
-              default: !currentRating,
-            },
-            {
-              value: PublishRatingOption.NSFW,
-              label: t('commands.publish-imported-pack.components.ratingNsfwLabel'),
-              description: t('commands.publish-imported-pack.components.ratingNsfwDescription'),
-              default: currentRating,
-            },
-          ],
-        } as unknown as ComponentInLabelData,
-      },
-    ],
+    title,
+    components,
   });
 };
 

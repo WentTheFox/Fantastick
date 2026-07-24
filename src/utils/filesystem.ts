@@ -34,7 +34,7 @@ const allowedFileExtensions = new Set<string>(['png', 'jpg', 'jpeg', 'webp', 'gi
 export const saveStickerFile = async (context: LoggerContext, input: SaveStickerInput): Promise<SaveStickerResult> => {
   const stickerFileId = crypto.randomUUID();
   context.logger.info(`[StickerFile#${stickerFileId}] ID generated for file ${input.fileId}`);
-  const fileExtension = input.fileName.split('.').pop();
+  const fileExtension = input.fileName.split('.').pop()?.toLowerCase();
   if (!fileExtension || !allowedFileExtensions.has(fileExtension)) {
     throw new Error(`Sticker file ${input.fileName} has an unsupported file extension: ${fileExtension}`);
   }

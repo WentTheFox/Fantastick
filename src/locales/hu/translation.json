@@ -2,98 +2,98 @@
   "commands": {
     "global": {
       "responses": {
-        "unexpectedError": "Váratlan hiba történt az interakció feldolgozása során",
-        "noPermission": "Nincs jogosultságod ezt a parancsot használni",
-        "dmsUnsupported": "Ez a parancs nem működik privát üzenetekben a Discord API korlátai miatt"
+        "unexpectedError": "There was an unexpected error while processing this interaction",
+        "noPermission": "You do not have permission to use this command",
+        "dmsUnsupported": "This command does not work in DM channels due to Discord API limitations"
       },
       "options": {}
     },
     "nsfw-sticker": {
-      "name": "nsfw-matrica",
-      "description": "Matrica küldése (NSFW csomagokból is)"
+      "name": "nsfw-sticker",
+      "description": "Sends a sticker (including from NSFW packs)"
     },
     "sticker": {
-      "name": "matrica",
-      "description": "Matrica küldése",
+      "name": "sticker",
+      "description": "Sends a sticker",
       "responses": {
-        "noPacks": "Nincs hozzáférésed egyetlen matricacsomaghoz sem. Létrehozhatsz sajátot a {{createCommand}} paranccsal.",
-        "invalidName": "Nem található matrica a megadott néven",
-        "messageNotFound": "Úgy tűnik, ez az üzenet nem tartalmaz semmilyen ebből az alkalmazásból származó matricát",
-        "onlyExecutorCanDelete": "Csak {{user}} (aki a matricát küldte) törölheti azt ezzel a gombbal",
-        "recentlyUpdated": "Ez az üzenet nemrégiben már frissítve lett. Kérlek, próbálkozz újra {{ts}}.",
-        "updated": "Az üzenet sikeresen frissítve",
-        "deleted": "Az üzenet sikeresen törölve"
+        "noPacks": "You do not have access to any sticker packs. You can create your own using {{createCommand}}.",
+        "invalidName": "There is no sticker with the specified name",
+        "messageNotFound": "This message does not seem to contain any stickers from this app",
+        "onlyExecutorCanDelete": "Only {{user}} (who sent the sticker) can delete it using this button",
+        "recentlyUpdated": "This message has already been updated recently. Please trying again {{ts}}.",
+        "updated": "The message has been updated successfully",
+        "deleted": "The message has been deleted successfully"
       },
       "components": {
-        "updateMessageButton": "Frissítés",
-        "deleteMessageButton": "Törlés"
+        "updateMessageButton": "Update",
+        "deleteMessageButton": "Delete"
       },
       "options": {
         "name": {
-          "name": "név",
-          "description": "Matrica neve"
+          "name": "name",
+          "description": "Sticker name"
         },
         "preview": {
-          "name": "előnézet",
-          "description": "Ha True, akkor a matrica csak számodra lesz látható"
+          "name": "preview",
+          "description": "If True, the sticker will only be visible to you"
         }
       }
     },
     "create-pack": {
-      "name": "csomag-létrehozás",
-      "description": "Létrehoz egy új matricacsomagot",
+      "name": "create-pack",
+      "description": "Create a new sticker pack",
       "responses": {
-        "nameTooShort": "A megadott matricacsomag név túl rövid (minimum {{min}} karakter)",
-        "nameTooLong": "A megadott matricacsomag név túl hosszú (maximum {{max}} karakter)",
-        "invalidName": "A megadott matricacsomag név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
-        "duplicateName": "Már létezik egy ilyen nevű matricacsomag, kérlek válassz másik nevet",
-        "tooManyPacks": "Legfeljebb {{maxPacks}} matricacsomagot hozhatsz létre. Kérlek töröld az egyik matrica csomagod mielőtt újat hoznál létre.",
-        "createdPublic": "Új **publikus** matricacsomag létrehozva {{name}} néven",
-        "createdPrivate": "Új **privát** matricacsomag létrehozva {{name}} néven"
+        "nameTooShort": "The provided sticker pack name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker pack name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker pack name contains the following invalid character(s): {{chars}}",
+        "duplicateName": "A sticker pack with the same name already exists, please choose a different one",
+        "tooManyPacks": "You can only create up to {{maxPacks}} sticker packs. Please delete an existing pack before creating a new one.",
+        "createdPublic": "New **public** sticker pack created with name {{name}}",
+        "createdPrivate": "New **private** sticker pack created with name {{name}}"
       },
       "components": {
-        "createPackModalTitle": "Új matricacsomag létrehozása",
-        "nameLabel": "Csomag neve",
-        "nameDescription": "Adj meg egy egyedi nevet az új matricacsomagnak. Két csomagnak nem lehet ugyanaz a neve az alkalmazáson belül.",
-        "publicChoiceLabel": "Csomag láthatósága",
-        "publicChoiceDescription": "Meghatározza, hogy ki láthatja és használhatja a csomagban lévő matricákat.",
-        "publicTrueLabel": "Publikus",
-        "publicTrueDescription": "A csomag mindenki számára látható és használható lesz",
-        "publicFalseLabel": "Privát",
-        "publicFalseDescription": "A csomag csak az számodra lesz látható és használható",
-        "nsfwChoiceLabel": "Csomag tartalmi besorolása",
-        "nsfwChoiceDescription": "Meghatározza, hogy a csomagban lévő matricák hol és hogyan lesznek használhatók.",
-        "nsfwTrueLabel": "Korhatáros (NSFW)",
-        "nsfwTrueDescription": "A matricák csak korhatáros csatornákban lesznek használhatók a {{command}} paranccsal",
-        "nsfwFalseLabel": "Korhatárra való tekintet nélkül megtekinthető",
-        "nsfwFalseDescription": "A matricák bárhol használhatók lesznek a {{command}} paranccsal"
+        "createPackModalTitle": "Create new sticker pack",
+        "nameLabel": "Pack name",
+        "nameDescription": "Enter a unique name for the new sticker pack. Two packs cannot have the same name within the app.",
+        "publicChoiceLabel": "Pack visibility",
+        "publicChoiceDescription": "Determines who will be able to see and use the stickers in the pack.",
+        "publicTrueLabel": "Public",
+        "publicTrueDescription": "The pack will be visible usable by everyone",
+        "publicFalseLabel": "Private",
+        "publicFalseDescription": "The pack will only be visible to and usable by you",
+        "nsfwChoiceLabel": "Pack content rating",
+        "nsfwChoiceDescription": "Determines where and how the stickers in this pack will be usable.",
+        "nsfwTrueLabel": "Age-restricted (NSFW)",
+        "nsfwTrueDescription": "Stickers will only be usable in age-restricted channels and DMs via {{command}}",
+        "nsfwFalseLabel": "Safe for all audiences",
+        "nsfwFalseDescription": "Stickers will be usable in any channel and DMs via {{command}}"
       },
       "options": {
         "name": {
-          "name": "név",
-          "description": "Az új matricacsomag neve"
+          "name": "name",
+          "description": "Name for the new sticker pack"
         }
       }
     },
     "import-telegram-pack": {
-      "name": "importálás",
-      "description": "Matricák importálása egy Telegram csomagból",
+      "name": "import-telegram-pack",
+      "description": "Import or update stickers from a Telegram pack",
       "responses": {
         "nsfwRequiredForNewPack": "You have not imported this Telegram pack yet, please specify the nsfw option to create your copy",
         "packImportAlreadyRunning": "An import is already in progress for this Telegram pack. Please wait for it to finish.",
-        "invalidUrl": "A megadott Telegram csomag URL érvénytelen",
-        "importFailed": "Az importálás nem sikerült, kérlek próbálkozz újra később",
-        "importProgress": "Matricák importálása… ({{current}}/{{total}})",
-        "finalizingImport": "Importálás véglegesítése…",
-        "rollbackProgress": "Az importálás véglegesítése nem sikerült. Ideiglenes fájlok törlése… ({{current}}/{{total}})",
-        "imported": "Az importálás sikeresen megtörtént",
+        "invalidUrl": "The provided Telegram pack URL is invalid",
+        "importFailed": "The import failed, please try again later",
+        "importProgress": "Importing stickers… ({{current}}/{{total}})",
+        "finalizingImport": "Finalizing import…",
+        "rollbackProgress": "Finalizing import failed. Deleting temporary files… ({{current}}/{{total}})",
+        "imported": "The import completed successfully",
         "importQueued": "Import queued…",
         "importAlreadyRunning": "You already have an import in progress. Please wait for it to finish before starting another."
       },
       "options": {
         "url": {
           "name": "url",
-          "description": "A Telegram matricacsomag URL-js"
+          "description": "URL of the Telegram sticker pack"
         },
         "nsfw": {
           "name": "nsfw",
@@ -102,49 +102,49 @@
       }
     },
     "create-sticker": {
-      "name": "matrica-létrehozás",
-      "description": "Új matrica létrehozása",
+      "name": "create-sticker",
+      "description": "Create new sticker",
       "responses": {
-        "noPacks": "Új matrica létrehozásához először létre kell hoznod legalább egy matricacsomagot",
-        "invalidPack": "Nem található matricacsomag a megadott néven",
-        "nameTooShort": "A megadott matrica név túl rövid (minimum {{min}} karakter)",
-        "nameTooLong": "A megadott matrica név túl hosszú (maximum {{max}} karakter)",
-        "invalidName": "A megadott matrica név az alábbi érvénytelen karakter(eke)t tartalmazza: {{chars}}",
-        "duplicateName": "Már létezik egy ilyen nevű matrica ebben a matricacsomagban, kérlek válassz másik nevet",
-        "missingFile": "Fel kell töltened egy fájlt a matricához",
-        "invalidUrl": "A megadott URL érvénytelen",
-        "missingSource": "A matrica bemeneti forrása hiányzik",
-        "created": "Új matrica létrehozva {{name}} néven"
+        "noPacks": "You must first create at least one sticker pack before creating a new sticker",
+        "invalidPack": "The selected pack could not be found",
+        "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker name contains the following invalid character(s): {{chars}}",
+        "duplicateName": "A sticker with the same name already exists in this pack, please choose a different one",
+        "missingFile": "You must upload a file for the sticker",
+        "invalidUrl": "The provided URL is invalid",
+        "missingSource": "Sticker input source selection is missing",
+        "created": "New sticker created with name {{name}}"
       },
       "components": {
-        "createStickerModalTitle": "Sticker részletei",
-        "packLabel": "Matricacsomag kiválasztása",
-        "packDescription": "Válaszd ki a matricacsomagot amibe a matrica kerüljön",
-        "nameLabel": "Matrica neve",
-        "nameDescription": "Adj meg egy nevet a matricának, hogy később könnyen tudd használni",
-        "altLabel": "Matrica leírása",
-        "altDescription": "Megadhatsz egy hosszabb leírást a matricának, ami leírja, mi látható a képen",
-        "fileLabel": "Matrica fájl",
-        "fileDescription": "Töltsd fel a képet a matricához. Vagy ez, vagy az URL kötelező.",
-        "urlLabel": "Matrica URL",
-        "urlDescription": "Add meg az URL-t a matricához. Hagyd üresen, ha fájlt szeretnél feltölteni.",
-        "urlPlaceholder": "https://example.com/matrica.png"
+        "createStickerModalTitle": "Sticker details",
+        "packLabel": "Choose sticker pack",
+        "packDescription": "Select the sticker pack where this sticker will be added",
+        "nameLabel": "Sticker name",
+        "nameDescription": "Enter a name for the sticker to make it easier to use later",
+        "altLabel": "Sticker description",
+        "altDescription": "Enter an optional, longer description for the sticker which describes what is on the image",
+        "fileLabel": "Sticker file",
+        "fileDescription": "Upload the image file for the sticker. Either this or the URL is required.",
+        "urlLabel": "Sticker URL",
+        "urlDescription": "Specify the URL for the sticker. Leave blank if you would like to upload a file.",
+        "urlPlaceholder": "https://example.com/sticker.png"
       },
       "options": {}
     },
     "nsfw-pack": {
-      "name": "nsfw-csomag",
-      "description": "Megjeleníti a csomag matricáit (NSFW csomagokból is)"
+      "name": "nsfw-pack",
+      "description": "Displays stickers from a pack (including from NSFW packs)"
     },
     "pack": {
-      "name": "csomag",
-      "description": "Megjeleníti a csomag matricáit",
+      "name": "pack",
+      "description": "Displays stickers from a pack",
       "responses": {
-        "invalidPack": "Nem található matricacsomag a megadott néven"
+        "invalidPack": "There is no pack with the specified name"
       },
       "components": {
-        "emptyPack": "Ebben a csomagban még nincs matrica",
-        "packPreview": "Alább láthatsz egy előnézetet a csomagban található matricákból",
+        "emptyPack": "There are no stickers in this pack yet",
+        "packPreview": "Below is a preview of the stickers in this pack",
         "importedFrom": "Imported from Telegram: {{url}}",
         "firstPageButton": "First",
         "previousPageButton": "Previous",
@@ -154,41 +154,41 @@
       },
       "options": {
         "name": {
-          "name": "név",
-          "description": "Csomag neve"
+          "name": "name",
+          "description": "Pack name"
         }
       }
     },
     "edit-sticker": {
-      "name": "matrica-szerkesztés",
-      "description": "Létező matrica szerkesztése",
+      "name": "edit-sticker",
+      "description": "Edit an existing sticker",
       "responses": {
-        "stickerNotFound": "A megadott matrica nem található",
-        "updated": "A(z) {{name}} nevű matrica sikeresen szerkesztve"
+        "stickerNotFound": "The specified sticker could not be found",
+        "updated": "The sticker {{name}} has been updated successfully"
       },
       "components": {
-        "editStickerModalTitle": "A(z) {{name}} matrica szerkesztése",
-        "editingText": "A(z) {{name}} matricát szerkeszted a(z) {{pack}} matricacsomagból. ha nem szeretnéd megváltoztatni a matrica képét, akkor ne adj meg URL-t és ne tölts fel fájlt.",
-        "newFileLabel": "Matricafájl frissítése",
-        "newFileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
-        "newUrlLabel": "Matrica URL frissítése",
-        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
+        "editStickerModalTitle": "Edit sticker {{name}}",
+        "editingText": "You are editing sticker {{name}} from pack {{pack}}. If you do not want to change the sticker image, do not enter an URL or upload a file.",
+        "newFileLabel": "Update sticker file",
+        "newFileDescription": "Upload a new file to change the sticker image. Leave blank to keep the image unchanged.",
+        "newUrlLabel": "Update sticker URL",
+        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged.",
         "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
         "importedNameLabel": "Sticker name (optional)",
         "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position.",
-        "ratingChoiceLabel": "Matrica tartalmi besorolása",
-        "ratingChoiceDescription": "Felülbírálja a csomag tartalmi besorolását, kizárólag ennél a matricánál.",
-        "ratingDefaultLabel": "Csomag alapértelmezés",
-        "ratingDefaultDescription": "A csomag saját tartalmi besorolásának használata ennél a matricánál",
-        "ratingSfwLabel": "Mindenki számára biztonságos",
-        "ratingSfwDescription": "Ez a matrica mindig biztonságosnak minősül, még korhatáros csomagban is",
-        "ratingNsfwLabel": "Korhatáros (NSFW)",
-        "ratingNsfwDescription": "Ez a matrica mindig korhatárosnak minősül, még mindenki számára biztonságos csomagban is"
+        "ratingChoiceLabel": "Sticker content rating",
+        "ratingChoiceDescription": "Overrides the pack's content rating for this sticker only.",
+        "ratingDefaultLabel": "Pack default",
+        "ratingDefaultDescription": "Use the pack's own content rating for this sticker",
+        "ratingSfwLabel": "Safe for all audiences",
+        "ratingSfwDescription": "Always treat this sticker as safe for all audiences, even in an age-restricted pack",
+        "ratingNsfwLabel": "Age-restricted (NSFW)",
+        "ratingNsfwDescription": "Always treat this sticker as age-restricted, even in a safe-for-all-audiences pack"
       },
       "options": {
         "name": {
-          "name": "név",
-          "description": "A szerkeszteni kívánt matrica neve"
+          "name": "name",
+          "description": "Name of the sticker you want to edit"
         }
       }
     },
@@ -250,30 +250,30 @@
       }
     },
     "reorder-sticker": {
-      "name": "matrica-átrendezés",
-      "description": "Egy matrica sorrendjének módosítása a csomagon belül",
+      "name": "reorder-sticker",
+      "description": "Reorder a sticker within its pack",
       "responses": {
-        "stickerNotFound": "A megadott matrica nem található",
-        "targetNotFound": "A megadott matrica nem található ugyanabban a csomagban",
-        "bothProvided": "Nem adhatsz meg egyszerre elé és mögé kerülő matricát is",
-        "noneProvided": "Meg kell adnod egy elé vagy egy mögé kerülő matricát",
-        "conflict": "A csomag matricái megváltoztak átrendezés közben, kérjük, próbáld újra",
-        "movedBefore": "A(z) {{name}} matrica áthelyezve a(z) {{target}} elé a(z) {{pack}} csomagban",
-        "movedAfter": "A(z) {{name}} matrica áthelyezve a(z) {{target}} mögé a(z) {{pack}} csomagban",
+        "stickerNotFound": "The specified sticker could not be found",
+        "targetNotFound": "The specified sticker could not be found in the same pack",
+        "bothProvided": "You cannot specify both a before and an after sticker at the same time",
+        "noneProvided": "You must specify either a before or an after sticker",
+        "conflict": "The pack's stickers were changed while reordering, please try again",
+        "movedBefore": "Moved {{name}} to before {{target}} in pack {{pack}}",
+        "movedAfter": "Moved {{name}} to after {{target}} in pack {{pack}}",
         "importedStickerImmutable": "Imported stickers cannot be reordered because their order is managed by the Telegram pack they come from"
       },
       "options": {
         "sticker": {
-          "name": "matrica",
-          "description": "Az átrendezni kívánt matrica neve"
+          "name": "sticker",
+          "description": "Name of the sticker you want to reorder"
         },
         "before": {
-          "name": "elé",
-          "description": "A matrica áthelyezése ez elé a matrica elé"
+          "name": "before",
+          "description": "Move the sticker before this sticker"
         },
         "after": {
-          "name": "mögé",
-          "description": "A matrica áthelyezése ez mögé a matrica mögé"
+          "name": "after",
+          "description": "Move the sticker after this sticker"
         }
       }
     },
@@ -353,48 +353,48 @@
       }
     },
     "delete-sticker": {
-      "name": "matrica-törlés",
-      "description": "Létező matrica törlése",
+      "name": "delete-sticker",
+      "description": "Delete an existing sticker",
       "responses": {
-        "stickerNotFound": "A megadott matrica nem található",
+        "stickerNotFound": "The specified sticker could not be found",
         "importedSticker": "Imported stickers cannot be deleted individually. They disappear when removed from the Telegram pack, or you can delete your copy of the whole pack.",
-        "deleteFailed": "Váratlan hiba miatt nem sikerült törölni a matricát, kérjük, próbáld újra később.",
-        "unsupportedMethod": "A megadott törlési módszer ({{method}}) nem támogatott (még).",
-        "deleted": "A(z) {{name}} nevű matrica sikeresen törölve"
+        "deleteFailed": "Could not delete the sticker due to an unexpected error, please try again later",
+        "unsupportedMethod": "The provided deletion method ({{method}}) is not (yet) supported",
+        "deleted": "The sticker {{name}} has been deleted successfully"
       },
       "components": {
-        "deleteStickerModalTitle": "A(z) {{name}} matrica törlése",
-        "deletingText": "A(z) {{name}} matricát készülsz törölni a(z) {{pack}} csomagból.",
-        "deletionMethodLabel": "Törlési módszer kiválasztása",
-        "deletionMethodDescription": "Válaszd ki, hogyan szeretnéd törölni a matricát",
-        "stickerOnlyMethodLabel": "Csak matrica törlése",
-        "stickerOnlyMethodDescription": "Az alapértelmezett módszer, amely törli a matricát, és nem változtatja meg a korábban elküldött üzeneteket",
-        "deleteMessagesMethodLabel": "Matrica és meglévő üzenetek törlése",
-        "deleteMessagesMethodDescription": "A matrica törlése mellett az azt tartalmazó üzenetek is törlődnek, amiket az alkalmazás küldött",
-        "limitationsText": "A Discord API korlátai miatt a 15 percnél régebbi üzenetek nem mindig szerkeszthetők/frissíthetők automatikusan. Az \"{{updateMessageCommandName}}\" környezeti menü paranccsal törölheted azokat az üzeneteket, amelyek nem törlődtek automatikusan. Ez a parancs privát üzenetekben nem működik a Discord API korlátai miatt."
+        "deleteStickerModalTitle": "Delete sticker {{name}}",
+        "deletingText": "You are about to delete sticker {{name}} from pack {{pack}}.",
+        "deletionMethodLabel": "Choose deletion method",
+        "deletionMethodDescription": "Select how the sticker should be deleted",
+        "stickerOnlyMethodLabel": "Delete sticker only",
+        "stickerOnlyMethodDescription": "The default method, which deletes the sticker and does not change previously sent messages",
+        "deleteMessagesMethodLabel": "Delete sticker and existing messages",
+        "deleteMessagesMethodDescription": "In addition to deleting the sticker, messages sent by the app that contain it will be deleted",
+        "limitationsText": "Due to Discord API limitations, messages older than 15 minutes cannot always be edited/updated automatically. Use the \"{{updateMessageCommandName}}\" context menu command in server to delete messages that were not deleted automatically after deletion. Using this command in DMs is not supported due to Discord API limitations."
       },
       "options": {
         "name": {
-          "name": "név",
-          "description": "A törölni kívánt matrica neve"
+          "name": "name",
+          "description": "Name of the sticker you want to delete"
         }
       }
     },
     "Update Message": {
-      "name": "Üzenet frissítése",
+      "name": "Update Message",
       "responses": {
-        "upToDate": "Ez az üzenet már a lehető legfrissebb"
+        "upToDate": "This message is already up to date"
       }
     },
     "Sticker Details": {
-      "name": "Sticker részletei",
+      "name": "Sticker Details",
       "responses": {
-        "alreadyDeleted": "már törölve",
-        "name": "Név",
-        "pack": "Csomag",
-        "uploadedBy": "Feltöltötte",
-        "latestImage": "Legújabb kép",
-        "outdatedNote": "Lehet, hogy a forrás üzenet elavult. Használd az **{{updateMessageCommand}}** környezeti menü menüparancsot a frisítéshez."
+        "alreadyDeleted": "already deleted",
+        "name": "Name",
+        "pack": "Pack",
+        "uploadedBy": "Uploaded by",
+        "latestImage": "Latest image",
+        "outdatedNote": "The source message may be outdated, use the **{{updateMessageCommand}}** context menu command to refresh it."
       }
     }
   }

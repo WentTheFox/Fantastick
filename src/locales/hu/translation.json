@@ -118,8 +118,6 @@
       },
       "components": {
         "createStickerModalTitle": "Sticker részletei",
-        "packLabel": "Matricacsomag kiválasztása",
-        "packDescription": "Válaszd ki a matricacsomagot amibe a matrica kerüljön",
         "nameLabel": "Matrica neve",
         "nameDescription": "Adj meg egy nevet a matricának, hogy később könnyen tudd használni",
         "altLabel": "Matrica leírása",
@@ -130,7 +128,12 @@
         "urlDescription": "Add meg az URL-t a matricához. Hagyd üresen, ha fájlt szeretnél feltölteni.",
         "urlPlaceholder": "https://example.com/matrica.png"
       },
-      "options": {}
+      "options": {
+        "pack": {
+          "name": "pack",
+          "description": "The pack to add this sticker to"
+        }
+      }
     },
     "nsfw-pack": {
       "name": "nsfw-csomag",

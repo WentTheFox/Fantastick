@@ -118,8 +118,6 @@
       },
       "components": {
         "createStickerModalTitle": "Sticker details",
-        "packLabel": "Choose sticker pack",
-        "packDescription": "Select the sticker pack where this sticker will be added",
         "nameLabel": "Sticker name",
         "nameDescription": "Enter a name for the sticker to make it easier to use later",
         "altLabel": "Sticker description",
@@ -130,7 +128,12 @@
         "urlDescription": "Specify the URL for the sticker. Leave blank if you would like to upload a file.",
         "urlPlaceholder": "https://example.com/sticker.png"
       },
-      "options": {}
+      "options": {
+        "pack": {
+          "name": "pack",
+          "description": "The pack to add this sticker to"
+        }
+      }
     },
     "nsfw-pack": {
       "name": "nsfw-pack",

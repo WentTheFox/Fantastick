@@ -26,6 +26,10 @@ export const enum EditStickerCommandOptionName {
   NAME = 'name',
 }
 
+export const enum CreateStickerCommandOptionName {
+  PACK = 'pack',
+}
+
 export const enum DeleteStickerCommandOptionName {
   NAME = 'name',
 }
@@ -64,6 +68,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandOptionName,
+  [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandOptionName,
   [BotChatInputCommandName.IMPORT_TELEGRAM_PACK]: ImportCommandOptionName,
   [BotChatInputCommandName.PACK]: PackCommandOptionName,
   [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
@@ -220,8 +225,6 @@ interface ComponentsMap {
   ],
   [BotChatInputCommandName.CREATE_STICKER]: [
     'createStickerModalTitle',
-    'packLabel',
-    'packDescription',
     'nameLabel',
     'nameDescription',
     'altLabel',

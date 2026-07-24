@@ -46,7 +46,7 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
     include: { telegramSticker: true, pack: true },
     take: 1,
   });
-  if (!stickers) {
+  if (stickers.length === 0) {
     await interactionReply(context, interaction, {
       content: t('commands.sticker.responses.invalidName'),
       flags: MessageFlags.Ephemeral,

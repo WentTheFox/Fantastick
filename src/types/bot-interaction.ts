@@ -26,7 +26,7 @@ export const enum BotChatInputCommandName {
   DELETE_PACK = 'delete-pack',
   EDIT_PACK = 'edit-pack',
   REORDER_STICKER = 'reorder-sticker',
-  MASS_RENAME_STICKERS = 'mass-rename-stickers',
+  MASS_EDIT_STICKERS = 'mass-edit-stickers',
   PUBLISH_IMPORTED_PACK = 'publish-imported-pack',
 }
 
@@ -42,7 +42,7 @@ export const enum BotModalId {
   CREATE_PACK = 'createPackModal',
   DELETE_PACK = 'deletePackModal',
   EDIT_PACK = 'editPackModal',
-  MASS_RENAME_STICKER = 'massRenameStickerModal',
+  MASS_EDIT_STICKER = 'massEditStickerModal',
   PUBLISH_EDIT_STICKER = 'publishEditStickerModal',
 }
 
@@ -53,9 +53,9 @@ export const enum BotMessageComponentCustomId {
   PACK_PAGE_PREV = 'pack-page-prev',
   PACK_PAGE_NEXT = 'pack-page-next',
   PACK_PAGE_LAST = 'pack-page-last',
-  MASS_RENAME_OPEN = 'mass-rename-open',
-  MASS_RENAME_PREV = 'mass-rename-prev',
-  MASS_RENAME_NEXT = 'mass-rename-next',
+  MASS_EDIT_OPEN = 'mass-edit-open',
+  MASS_EDIT_PREV = 'mass-edit-prev',
+  MASS_EDIT_NEXT = 'mass-edit-next',
   PUBLISH_OPEN = 'publish-open',
   PUBLISH_PREV = 'publish-prev',
   PUBLISH_NEXT = 'publish-next',

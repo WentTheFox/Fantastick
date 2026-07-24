@@ -1,5 +1,5 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
-import { TextInputComponentData } from 'discord.js';
+import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
@@ -8,6 +8,7 @@ import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
+import { EditStickerRatingOption } from '../constants/edit-sticker-modal-fields.js';
 import {
   CreateStickerModalCustomIds,
   createStickerModalHandler,
@@ -96,6 +97,35 @@ export const createStickerCommand: BotChatInputCommand = {
             maxLength: stickerAltOptionMeta.max_length,
             required: false,
           } as TextInputComponentData,
+        },
+        {
+          type: ComponentType.Label,
+          label: t('commands.edit-sticker.components.ratingChoiceLabel'),
+          description: t('commands.edit-sticker.components.ratingChoiceDescription'),
+          component: {
+            type: ComponentType.RadioGroup,
+            customId: CreateStickerModalCustomIds.RATING_INPUT,
+            options: [
+              {
+                value: EditStickerRatingOption.DEFAULT,
+                label: t('commands.edit-sticker.components.ratingDefaultLabel'),
+                description: t('commands.edit-sticker.components.ratingDefaultDescription'),
+                default: true,
+              },
+              {
+                value: EditStickerRatingOption.SFW,
+                label: t('commands.edit-sticker.components.ratingSfwLabel'),
+                description: t('commands.edit-sticker.components.ratingSfwDescription'),
+                default: false,
+              },
+              {
+                value: EditStickerRatingOption.NSFW,
+                label: t('commands.edit-sticker.components.ratingNsfwLabel'),
+                description: t('commands.edit-sticker.components.ratingNsfwDescription'),
+                default: false,
+              },
+            ],
+          } as unknown as ComponentInLabelData,
         },
         {
           type: ComponentType.Label,

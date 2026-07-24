@@ -8,7 +8,7 @@ import {
   getPublishStickerContent,
   isStickerPublishReady,
 } from '../utils/get-publish-pack-content.js';
-import { findOrderedPackStickers } from '../utils/get-mass-rename-content.js';
+import { findOrderedPackStickers } from '../utils/get-mass-edit-content.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';

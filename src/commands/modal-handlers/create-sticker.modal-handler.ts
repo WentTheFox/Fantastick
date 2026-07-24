@@ -11,6 +11,7 @@ import { ModalHandler } from '../../types/bot-interaction.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
+import { parseRatingOption } from '../../constants/edit-sticker-modal-fields.js';
 import {
   normalizeStickerDescriptionInput,
 } from '../../utils/normalize-sticker-description-input.js';
@@ -22,6 +23,7 @@ export enum CreateStickerModalCustomIds {
   ALT_INPUT = 'altInput',
   FILE_INPUT = 'fileInput',
   URL_INPUT = 'urlInput',
+  RATING_INPUT = 'ratingInput',
 }
 
 export const createStickerModalHandler: ModalHandler = async (interaction, context) => {
@@ -167,6 +169,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
   }
   const order = await db.sticker.count({ where: { packId: userPack.id } });
   const description = normalizeStickerDescriptionInput(data[CreateStickerModalCustomIds.ALT_INPUT]);
+  const nsfwOverride = parseRatingOption(data[CreateStickerModalCustomIds.RATING_INPUT]);
   const sticker = await db.sticker.create({
     data: {
       id: stickerId,
@@ -177,6 +180,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
       deleteUrl: stickerDeleteUrl,
       createdBy: user.id,
       order,
+      nsfwOverride,
     },
     include: { telegramSticker: true },
   });

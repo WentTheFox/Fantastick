@@ -1,28 +1,28 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { getMassRenameStickersOptions } from '../options/mass-rename-stickers.options.js';
+import { getMassEditStickersOptions } from '../options/mass-edit-stickers.options.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
-import { MassRenameStickersCommandOptionName } from '../types/localization.js';
+import { MassEditStickersCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
-import { findOrderedPackStickers, getMassRenameStickerContent } from '../utils/get-mass-rename-content.js';
+import { findOrderedPackStickers, getMassEditStickerContent } from '../utils/get-mass-edit-content.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import {
-  massRenameStickerModalHandler,
-} from './modal-handlers/mass-rename-sticker.modal-handler.js';
+  massEditStickerModalHandler,
+} from './modal-handlers/mass-edit-sticker.modal-handler.js';
 
-export const massRenameStickersCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.MASS_RENAME_STICKERS,
+export const massEditStickersCommand: BotChatInputCommand = {
+  name: BotChatInputCommandName.MASS_EDIT_STICKERS,
   getDefinition: (t) => {
     if (!t) throw new Error('Missing translation function');
     return {
-      ...getLocalizedObject('description', (lng) => t('commands.mass-rename-stickers.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.mass-rename-stickers.name', { lng })),
-      options: getMassRenameStickersOptions(t),
+      ...getLocalizedObject('description', (lng) => t('commands.mass-edit-stickers.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.mass-edit-stickers.name', { lng })),
+      options: getMassEditStickersOptions(t),
     };
   },
   autocomplete: {
-    [MassRenameStickersCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
+    [MassEditStickersCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },
   async handle(interaction, context) {
     const { t, db } = context;
@@ -35,7 +35,7 @@ export const massRenameStickersCommand: BotChatInputCommand = {
       return;
     }
 
-    const packId = interaction.options.getString(MassRenameStickersCommandOptionName.PACK, true);
+    const packId = interaction.options.getString(MassEditStickersCommandOptionName.PACK, true);
     const pack = await db.pack.findFirst({
       where: { id: packId, deletedAt: null, createdBy: user.id },
       include: { telegramPack: true },
@@ -43,7 +43,7 @@ export const massRenameStickersCommand: BotChatInputCommand = {
 
     if (!pack) {
       await interactionReply(context, interaction, {
-        content: t('commands.mass-rename-stickers.responses.packNotFound'),
+        content: t('commands.mass-edit-stickers.responses.packNotFound'),
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -52,16 +52,16 @@ export const massRenameStickersCommand: BotChatInputCommand = {
     const stickers = await findOrderedPackStickers(db, pack);
     if (stickers.length === 0) {
       await interactionReply(context, interaction, {
-        content: t('commands.mass-rename-stickers.responses.emptyPack'),
+        content: t('commands.mass-edit-stickers.responses.emptyPack'),
         flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
     // The user-facing start position is 1-based, matching the position shown in the message
-    const start = interaction.options.getInteger(MassRenameStickersCommandOptionName.START) ?? 1;
+    const start = interaction.options.getInteger(MassEditStickersCommandOptionName.START) ?? 1;
     const startIndex = Math.min(start - 1, stickers.length - 1);
-    const { components, files } = getMassRenameStickerContent({
+    const { components, files } = getMassEditStickerContent({
       t,
       pack,
       sticker: stickers[startIndex],
@@ -75,6 +75,6 @@ export const massRenameStickersCommand: BotChatInputCommand = {
     });
   },
   modal: {
-    [BotModalId.MASS_RENAME_STICKER]: massRenameStickerModalHandler,
+    [BotModalId.MASS_EDIT_STICKER]: massEditStickerModalHandler,
   },
 };

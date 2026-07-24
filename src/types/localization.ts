@@ -44,7 +44,7 @@ export const enum ReorderStickerCommandOptionName {
   AFTER = 'after',
 }
 
-export const enum MassRenameStickersCommandOptionName {
+export const enum MassEditStickersCommandOptionName {
   PACK = 'pack',
   START = 'start',
 }
@@ -65,7 +65,7 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandOptionName,
-  [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandOptionName,
+  [BotChatInputCommandName.MASS_EDIT_STICKERS]: MassEditStickersCommandOptionName,
   [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandOptionName,
 }
 
@@ -162,7 +162,7 @@ export const enum ReorderStickerCommandResponse {
   importedStickerImmutable = 'importedStickerImmutable',
 }
 
-export const enum MassRenameStickersCommandResponse {
+export const enum MassEditStickersCommandResponse {
   packNotFound = 'packNotFound',
   emptyPack = 'emptyPack',
   stickerNotFound = 'stickerNotFound',
@@ -193,7 +193,7 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandResponse,
-  [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandResponse,
+  [BotChatInputCommandName.MASS_EDIT_STICKERS]: MassEditStickersCommandResponse,
   [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandResponse,
 }
 
@@ -292,14 +292,12 @@ interface ComponentsMap {
     'nsfwFalseLabel',
     'nsfwFalseDescription',
   ],
-  [BotChatInputCommandName.MASS_RENAME_STICKERS]: [
-    'renamingText',
+  [BotChatInputCommandName.MASS_EDIT_STICKERS]: [
+    'reviewingText',
     'currentNameText',
-    'renamingModalText',
-    'renameButton',
+    'editButton',
     'previousButton',
     'nextButton',
-    'renameModalTitle',
     'allDoneText',
   ],
   [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: [

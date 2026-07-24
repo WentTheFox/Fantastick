@@ -8,7 +8,7 @@ import {
   stickerNameOptionMeta,
 } from '../options/metadata/sticker-name.option-meta.js';
 import { BotMessageComponentCustomId } from '../types/bot-interaction.js';
-import { findOrderedPackStickers } from './get-mass-rename-content.js';
+import { findOrderedPackStickers } from './get-mass-edit-content.js';
 import { FormattablePack, getFormattedPackName } from './get-formatted-pack-name.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
 

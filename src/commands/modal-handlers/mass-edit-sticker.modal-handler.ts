@@ -1,13 +1,12 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
 import { applyStickerModalEdit } from '../../utils/apply-sticker-edit.js';
-import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
+import { getMassEditStepContent } from '../../utils/get-mass-edit-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed } from '../../utils/post-sticker-to-feed.js';
 
-export const editStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
+export const massEditStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
   const { t, db } = context;
   const user = await updateOrCreateUser(context, interaction);
   if (user.readOnly) {
@@ -25,7 +24,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   if (!sticker) {
     await interactionReply(context, interaction, {
-      content: t('commands.edit-sticker.responses.stickerNotFound'),
+      content: t('commands.mass-edit-stickers.responses.stickerNotFound'),
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -34,12 +33,21 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
   const result = await applyStickerModalEdit(interaction, context, sticker);
   if (!result) return;
 
-  await interactionReply(context, interaction, {
-    content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.edit-sticker.responses.updated', {
-      name: `\`${getFormattedStickerName(result.sticker)}\``,
-    })}`,
-    flags: MessageFlags.Ephemeral,
+  const nextContent = await getMassEditStepContent({
+    t,
+    db,
+    pack: result.sticker.pack,
+    currentStickerId: result.sticker.id,
+    direction: 'next',
   });
+  if (interaction.isFromMessage()) {
+    await interaction.update({ flags: MessageFlags.IsComponentsV2, ...nextContent });
+  } else {
+    await interactionReply(context, interaction, {
+      flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
+      ...nextContent,
+    });
+  }
 
   await postStickerToFeed({
     context,

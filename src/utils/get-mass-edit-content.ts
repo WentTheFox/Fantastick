@@ -8,7 +8,7 @@ import { FormattablePack, getFormattedPackName } from './get-formatted-pack-name
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
 import { resolveStickerNsfw } from './resolve-sticker-nsfw.js';
 
-export type MassRenamePack = Pick<Pack, 'id' | 'telegramPackId' | 'nsfw'> & FormattablePack;
+export type MassEditPack = Pick<Pack, 'id' | 'telegramPackId' | 'nsfw'> & FormattablePack;
 
 export const findOrderedPackStickers = (db: PrismaClient, pack: Pick<Pack, 'id' | 'telegramPackId'>) => db.sticker.findMany({
   where: { deletedAt: null, packId: pack.id },
@@ -17,15 +17,15 @@ export const findOrderedPackStickers = (db: PrismaClient, pack: Pick<Pack, 'id' 
   orderBy: pack.telegramPackId !== null ? { telegramSticker: { order: 'asc' } } : { order: 'asc' },
 });
 
-interface GetMassRenameStickerContentOptions {
+interface GetMassEditStickerContentOptions {
   t: TFunction;
-  pack: MassRenamePack;
+  pack: MassEditPack;
   sticker: Sticker & { telegramSticker: TelegramSticker | null };
   index: number;
   total: number;
 }
 
-export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: GetMassRenameStickerContentOptions) => {
+export const getMassEditStickerContent = ({ t, pack, sticker, index, total }: GetMassEditStickerContentOptions) => {
   const { files, items } = mapStickersToGalleryItems([sticker], resolveStickerNsfw(sticker, pack));
 
   // Imported stickers are identified by their emoji and position on the position line;
@@ -37,13 +37,13 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
     {
       type: ComponentType.TextDisplay,
       content: [
-        t('commands.mass-rename-stickers.components.renamingText', {
+        t('commands.mass-edit-stickers.components.reviewingText', {
           pack: getFormattedPackName(pack),
           position: index + 1,
           total,
           identifier: stickerIdentifier,
         }),
-        ...(sticker.name ? [t('commands.mass-rename-stickers.components.currentNameText', {
+        ...(sticker.name ? [t('commands.mass-edit-stickers.components.currentNameText', {
           name: `\`${sticker.name}\``,
         })] : []),
       ].join('\n'),
@@ -57,23 +57,23 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
       components: [
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.MASS_RENAME_PREV}:${sticker.id}`,
-          label: t('commands.mass-rename-stickers.components.previousButton'),
+          custom_id: `${BotMessageComponentCustomId.MASS_EDIT_PREV}:${sticker.id}`,
+          label: t('commands.mass-edit-stickers.components.previousButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.ARROW_LEFT },
           disabled: index <= 0,
         },
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.MASS_RENAME_OPEN}:${sticker.id}`,
-          label: t('commands.mass-rename-stickers.components.renameButton'),
+          custom_id: `${BotMessageComponentCustomId.MASS_EDIT_OPEN}:${sticker.id}`,
+          label: t('commands.mass-edit-stickers.components.editButton'),
           style: ButtonStyle.Primary,
           emoji: { name: EmojiCharacters.PENCIL },
         },
         {
           type: ComponentType.Button,
-          custom_id: `${BotMessageComponentCustomId.MASS_RENAME_NEXT}:${sticker.id}`,
-          label: t('commands.mass-rename-stickers.components.nextButton'),
+          custom_id: `${BotMessageComponentCustomId.MASS_EDIT_NEXT}:${sticker.id}`,
+          label: t('commands.mass-edit-stickers.components.nextButton'),
           style: ButtonStyle.Secondary,
           emoji: { name: EmojiCharacters.ARROW_RIGHT },
         },
@@ -84,11 +84,11 @@ export const getMassRenameStickerContent = ({ t, pack, sticker, index, total }: 
   return { components, files };
 };
 
-export const getMassRenameDoneContent = (t: TFunction, pack: MassRenamePack) => ({
+export const getMassEditDoneContent = (t: TFunction, pack: MassEditPack) => ({
   components: [
     {
       type: ComponentType.TextDisplay,
-      content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.mass-rename-stickers.components.allDoneText', {
+      content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.mass-edit-stickers.components.allDoneText', {
         pack: getFormattedPackName(pack),
       })}`,
     },
@@ -96,25 +96,25 @@ export const getMassRenameDoneContent = (t: TFunction, pack: MassRenamePack) => 
   files: [],
 });
 
-interface GetMassRenameStepContentOptions {
+interface GetMassEditStepContentOptions {
   t: TFunction;
   db: PrismaClient;
-  pack: MassRenamePack;
+  pack: MassEditPack;
   currentStickerId: string;
   direction: 'prev' | 'next';
 }
 
 // Builds the message content for the sticker before/after the current one, or the
 // completion text once the end of the pack is reached
-export const getMassRenameStepContent = async ({ t, db, pack, currentStickerId, direction }: GetMassRenameStepContentOptions) => {
+export const getMassEditStepContent = async ({ t, db, pack, currentStickerId, direction }: GetMassEditStepContentOptions) => {
   const stickers = await findOrderedPackStickers(db, pack);
   const currentIndex = stickers.findIndex(sticker => sticker.id === currentStickerId);
   const targetIndex = direction === 'prev' ? Math.max(0, currentIndex - 1) : currentIndex + 1;
   if (currentIndex === -1 || targetIndex >= stickers.length) {
-    return getMassRenameDoneContent(t, pack);
+    return getMassEditDoneContent(t, pack);
   }
 
-  return getMassRenameStickerContent({
+  return getMassEditStickerContent({
     t,
     pack,
     sticker: stickers[targetIndex],

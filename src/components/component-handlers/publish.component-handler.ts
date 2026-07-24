@@ -13,7 +13,7 @@ import {
   getPublishStepContent,
   isStickerPublishReady,
 } from '../../utils/get-publish-pack-content.js';
-import { findOrderedPackStickers } from '../../utils/get-mass-rename-content.js';
+import { findOrderedPackStickers } from '../../utils/get-mass-edit-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 import { PackSnapshot, postPackToFeed } from '../../utils/post-pack-to-feed.js';

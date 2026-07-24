@@ -3,6 +3,8 @@ import { WorkHandler } from 'pg-boss/dist/types.js';
 export enum QueueType {
   UpdateMessage = 'update-message',
   TelegramImport = 'telegram-import',
+  CleanupOrphanedTelegramPacks = 'cleanup-orphaned-telegram-packs',
+  HardDeleteOldStickers = 'hard-delete-old-stickers',
 }
 
 export interface QueueReqData {
@@ -19,6 +21,10 @@ export interface QueueReqData {
   [QueueType.TelegramImport]: {
     importJobId: string;
   };
+  // Both maintenance jobs run on a daily schedule (plus once at startup) and sweep the
+  // whole table rather than targeting a single record, so neither needs job data
+  [QueueType.CleanupOrphanedTelegramPacks]: Record<string, never>;
+  [QueueType.HardDeleteOldStickers]: Record<string, never>;
 }
 
 export type QueueHandler<Type extends QueueType> = WorkHandler<QueueReqData[Type], void>;

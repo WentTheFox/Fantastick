@@ -5,8 +5,18 @@ import { initI18next } from '../constants/locales.js';
 import { env } from '../env.js';
 import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueReqData, QueueType } from '../types/queue.js';
+import { cleanupOrphanedTelegramPacksQueueHandler } from './queue-handlers/cleanup-orphaned-telegram-packs.queue-handler.js';
+import { hardDeleteOldStickersQueueHandler } from './queue-handlers/hard-delete-old-stickers.queue-handler.js';
 import { telegramImportQueueHandler } from './queue-handlers/telegram-import.queue-handler.js';
 import { updateMessageQueueHandler } from './queue-handlers/update-message.queue-handler.js';
+
+// Run daily at 03:00 UTC (low-traffic hours), plus once immediately at startup so a
+// freshly deployed/restarted app doesn't wait a full day for its first sweep
+const dailyMaintenanceQueues: QueueType[] = [
+  QueueType.CleanupOrphanedTelegramPacks,
+  QueueType.HardDeleteOldStickers,
+];
+const dailyMaintenanceCron = '0 3 * * *';
 
 export class QueueManager {
   protected readonly boss: PgBoss;
@@ -24,6 +34,8 @@ export class QueueManager {
     this.queueWorkers = {
       [QueueType.UpdateMessage]: updateMessageQueueHandler,
       [QueueType.TelegramImport]: telegramImportQueueHandler,
+      [QueueType.CleanupOrphanedTelegramPacks]: cleanupOrphanedTelegramPacksQueueHandler,
+      [QueueType.HardDeleteOldStickers]: hardDeleteOldStickersQueueHandler,
     };
     this.i18next = initI18next(this.logger);
   }
@@ -41,6 +53,16 @@ export class QueueManager {
   protected async setupQueues(): Promise<void> {
     await Promise.all(Object.keys(this.queueWorkers).map(queueType => {
       return this.boss.createQueue(queueType);
+    }));
+  }
+
+  // Only called by the queue-worker process (the one actually running `.work()`), not
+  // by every place that constructs a QueueManager just to `.send()` jobs — otherwise
+  // every shard would independently schedule/kick off the same maintenance sweep
+  async setupDailyMaintenance(): Promise<void> {
+    await Promise.all(dailyMaintenanceQueues.map(async (queueType) => {
+      await this.boss.schedule(queueType, dailyMaintenanceCron, {});
+      await this.send(queueType, {});
     }));
   }
 

@@ -41,10 +41,6 @@ const mapDescription = (description: string | null, prefix: string) => (
     `**${prefix}:** _(empty)_`,
   ]
 );
-const wrapUrlInSpoiler = (spoiler: boolean, url: string) => {
-  return spoiler ? `||${url}||` : url;
-};
-
 interface PostStickerToFeedParams {
   context: InteractionContext;
   interaction: ChatInputCommandInteraction | ModalSubmitInteraction;
@@ -92,8 +88,8 @@ export const postStickerToFeed = async ({
       `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
       ...(sticker.deletedBy ? [`**Deleted by:** ${userMention(String(sticker.deletedBy))} (\`${sticker.deletedBy}\`)`] : []),
       `**Pack:** \`${wrapUrlsInAngleBrackets(userPack.telegramPack?.title ?? userPack.name)}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
-      ...(urlChanged ? [`**Old URL:** ${snapshot.url ? wrapUrlInSpoiler(spoiler, snapshot.url) : '_(none)_'}`, `**New URL:** \`${getStickerUrl(sticker)}\``] : []),
-      `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => wrapUrlInSpoiler(spoiler, item.media.url)).join(' ')}`,
+      ...(urlChanged ? [`**Old URL:** ${snapshot.url || '_(none)_'}`, `**New URL:** \`${getStickerUrl(sticker)}\``] : []),
+      `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => item.media.url).join(' ')}`,
     ].join('\n'),
     files,
   });

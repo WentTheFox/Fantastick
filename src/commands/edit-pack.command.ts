@@ -1,5 +1,6 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
+import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { editPackOptions } from '../options/edit-pack.options.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
@@ -11,7 +12,7 @@ import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { getPackNsfwEmoji } from '../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../utils/interaction-reply.js';
-import { updateOrCreateUser } from '../utils/messaging.js';
+import { truncateToMaximumLength, updateOrCreateUser } from '../utils/messaging.js';
 import {
   EditPackModalBooleanOption,
   EditPackModalCustomIds,
@@ -58,7 +59,7 @@ export const editPackCommand: BotChatInputCommand = {
 
     await interaction.showModal({
       customId: `${BotModalId.EDIT_PACK}:${pack.id}`,
-      title: t('commands.edit-pack.components.editPackModalTitle', { name: getPackDisplayName(pack) }),
+      title: truncateToMaximumLength(t('commands.edit-pack.components.editPackModalTitle', { name: getPackDisplayName(pack) }), MODAL_TITLE_MAX_LENGTH),
       components: [
         // Imported pack names come from Telegram and cannot be edited here
         ...(pack.telegramPackId !== null ? [

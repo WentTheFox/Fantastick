@@ -1,6 +1,7 @@
 import { ComponentType, MessageFlags } from 'discord-api-types/v10';
 import { ComponentInLabelData } from 'discord.js';
 import { getDeleteStickerOptions } from '../options/delete-sticker.options.js';
+import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { DeleteStickerCommandOptionName } from '../types/localization.js';
 import {
@@ -10,7 +11,7 @@ import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
-import { updateOrCreateUser } from '../utils/messaging.js';
+import { truncateToMaximumLength, updateOrCreateUser } from '../utils/messaging.js';
 import {
   DeleteStickerModalCustomIds,
   deleteStickerModalHandler,
@@ -67,7 +68,7 @@ export const deleteStickerCommand: BotChatInputCommand = {
 
     await interaction.showModal({
       customId: `${BotModalId.DELETE_STICKER}:${sticker.id}`,
-      title: t('commands.delete-sticker.components.deleteStickerModalTitle', { name: getFormattedStickerName(sticker) }),
+      title: truncateToMaximumLength(t('commands.delete-sticker.components.deleteStickerModalTitle', { name: getFormattedStickerName(sticker) }), MODAL_TITLE_MAX_LENGTH),
       components: [
         {
           type: ComponentType.TextDisplay,

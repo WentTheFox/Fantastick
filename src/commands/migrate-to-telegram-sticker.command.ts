@@ -1,6 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
-import { getMigrateToTelegramStickerOptions } from '../options/migrate-to-telegram-sticker.options.js';
 import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
 import { MigrateToTelegramStickerCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
@@ -9,7 +8,6 @@ import {
 } from '../utils/autocomplete/pack-scoped-sticker.autocomplete.js';
 import { deleteStickerFile } from '../utils/delete-sticker-file.js';
 import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import { postStickerToFeed, StickerSnapshot } from '../utils/post-sticker-to-feed.js';
@@ -18,14 +16,6 @@ const stickerInclude = { pack: { include: { telegramPack: true } }, telegramStic
 
 export const migrateToTelegramStickerCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.MIGRATE_TO_TELEGRAM_STICKER,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.migrate-to-telegram-sticker.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.migrate-to-telegram-sticker.name', { lng })),
-      options: getMigrateToTelegramStickerOptions(t),
-    };
-  },
   autocomplete: {
     [MigrateToTelegramStickerCommandOptionName.SOURCE_PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true, excludeImported: true }),
     [MigrateToTelegramStickerCommandOptionName.SOURCE_STICKER]: getPackScopedStickerAutocompleteHandler(

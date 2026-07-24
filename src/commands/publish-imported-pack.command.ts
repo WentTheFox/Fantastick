@@ -1,6 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { userMention } from 'discord.js';
-import { getPublishImportedPackOptions } from '../options/publish-imported-pack.options.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { PublishImportedPackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
@@ -9,7 +8,6 @@ import {
   isStickerPublishReady,
 } from '../utils/get-publish-pack-content.js';
 import { findOrderedPackStickers } from '../utils/get-mass-edit-content.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import {
@@ -18,14 +16,6 @@ import {
 
 export const publishImportedPackCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.PUBLISH_IMPORTED_PACK,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.publish-imported-pack.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.publish-imported-pack.name', { lng })),
-      options: getPublishImportedPackOptions(t),
-    };
-  },
   autocomplete: {
     [PublishImportedPackCommandOptionName.PACK]: getPackNameAutocompleteHandler({
       nsfw: true,

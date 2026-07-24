@@ -1,5 +1,5 @@
 {
-  "name": "@wentthefox/fantastick",
+  "name": "@went.tf/fantastick",
   "version": "1.0.0",
   "description": "Discord app for managing custom stickers using slash commands",
   "author": "WentTheFox <mail@went.tf> (https://github.com/WentTheFox)",
@@ -26,7 +26,8 @@
     "@discordjs/rest": "^2.6.1",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
-    "@wentthefox-org/discord-bot-framework": "^1.2.0",
+    "@went.tf/discord-bot-framework": "^2.0.0",
+    "ajv": "^8.20.0",
     "bufferutil": "^4.1.0",
     "date-fns": "^4.4.0",
     "discord-api-types": "^0.38.49",

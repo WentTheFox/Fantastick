@@ -9,7 +9,7 @@ import type {
   NamedChatInputCommand,
   NamedComponent,
   NamedContextMenuCommand,
-} from '@wentthefox-org/discord-bot-framework/interactions';
+} from '@went.tf/discord-bot-framework/interactions';
 
 import { UserInteractionContext } from './contexts/user-interaction.context.js';
 
@@ -75,9 +75,9 @@ export type ModalHandler = FrameworkModalHandler<UserInteractionContext>;
 export type ModalHandlers = Record<string, ModalHandler>;
 export type BotMessageComponentHandler = FrameworkComponentHandler<UserInteractionContext>;
 
-export type BotChatInputCommand = NamedChatInputCommand<UserInteractionContext, BotChatInputCommandName, TFunction>;
+export type BotChatInputCommand = NamedChatInputCommand<UserInteractionContext, BotChatInputCommandName>;
 
-export type BotMessageContextMenuCommand = NamedContextMenuCommand<UserInteractionContext, BotMessageContextMenuCommandName, TFunction>;
+export type BotMessageContextMenuCommand = NamedContextMenuCommand<UserInteractionContext, BotMessageContextMenuCommandName>;
 
 export type BotMessageComponentDefinitionGetter = (t: TFunction, emojiIdMap: Record<string, string>) => APIMessageComponent;
 

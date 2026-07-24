@@ -10,7 +10,17 @@
     },
     "nsfw-sticker": {
       "name": "nsfw-matrica",
-      "description": "Matrica küldése (NSFW csomagokból is)"
+      "description": "Matrica küldése (NSFW csomagokból is)",
+      "options": {
+        "name": {
+          "name": "név",
+          "description": "Matrica neve"
+        },
+        "preview": {
+          "name": "előnézet",
+          "description": "Ha True, akkor a matrica csak számodra lesz látható"
+        }
+      }
     },
     "sticker": {
       "name": "matrica",
@@ -137,7 +147,13 @@
     },
     "nsfw-pack": {
       "name": "nsfw-csomag",
-      "description": "Megjeleníti a csomag matricáit (NSFW csomagokból is)"
+      "description": "Megjeleníti a csomag matricáit (NSFW csomagokból is)",
+      "options": {
+        "name": {
+          "name": "név",
+          "description": "Csomag neve"
+        }
+      }
     },
     "pack": {
       "name": "csomag",

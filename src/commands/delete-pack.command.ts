@@ -1,25 +1,15 @@
 import { ComponentType, MessageFlags } from 'discord-api-types/v10';
-import { deletePackOptions } from '../options/delete-pack.options.js';
 import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { DeletePackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { getFormattedPackName, getPackDisplayName } from '../utils/get-formatted-pack-name.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { truncateToMaximumLength, updateOrCreateUser } from '../utils/messaging.js';
 import { deletePackModalHandler } from './modal-handlers/delete-pack.modal-handler.js';
 
 export const deletePackCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.DELETE_PACK,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.delete-pack.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.delete-pack.name', { lng })),
-      options: deletePackOptions(t),
-    };
-  },
   autocomplete: {
     [DeletePackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },

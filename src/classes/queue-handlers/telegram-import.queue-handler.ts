@@ -7,7 +7,7 @@ import typia from 'typia';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { env } from '../../env.js';
 import { Pack, Sticker, TelegramPack, TelegramSticker } from '../../generated/prisma/client.js';
-import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 import { QueueHandler, QueueType } from '../../types/queue.js';
 import {
   convertTgsToGif,

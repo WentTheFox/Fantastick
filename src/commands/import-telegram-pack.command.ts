@@ -1,9 +1,7 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { getImportTelegramPackOptions } from '../options/import-telegram-pack.options.js';
 import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
 import { ImportCommandOptionName } from '../types/localization.js';
 import { QueueType } from '../types/queue.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import { parseTelegramPackName } from '../utils/parse-telegram-pack-name.js';
@@ -12,14 +10,6 @@ const activeImportJobStatuses = ['PENDING', 'FETCHING', 'IMPORTING', 'FINALIZING
 
 export const importTelegramPackCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.IMPORT_TELEGRAM_PACK,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.import-telegram-pack.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.import-telegram-pack.name', { lng })),
-      options: getImportTelegramPackOptions(t),
-    };
-  },
   async handle(interaction, context) {
     const { t, db } = context;
     const user = await updateOrCreateUser(context, interaction);

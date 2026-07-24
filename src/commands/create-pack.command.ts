@@ -1,9 +1,7 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
-import { getCreatePackOptions } from '../options/create-pack.options.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { getPackNsfwEmoji } from '../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -16,14 +14,6 @@ import {
 
 export const createPackCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.CREATE_PACK,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.create-pack.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.create-pack.name', { lng })),
-      options: getCreatePackOptions(t),
-    };
-  },
   async handle(interaction, context) {
     const { t } = context;
     const user = await updateOrCreateUser(context, interaction);

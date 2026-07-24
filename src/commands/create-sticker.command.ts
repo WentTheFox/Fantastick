@@ -1,13 +1,11 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
-import { getCreateStickerOptions } from '../options/create-sticker.options.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { CreateStickerCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
-import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import { EditStickerRatingOption } from '../constants/edit-sticker-modal-fields.js';
@@ -18,14 +16,6 @@ import {
 
 export const createStickerCommand: BotChatInputCommand = {
   name: BotChatInputCommandName.CREATE_STICKER,
-  getDefinition: (t) => {
-    if (!t) throw new Error('Missing translation function');
-    return {
-      ...getLocalizedObject('description', (lng) => t('commands.create-sticker.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.create-sticker.name', { lng })),
-      options: getCreateStickerOptions(t),
-    };
-  },
   autocomplete: {
     [CreateStickerCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true, excludeImported: true }),
   },

@@ -3,8 +3,8 @@ import {
   RESTGetAPIApplicationGuildCommandResult,
   Routes,
 } from 'discord-api-types/v10';
-import { createCommandRegistrar } from '@wentthefox-org/discord-bot-framework/commands';
-import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { createCommandRegistrar } from '@went.tf/discord-bot-framework/commands';
+import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 import { env } from '../env.js';
 import { rest } from './rest.js';
 

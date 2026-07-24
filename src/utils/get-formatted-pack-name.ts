@@ -12,7 +12,11 @@ export type FormattablePack = PackNameSource & Pick<Pack, 'public' | 'nsfw'>;
 
 export const getPackDisplayName = (pack: PackNameSource) => pack.telegramPack !== null ? pack.telegramPack.title : pack.name;
 
-export const getFormattedPackName = (pack: FormattablePack) => {
+// `escapeUrls` guards against Discord auto-embedding a link when the name is
+// posted as raw message text; pass false where that can't happen (autocomplete
+// choices, or text already wrapped in a code span) to avoid literal <> showing up.
+export const getFormattedPackName = (pack: FormattablePack, escapeUrls = true) => {
   const importedPrefix = pack.telegramPack !== null ? `${EmojiCharacters.PAPER_PLANE} ` : '';
-  return `${getPackVisibilityEmoji(pack)} ${importedPrefix}${wrapUrlsInAngleBrackets(getPackDisplayName(pack))}${getPackNsfwEmoji(pack)}`;
+  const displayName = getPackDisplayName(pack);
+  return `${getPackVisibilityEmoji(pack)} ${importedPrefix}${escapeUrls ? wrapUrlsInAngleBrackets(displayName) : displayName}${getPackNsfwEmoji(pack)}`;
 };

@@ -30,7 +30,7 @@ export const getPackNameAutocompleteHandler = ({ nsfw = false, ownedOnly = false
     .filter(pack => getPackDisplayName(pack).toLowerCase().includes(value) || pack.telegramPack?.telegramPackName.toLowerCase().includes(value))
     .slice(0, 25)
     .map(pack => ({
-      name: truncateToMaximumLength(getFormattedPackName(pack), 100),
+      name: truncateToMaximumLength(getFormattedPackName(pack, false), 100),
       value: pack.id,
     })));
 };

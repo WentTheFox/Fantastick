@@ -379,7 +379,7 @@
       "options": {
         "source-pack": {
           "name": "source-pack",
-          "description": "Optional: narrows source-sticker to this non-imported pack. Omit to search all your non-imported packs"
+          "description": "Narrows source-sticker to this pack. Omit to search all your non-imported packs"
         },
         "source-sticker": {
           "name": "source-sticker",

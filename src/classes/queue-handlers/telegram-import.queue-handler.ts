@@ -37,7 +37,6 @@ import {
   TelegramApiGetFileResponse,
   TelegramApiGetStickerSetResponse,
 } from '../../utils/telegram-api.js';
-import { wrapUrlsInAngleBrackets } from '../../utils/wrap-urls-in-angle-brackets.js';
 
 const buildProgressContent = (emojiIdMap: Record<string, string>, total: number, current: number, failed = false, finalizing = false) => {
   const [bar] = filledBar(total, current, 18, EmojiCharacters.WHITE_SQUARE, failed ? EmojiCharacters.RED_SQUARE : EmojiCharacters.GREEN_SQUARE);
@@ -512,7 +511,7 @@ const postImportedStickersToFeed = async ({ db, stickers, pack, telegramPack, im
           '# Sticker imported',
           `**Name:** \`${getFormattedStickerName(sticker)}\` (\`${sticker.id}\`)`,
           '**Description:** _(empty)_',
-          `**Pack:** \`${wrapUrlsInAngleBrackets(telegramPack.title)}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
+          `**Pack:** \`${telegramPack.title}\` (\`${pack.id}\`) ${getPackVisibilityEmoji(pack)}${getPackNsfwEmoji(pack)}`,
           `**Imported by:** ${userMention(importedBy)} (\`${importedBy}\`)`,
           `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => spoiler ? `||${item.media.url}||` : item.media.url).join(' ')}`,
         ].join('\n'),

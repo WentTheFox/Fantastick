@@ -17,7 +17,6 @@ import { getPackVisibilityEmoji } from './get-pack-visibility-emoji.js';
 import { mapStickersToGalleryItems } from './map-stickers-to-gallery-items.js';
 import { recordStickerMessages } from './record-sticker-messages.js';
 import { resolveStickerNsfw } from './resolve-sticker-nsfw.js';
-import { wrapUrlsInAngleBrackets } from './wrap-urls-in-angle-brackets.js';
 
 export interface StickerSnapshot {
   name: string;
@@ -87,7 +86,7 @@ export const postStickerToFeed = async ({
       ...(sticker.deletedAt ? [`**Deleted at:** ${time(sticker.deletedAt, TimestampStyles.FullDateShortTime)} (${time(sticker.deletedAt, TimestampStyles.RelativeTime)})`] : []),
       `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
       ...(sticker.deletedBy ? [`**Deleted by:** ${userMention(String(sticker.deletedBy))} (\`${sticker.deletedBy}\`)`] : []),
-      `**Pack:** \`${wrapUrlsInAngleBrackets(userPack.telegramPack?.title ?? userPack.name)}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
+      `**Pack:** \`${userPack.telegramPack?.title ?? userPack.name}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
       ...(urlChanged ? [`**Old URL:** ${snapshot.url || '_(none)_'}`, `**New URL:** \`${getStickerUrl(sticker)}\``] : []),
       `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => item.media.url).join(' ')}`,
     ].join('\n'),

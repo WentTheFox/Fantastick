@@ -379,7 +379,7 @@
       "options": {
         "source-pack": {
           "name": "source-pack",
-          "description": "The non-imported pack containing the sticker to migrate"
+          "description": "Optional: narrows source-sticker to this non-imported pack. Omit to search all your non-imported packs"
         },
         "source-sticker": {
           "name": "source-sticker",

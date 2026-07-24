@@ -47,7 +47,7 @@ export const migrateToTelegramStickerCommand: BotChatInputCommand = {
       return;
     }
 
-    const sourcePackId = interaction.options.getString(MigrateToTelegramStickerCommandOptionName.SOURCE_PACK, true);
+    const sourcePackId = interaction.options.getString(MigrateToTelegramStickerCommandOptionName.SOURCE_PACK);
     const sourceStickerId = interaction.options.getString(MigrateToTelegramStickerCommandOptionName.SOURCE_STICKER, true);
     const targetPackId = interaction.options.getString(MigrateToTelegramStickerCommandOptionName.TARGET_PACK, true);
     const targetStickerId = interaction.options.getString(MigrateToTelegramStickerCommandOptionName.TARGET_STICKER, true);
@@ -55,7 +55,7 @@ export const migrateToTelegramStickerCommand: BotChatInputCommand = {
     const sourceSticker = await db.sticker.findFirst({
       where: {
         id: sourceStickerId,
-        packId: sourcePackId,
+        ...(sourcePackId ? { packId: sourcePackId } : {}),
         deletedAt: null,
         telegramStickerId: null,
         pack: { telegramPackId: null, deletedAt: null, createdBy: user.id },

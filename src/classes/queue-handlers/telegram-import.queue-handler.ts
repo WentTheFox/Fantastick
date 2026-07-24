@@ -181,6 +181,14 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
 
   try {
     for (const [order, sticker] of telegramStickers.entries()) {
+      // Temporary timing instrumentation to pin down where per-sticker latency comes
+      // from (Telegram API vs. file download vs. upload) — remove once diagnosed.
+      let stepStart = Date.now();
+      const logStep = (step: string) => {
+        const now = Date.now();
+        logger.debug(`[timing] sticker #${order} ${step}: ${now - stepStart}ms`);
+        stepStart = now;
+      };
       const needsTgsConversion = sticker.is_animated;
       const needsWebmConversion = sticker.is_video;
       if ((needsTgsConversion && tgsConversionDisabled) || (needsWebmConversion && webmConversionDisabled)) {
@@ -201,6 +209,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
           },
         },
       });
+      logStep('existing lookup');
       if (existing) {
         if (existing.deletedAt !== null || existing.emoji !== sticker.emoji || existing.order !== order) {
           updateTelegramStickerRecords.push({
@@ -222,6 +231,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
           validator: typia.createValidate<TelegramApiGetFileResponse>(),
         });
         telegramFilePath = getFileRequest.response.result!.file_path;
+        logStep('getFile');
       } catch (e) {
         logger.error(`Failed to get file path for sticker ${sticker.file_id} (#${order})`, e);
         failedCount++;
@@ -236,6 +246,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         raw: true,
         validator: typia.createValidate<Readable>(),
       });
+      logStep('file download request');
 
       let fileName: string;
       let data: SaveStickerInput['data'];
@@ -251,6 +262,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
           data = fileRequest.response;
           fileName = 'sticker.webp';
         }
+        logStep('convert/read');
       } catch (e) {
         logger.error(`Failed to convert sticker ${sticker.file_id} (#${order}) to GIF`, e);
         if (isFfmpegUnavailableError(e)) {
@@ -276,6 +288,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         fileName,
         data,
       });
+      logStep('saveStickerFile');
       createdFiles.push({ filePath, deleteUrl });
 
       createTelegramStickerRecords.push({
@@ -293,7 +306,9 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       completed++;
       logger.info(`Downloaded sticker ${sticker.file_id} (#${order}) → ${telegramStickerId}`);
       await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
+      logStep('importJob.update');
       await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
+      logStep('progress update');
     }
   } finally {
     await renderer?.close();

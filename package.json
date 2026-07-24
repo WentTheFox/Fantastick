@@ -24,7 +24,7 @@
     "@discordjs/rest": "^2.6.1",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
-    "@wentthefox-org/discord-bot-framework": "^1.1.0",
+    "@wentthefox-org/discord-bot-framework": "^1.2.0",
     "bufferutil": "^4.1.0",
     "date-fns": "^4.4.0",
     "discord-api-types": "^0.38.49",

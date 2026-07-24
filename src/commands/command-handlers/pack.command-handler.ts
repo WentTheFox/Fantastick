@@ -1,24 +1,25 @@
-import { ComponentType, MessageFlags } from 'discord-api-types/v10';
-import { ChatInputCommandInteraction } from 'discord.js';
-import { InteractionHandler } from '../../types/bot-interaction.js';
+import { MessageFlags } from 'discord-api-types/v10';
+import { CommandHandler } from '../../types/bot-interaction.js';
 import { PackCommandOptionName } from '../../types/localization.js';
-import { getFormattedPackName } from '../../utils/get-formatted-pack-name.js';
+import { getPackPreviewContent, packItemsPerPage } from '../../utils/get-pack-preview-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
-import { mapStickersToGalleryItems } from '../../utils/map-stickers-to-gallery-items.js';
 
-const itemsPerPage = 9;
-
-export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputCommandInteraction> => async function handle(interaction, context) {
+export const packCommandHandler = (nsfw: boolean): CommandHandler => async function handle(interaction, context) {
   const { t, db } = context;
+  // Pack previews attach up to `packItemsPerPage` sticker files, which can take longer than
+  // Discord's 3s interaction-ack window to read from disk and upload (see getPackPreviewContent).
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const packId = interaction.options.getString(PackCommandOptionName.NAME) ?? undefined;
   const pack = await db.pack.findFirst({
     where: {
-      OR: [
-        { id: packId },
-        { name: packId },
+      AND: [
+        { OR: [{ id: packId }, { name: packId }] },
+        { OR: [{ public: true }, { createdBy: BigInt(interaction.user.id) }] },
       ],
       nsfw: nsfw ? undefined : false,
+      deletedAt: null,
     },
+    include: { telegramPack: true },
   });
   if (!pack) {
     await interactionReply(context, interaction, {
@@ -27,35 +28,25 @@ export const packCommandHandler = (nsfw: boolean): InteractionHandler<ChatInputC
     });
     return;
   }
+
+  // Stickers explicitly overridden to NSFW never appear in the non-NSFW commands,
+  // even inside an otherwise safe-for-all-audiences pack
+  const stickerWhere = {
+    deletedAt: null,
+    packId: pack.id,
+    ...(nsfw ? {} : { NOT: { nsfwOverride: true } }),
+  };
+  const stickerCount = await db.sticker.count({ where: stickerWhere });
+  const totalPages = Math.max(1, Math.ceil(stickerCount / packItemsPerPage));
   const stickers = await db.sticker.findMany({
-    where: {
-      deletedAt: null,
-      packId: pack.id,
-    },
-    take: itemsPerPage,
-    orderBy: { order: 'asc' },
+    where: stickerWhere,
+    include: { telegramSticker: true },
+    take: packItemsPerPage,
+    // Imported sticker order lives on the shared TelegramSticker row
+    orderBy: pack.telegramPackId !== null ? { telegramSticker: { order: 'asc' } } : { order: 'asc' },
   });
 
-  const { files, items } = mapStickersToGalleryItems(stickers, pack.nsfw);
+  const { flags, components, files } = getPackPreviewContent({ t, pack, stickers, page: 0, totalPages, nsfw });
 
-  await interactionReply(context, interaction, {
-    flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
-    components: [
-      {
-        type: ComponentType.TextDisplay,
-        content: [
-          `# ${getFormattedPackName(pack)}`,
-          items.length === 0
-            ? t('commands.pack.responses.emptyPack')
-            : t('commands.pack.components.packPreview'),
-        ].join('\n'),
-      },
-      {
-        type: ComponentType.MediaGallery,
-        items,
-      },
-      // TODO Paging buttons
-    ],
-    files,
-  });
+  await interactionReply(context, interaction, { flags, components, files });
 };

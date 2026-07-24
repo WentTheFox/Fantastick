@@ -84,6 +84,7 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
       },
       deletedAt: null,
     },
+    include: { telegramSticker: true, pack: true },
   });
 
   const updateData: StickerMessageUpdateInput = {};

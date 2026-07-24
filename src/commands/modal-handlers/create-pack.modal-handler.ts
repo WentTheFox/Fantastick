@@ -48,6 +48,16 @@ export const createPackModalHandler: ModalHandler = async (interaction, context)
     });
     return;
   }
+  // The paper plane marks imported packs and must never appear in user-provided names
+  if (packName.includes(EmojiCharacters.PAPER_PLANE)) {
+    await interactionReply(context, interaction, {
+      content: t('commands.create-pack.responses.invalidName', {
+        chars: '```\n' + EmojiCharacters.PAPER_PLANE + '\n```',
+      }),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
   const invalidChars = new Set(packName.match(packNameInvalidPattern));
   if (invalidChars.size > 0) {
     await interactionReply(context, interaction, {
@@ -62,6 +72,7 @@ export const createPackModalHandler: ModalHandler = async (interaction, context)
     where: {
       name: packName,
       deletedAt: null,
+      telegramPackId: null,
     },
   });
   if (packPacksWithSameNameCount !== 0) {

@@ -2,6 +2,8 @@ import { MessageFlags } from 'discord-api-types/v10';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
 import { QueueType } from '../../types/queue.js';
+import { deleteStickerFile } from '../../utils/delete-sticker-file.js';
+import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed, StickerSnapshot } from '../../utils/post-sticker-to-feed.js';
@@ -28,7 +30,7 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
 
   let sticker = resourceId ? await db.sticker.findUnique({
     where: { id: resourceId, deletedAt: null, createdBy: user.id },
-    include: { pack: true },
+    include: { pack: true, telegramSticker: true },
   }) : null;
 
   if (!sticker) {
@@ -38,10 +40,21 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
     });
     return;
   }
+
+  // Imported stickers mirror the Telegram set; they only disappear when removed from
+  // the Telegram pack or when the whole pack is deleted
+  if (sticker.telegramStickerId !== null) {
+    await interactionReply(context, interaction, {
+      content: t('commands.delete-sticker.responses.importedSticker'),
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
   const stickerSnapshot: StickerSnapshot = {
     name: sticker.name,
     description: sticker.description,
     url: sticker.url,
+    nsfwOverride: sticker.nsfwOverride,
   };
 
   const {
@@ -94,7 +107,7 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
         deletedBy: user.id,
         deletedAt: new Date(),
       },
-      include: { pack: true },
+      include: { pack: true, telegramSticker: true },
     });
   } catch (e) {
     context.logger.error('Failed to delete sticker record', e);
@@ -105,9 +118,11 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
     return;
   }
 
+  await deleteStickerFile(context, { url: sticker.url, deleteUrl: sticker.deleteUrl });
+
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.delete-sticker.responses.deleted', {
-      name: `\`${sticker.name}\``,
+      name: `\`${getFormattedStickerName(sticker)}\``,
     })}`,
     flags: MessageFlags.Ephemeral,
   });

@@ -1,20 +1,32 @@
-import { ApiAuthType, ApiClient } from '../classes/api-client.js';
+import { ApiAuthType, ApiClient, ApiHttpException } from '@wentthefox-org/discord-bot-framework/api-client';
+import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
+import { env } from '../env.js';
 
-export const createTelegramApiClient = () => new ApiClient(console, {
+const telegramRetry = {
+  maxAttempts: 5,
+  initialDelayMs: 500,
+};
+
+export const createTelegramApiClient = (logger: NestableLogger) => new ApiClient(logger, {
   baseUrl: 'https://api.telegram.org/bot:token',
   authentication: {
     type: ApiAuthType.PATH_SEGMENT,
-    tokenEnvKey: 'TELEGRAM_BOT_TOKEN',
+    getValue: () => env.TELEGRAM_BOT_TOKEN,
   },
+  retry: telegramRetry,
 });
 
-export const createTelegramFileClient = () => new ApiClient(console, {
+export const createTelegramFileClient = (logger: NestableLogger) => new ApiClient(logger, {
   baseUrl: 'https://api.telegram.org/file/bot:token',
   authentication: {
     type: ApiAuthType.PATH_SEGMENT,
-    tokenEnvKey: 'TELEGRAM_BOT_TOKEN',
+    getValue: () => env.TELEGRAM_BOT_TOKEN,
   },
+  retry: telegramRetry,
 });
+
+export const isTelegramNotFoundError = (e: unknown): boolean =>
+  e instanceof ApiHttpException && e.status === 400;
 
 export interface TelegramApiResponse<T> {
   ok: boolean;

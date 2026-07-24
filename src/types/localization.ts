@@ -14,8 +14,8 @@ export const enum CreatePackCommandOptionName {
 }
 
 export const enum ImportCommandOptionName {
-  PACK = 'pack',
   URL = 'url',
+  NSFW = 'nsfw',
 }
 
 export const enum PackCommandOptionName {
@@ -30,15 +30,43 @@ export const enum DeleteStickerCommandOptionName {
   NAME = 'name',
 }
 
+export const enum DeletePackCommandOptionName {
+  NAME = 'name',
+}
+
+export const enum EditPackCommandOptionName {
+  NAME = 'name',
+}
+
+export const enum ReorderStickerCommandOptionName {
+  STICKER = 'sticker',
+  BEFORE = 'before',
+  AFTER = 'after',
+}
+
+export const enum MassRenameStickersCommandOptionName {
+  PACK = 'pack',
+  START = 'start',
+}
+
+export const enum PublishImportedPackCommandOptionName {
+  PACK = 'pack',
+}
+
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandOptionName,
-  [BotChatInputCommandName.IMPORT]: ImportCommandOptionName,
+  [BotChatInputCommandName.IMPORT_TELEGRAM_PACK]: ImportCommandOptionName,
   [BotChatInputCommandName.PACK]: PackCommandOptionName,
   [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandOptionName,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandOptionName,
+  [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
+  [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
+  [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandOptionName,
+  [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandOptionName,
+  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -80,13 +108,16 @@ export const enum CreateStickerCommandResponse {
 }
 
 export const enum ImportCommandResponse {
-  packNotFound = 'packNotFound',
+  nsfwRequiredForNewPack = 'nsfwRequiredForNewPack',
+  packImportAlreadyRunning = 'packImportAlreadyRunning',
   invalidUrl = 'invalidUrl',
   importFailed = 'importFailed',
   importProgress = 'importProgress',
   finalizingImport = 'finalizingImport',
   rollbackProgress = 'rollbackProgress',
   imported = 'imported',
+  importQueued = 'importQueued',
+  importAlreadyRunning = 'importAlreadyRunning',
 }
 
 export const enum PackCommandResponse {
@@ -99,20 +130,71 @@ export const enum EditStickerCommandResponse {
 
 export const enum DeleteStickerCommandResponse {
   stickerNotFound = 'stickerNotFound',
+  importedSticker = 'importedSticker',
   deleteFailed = 'deleteFailed',
   unsupportedMethod = 'unsupportedMethod',
   deleted = 'deleted',
+}
+
+export const enum DeletePackCommandResponse {
+  packNotFound = 'packNotFound',
+  deleteFailed = 'deleteFailed',
+  deleted = 'deleted',
+}
+
+export const enum EditPackCommandResponse {
+  packNotFound = 'packNotFound',
+  nameTooShort = 'nameTooShort',
+  nameTooLong = 'nameTooLong',
+  invalidName = 'invalidName',
+  duplicateName = 'duplicateName',
+  updated = 'updated',
+}
+
+export const enum ReorderStickerCommandResponse {
+  stickerNotFound = 'stickerNotFound',
+  targetNotFound = 'targetNotFound',
+  bothProvided = 'bothProvided',
+  noneProvided = 'noneProvided',
+  conflict = 'conflict',
+  movedBefore = 'movedBefore',
+  movedAfter = 'movedAfter',
+  importedStickerImmutable = 'importedStickerImmutable',
+}
+
+export const enum MassRenameStickersCommandResponse {
+  packNotFound = 'packNotFound',
+  emptyPack = 'emptyPack',
+  stickerNotFound = 'stickerNotFound',
+}
+
+export const enum PublishImportedPackCommandResponse {
+  packNotFound = 'packNotFound',
+  emptyPack = 'emptyPack',
+  stickerNotFound = 'stickerNotFound',
+  alreadyPublished = 'alreadyPublished',
+  alreadyPublishedElsewhere = 'alreadyPublishedElsewhere',
+  notReady = 'notReady',
+  published = 'published',
+  publishedRatingAllSfw = 'publishedRatingAllSfw',
+  publishedRatingAllNsfw = 'publishedRatingAllNsfw',
+  publishedRatingMixed = 'publishedRatingMixed',
 }
 
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
   [BotChatInputCommandName.STICKER]: StickerCommandResponse,
   [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandResponse,
-  [BotChatInputCommandName.IMPORT]: ImportCommandResponse,
+  [BotChatInputCommandName.IMPORT_TELEGRAM_PACK]: ImportCommandResponse,
   [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
   [BotChatInputCommandName.PACK]: PackCommandResponse,
   [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandResponse,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandResponse,
+  [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
+  [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
+  [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandResponse,
+  [BotChatInputCommandName.MASS_RENAME_STICKERS]: MassRenameStickersCommandResponse,
+  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandResponse,
 }
 
 interface ComponentsMap {
@@ -136,11 +218,28 @@ interface ComponentsMap {
   ],
   [BotChatInputCommandName.PACK]: [
     'emptyPack',
-    'packPreview'
+    'packPreview',
+    'importedFrom',
+    'firstPageButton',
+    'previousPageButton',
+    'nextPageButton',
+    'lastPageButton',
+    'pageIndicator',
   ],
   [BotChatInputCommandName.EDIT_STICKER]: [
     'editStickerModalTitle',
-    'editingText'
+    'editingText',
+    'importedStickerNote',
+    'importedNameLabel',
+    'importedNameDescription',
+    'ratingChoiceLabel',
+    'ratingChoiceDescription',
+    'ratingDefaultLabel',
+    'ratingDefaultDescription',
+    'ratingSfwLabel',
+    'ratingSfwDescription',
+    'ratingNsfwLabel',
+    'ratingNsfwDescription',
   ],
   [BotChatInputCommandName.DELETE_STICKER]: [
     'deleteStickerModalTitle',
@@ -151,6 +250,10 @@ interface ComponentsMap {
     'stickerOnlyMethodDescription',
     'deleteMessagesMethodLabel',
     'deleteMessagesMethodDescription',
+  ],
+  [BotChatInputCommandName.DELETE_PACK]: [
+    'deletePackModalTitle',
+    'deletingText',
   ],
   [BotChatInputCommandName.CREATE_PACK]: [
     'createPackModalTitle',
@@ -168,6 +271,60 @@ interface ComponentsMap {
     'nsfwTrueDescription',
     'nsfwFalseLabel',
     'nsfwFalseDescription',
+  ],
+  [BotChatInputCommandName.EDIT_PACK]: [
+    'editPackModalTitle',
+    'importedNameNote',
+    'importedUnpublishedNote',
+    'nameLabel',
+    'nameDescription',
+    'publicChoiceLabel',
+    'publicChoiceDescription',
+    'publicTrueLabel',
+    'publicTrueDescription',
+    'publicFalseLabel',
+    'publicFalseDescription',
+    'publicFalseDescriptionImported',
+    'nsfwChoiceLabel',
+    'nsfwChoiceDescription',
+    'nsfwTrueLabel',
+    'nsfwTrueDescription',
+    'nsfwFalseLabel',
+    'nsfwFalseDescription',
+  ],
+  [BotChatInputCommandName.MASS_RENAME_STICKERS]: [
+    'renamingText',
+    'currentNameText',
+    'renamingModalText',
+    'renameButton',
+    'previousButton',
+    'nextButton',
+    'renameModalTitle',
+    'allDoneText',
+  ],
+  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: [
+    'reviewingText',
+    'currentNameText',
+    'currentRatingText',
+    'ratingUnset',
+    'criteriaNameLabel',
+    'criteriaRatingLabel',
+    'editingModalText',
+    'nameLabel',
+    'nameDescription',
+    'ratingChoiceLabel',
+    'ratingChoiceDescription',
+    'ratingSfwLabel',
+    'ratingSfwDescription',
+    'ratingNsfwLabel',
+    'ratingNsfwDescription',
+    'editButton',
+    'previousButton',
+    'nextButton',
+    'publishButton',
+    'jumpToInvalidButton',
+    'editModalTitle',
+    'allDoneText',
   ],
 }
 

@@ -1,12 +1,13 @@
 import { ComponentType, MessageFlags } from 'discord-api-types/v10';
 import { ComponentInLabelData } from 'discord.js';
 import { getDeleteStickerOptions } from '../options/delete-sticker.options.js';
-import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { DeleteStickerCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
+import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -17,11 +18,15 @@ import {
 } from './modal-handlers/delete-sticker.modal-handler.js';
 
 export const deleteStickerCommand: BotChatInputCommand = {
-  getDefinition: (t) => ({
-    ...getLocalizedObject('description', (lng) => t('commands.delete-sticker.description', { lng })),
-    ...getLocalizedObject('name', (lng) => t('commands.delete-sticker.name', { lng })),
-    options: getDeleteStickerOptions(t),
-  }),
+  name: BotChatInputCommandName.DELETE_STICKER,
+  getDefinition: (t) => {
+    if (!t) throw new Error('Missing translation function');
+    return {
+      ...getLocalizedObject('description', (lng) => t('commands.delete-sticker.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.delete-sticker.name', { lng })),
+      options: getDeleteStickerOptions(t),
+    };
+  },
   autocomplete: {
     [DeleteStickerCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),
   },
@@ -39,7 +44,7 @@ export const deleteStickerCommand: BotChatInputCommand = {
     const id = interaction.options.getString(DeleteStickerCommandOptionName.NAME, true);
     const sticker = await db.sticker.findUnique({
       where: { id, deletedAt: null },
-      include: { pack: true },
+      include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
     });
 
     if (!sticker) {
@@ -50,14 +55,24 @@ export const deleteStickerCommand: BotChatInputCommand = {
       return;
     }
 
+    // Imported stickers mirror the Telegram set; they only disappear when removed from
+    // the Telegram pack or when the whole pack is deleted
+    if (sticker.telegramStickerId !== null) {
+      await interactionReply(context, interaction, {
+        content: t('commands.delete-sticker.responses.importedSticker'),
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     await interaction.showModal({
       customId: `${BotModalId.DELETE_STICKER}:${sticker.id}`,
-      title: t('commands.delete-sticker.components.deleteStickerModalTitle', { name: sticker.name }),
+      title: t('commands.delete-sticker.components.deleteStickerModalTitle', { name: getFormattedStickerName(sticker) }),
       components: [
         {
           type: ComponentType.TextDisplay,
           content: t('commands.delete-sticker.components.deletingText', {
-            name: `\`${sticker.name}\``,
+            name: `\`${getFormattedStickerName(sticker)}\``,
             pack: getFormattedPackName(sticker.pack),
           }),
         },

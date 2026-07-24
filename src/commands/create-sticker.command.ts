@@ -3,7 +3,7 @@ import { TextInputComponentData } from 'discord.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
-import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -14,10 +14,14 @@ import {
 } from './modal-handlers/create-sticker.modal-handler.js';
 
 export const createStickerCommand: BotChatInputCommand = {
-  getDefinition: (t) => ({
-    ...getLocalizedObject('description', (lng) => t('commands.create-sticker.description', { lng })),
-    ...getLocalizedObject('name', (lng) => t('commands.create-sticker.name', { lng })),
-  }),
+  name: BotChatInputCommandName.CREATE_STICKER,
+  getDefinition: (t) => {
+    if (!t) throw new Error('Missing translation function');
+    return {
+      ...getLocalizedObject('description', (lng) => t('commands.create-sticker.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.create-sticker.name', { lng })),
+    };
+  },
   async handle(interaction, context) {
     const { t, db } = context;
     const user = await updateOrCreateUser(context, interaction);
@@ -29,10 +33,14 @@ export const createStickerCommand: BotChatInputCommand = {
       return;
     }
 
+    // Imported packs mirror their Telegram set, so manual stickers cannot be added to them
     const userPacks = await db.pack.findMany({
       where: {
         createdBy: user.id,
+        deletedAt: null,
+        telegramPackId: null,
       },
+      include: { telegramPack: true },
     });
 
     if (userPacks.length === 0) {

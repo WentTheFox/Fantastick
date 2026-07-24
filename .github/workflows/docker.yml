@@ -1,0 +1,80 @@
+name: Docker
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ci-docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-build:
+    name: 'Docker Compose build & migration check'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      - name: Prepare .env
+        run: |
+          cat > .env <<'EOF'
+          LOCAL=true
+          DEBUG_I18N=false
+          DISABLE_SETTINGS=false
+          UA_STRING="gh:WentTheFox/Fantastick"
+          DISCORD_INVITE_URL="https://discord.gg/#example-invite-url"
+          DISCORD_BOT_TOKEN=MOCK_DISCORD_BOT_TOKEN
+          DISCORD_CLIENT_ID=MOCK_DISCORD_CLIENT_ID
+          TELEGRAM_BOT_TOKEN=MOCK_TELEGRAM_BOT_TOKEN
+          UPLOAD_API_HOST=http://example.com
+          UPLOAD_KEY=example-key
+          UPLOAD_API_DOMAIN=example.com
+          POSTGRES_USER=fantastick
+          POSTGRES_PASSWORD=fantastick
+          POSTGRES_DB=fantastick
+          EOF
+
+      - name: Build images
+        run: docker compose build
+
+      - name: Determine Postgres image cache key
+        id: postgres-cache-key
+        run: echo "week=$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Postgres image
+        id: cache-postgres-image
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /tmp/docker-image-cache/postgres.tar
+          key: postgres-image-${{ steps.postgres-cache-key.outputs.week }}
+
+      - name: Load cached Postgres image
+        if: steps.cache-postgres-image.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/docker-image-cache/postgres.tar
+
+      - name: Pull and cache Postgres image
+        if: steps.cache-postgres-image.outputs.cache-hit != 'true'
+        run: |
+          docker compose pull postgres
+          mkdir -p /tmp/docker-image-cache
+          docker save postgres:latest -o /tmp/docker-image-cache/postgres.tar
+
+      - name: Start Postgres and wait for healthy
+        run: docker compose up -d --wait --wait-timeout 60 postgres
+
+      - name: Run database migrations
+        run: docker compose run --rm migrate
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

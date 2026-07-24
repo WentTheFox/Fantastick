@@ -6,9 +6,18 @@ export enum EmojiCharacters {
   GREEN_SQUARE = '🟩',
   RED_SQUARE = '🟥',
   GREEN_CHECK = '✅',
+  CROSS_MARK = '❌',
   INFO = 'ℹ️',
   NO_ONE_UNDER_18 = '🔞',
   LOCKED = '🔒',
   TRASH_CAN = '🗑️',
   RELOAD = '🔄',
+  ARROW_LEFT = '⬅️',
+  ARROW_RIGHT = '➡️',
+  SKIP_BACK = '⏮️',
+  SKIP_FORWARD = '⏭️',
+  PENCIL = '✏️',
+  ROCKET = '🚀',
+  // Reserved for imported pack names, must not appear in user-provided names
+  PAPER_PLANE = '⌲',
 }

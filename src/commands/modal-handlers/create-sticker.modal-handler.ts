@@ -52,6 +52,8 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     where: {
       name: packName,
       createdBy: user.id,
+      deletedAt: null,
+      telegramPackId: null,
     },
   });
   if (!userPack) {
@@ -103,6 +105,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
   }
 
   let stickerUrl = data[CreateStickerModalCustomIds.URL_INPUT];
+  let stickerDeleteUrl: string | null = null;
   let stickerId: string | undefined = undefined;
   const stickerFileId = data[CreateStickerModalCustomIds.FILE_INPUT];
   const source = stickerUrl ? CreateStickerModalCustomIds.URL_INPUT : (stickerFileId ? CreateStickerModalCustomIds.FILE_INPUT : null);
@@ -147,7 +150,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
         return;
       }
 
-      ({ stickerFileId: stickerId, stickerUrl } = await saveStickerFile(context, {
+      ({ stickerFileId: stickerId, stickerUrl, deleteUrl: stickerDeleteUrl } = await saveStickerFile(context, {
         fileId: stickerFileMeta.id,
         fileName: stickerFileMeta.name,
         data: Readable.fromWeb(stickerFileData as never),
@@ -171,9 +174,11 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
       packId: userPack.id,
       description,
       url: stickerUrl,
+      deleteUrl: stickerDeleteUrl,
       createdBy: user.id,
       order,
     },
+    include: { telegramSticker: true },
   });
 
   await interactionReply(context, interaction, {

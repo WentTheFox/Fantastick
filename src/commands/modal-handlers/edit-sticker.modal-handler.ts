@@ -7,7 +7,9 @@ import {
   stickerNameOptionMeta,
 } from '../../options/metadata/sticker-name.option-meta.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
+import { deleteStickerFile } from '../../utils/delete-sticker-file.js';
 import { saveStickerFile } from '../../utils/filesystem.js';
+import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
 import {
@@ -20,7 +22,22 @@ export enum EditStickerModalCustomIds {
   NEW_ALT_INPUT = 'newAltInput',
   NEW_FILE_INPUT = 'newFileInput',
   NEW_URL_INPUT = 'newUrlInput',
+  RATING_INPUT = 'ratingInput',
 }
+
+export enum EditStickerRatingOption {
+  DEFAULT = 'default',
+  SFW = 'sfw',
+  NSFW = 'nsfw',
+}
+
+const parseRatingOption = (value: string | null): boolean | null => {
+  switch (value) {
+    case EditStickerRatingOption.SFW: return false;
+    case EditStickerRatingOption.NSFW: return true;
+    default: return null;
+  }
+};
 
 export const editStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
   const { t, db } = context;
@@ -35,7 +52,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   let sticker = resourceId ? await db.sticker.findUnique({
     where: { id: resourceId, deletedAt: null, createdBy: user.id },
-    include: { pack: true },
+    include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
   }) : null;
 
   if (!sticker) {
@@ -49,6 +66,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
     name: sticker.name,
     description: sticker.description,
     url: sticker.url,
+    nsfwOverride: sticker.nsfwOverride,
   };
 
   const {
@@ -56,9 +74,14 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
     data,
   } = collectModalSubmittedData(interaction, EditStickerModalCustomIds);
 
-  const stickerName = data[EditStickerModalCustomIds.NEW_NAME_INPUT];
+  // Imported stickers only carry an optional user-provided label; a blank name is
+  // acceptable and their display name is derived from the emoji and order instead
+  const isImportedSticker = sticker.telegramStickerId !== null;
+  const stickerName = isImportedSticker
+    ? (data[EditStickerModalCustomIds.NEW_NAME_INPUT] ?? '')
+    : data[EditStickerModalCustomIds.NEW_NAME_INPUT];
   if (stickerName !== sticker.name) {
-    if (stickerName === null || stickerName.length < stickerNameOptionMeta.min_length) {
+    if (stickerName === null || (!isImportedSticker && stickerName.length < stickerNameOptionMeta.min_length)) {
       await interactionReply(context, interaction, {
         content: t('commands.create-sticker.responses.nameTooShot'),
         flags: MessageFlags.Ephemeral,
@@ -82,25 +105,29 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
       });
       return;
     }
-    const otherStickersWithSameNameInPackCount = await db.sticker.count({
-      where: {
-        AND: [
-          { packId: sticker.packId, name: stickerName },
-          { NOT: { id: sticker.id } },
-        ],
-      },
-    });
-    if (otherStickersWithSameNameInPackCount !== 0) {
-      await interactionReply(context, interaction, {
-        content: t('commands.create-sticker.responses.duplicateName'),
-        flags: MessageFlags.Ephemeral,
+    if (!isImportedSticker) {
+      const otherStickersWithSameNameInPackCount = await db.sticker.count({
+        where: {
+          AND: [
+            { packId: sticker.packId, name: stickerName },
+            { NOT: { id: sticker.id } },
+          ],
+        },
       });
-      return;
+      if (otherStickersWithSameNameInPackCount !== 0) {
+        await interactionReply(context, interaction, {
+          content: t('commands.create-sticker.responses.duplicateName'),
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
     }
   }
 
-  let stickerUrl = data[EditStickerModalCustomIds.NEW_URL_INPUT];
-  const stickerFileId = data[EditStickerModalCustomIds.NEW_FILE_INPUT];
+  // Imported sticker images are managed by the Telegram import and cannot be replaced
+  let stickerUrl = isImportedSticker ? null : data[EditStickerModalCustomIds.NEW_URL_INPUT];
+  let stickerDeleteUrl: string | null = sticker.deleteUrl;
+  const stickerFileId = isImportedSticker ? null : data[EditStickerModalCustomIds.NEW_FILE_INPUT];
   const source = stickerUrl ? EditStickerModalCustomIds.NEW_URL_INPUT : (stickerFileId ? EditStickerModalCustomIds.NEW_FILE_INPUT : null);
   switch (source) {
     case EditStickerModalCustomIds.NEW_URL_INPUT: {
@@ -111,6 +138,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
         });
         return;
       }
+      stickerDeleteUrl = null;
     }
       break;
     case EditStickerModalCustomIds.NEW_FILE_INPUT: {
@@ -143,7 +171,7 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
         return;
       }
 
-      ({ stickerUrl } = await saveStickerFile(context, {
+      ({ stickerUrl, deleteUrl: stickerDeleteUrl } = await saveStickerFile(context, {
         stickerId: sticker.id,
         fileId: stickerFileMeta.id,
         fileName: stickerFileMeta.name,
@@ -157,19 +185,28 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
     }
   }
   const description = normalizeStickerDescriptionInput(data[EditStickerModalCustomIds.NEW_ALT_INPUT]);
+  const nsfwOverride = parseRatingOption(data[EditStickerModalCustomIds.RATING_INPUT]);
+  const previousStickerFile = { url: sticker.url, deleteUrl: sticker.deleteUrl };
+  const fileReplaced = source === EditStickerModalCustomIds.NEW_URL_INPUT || source === EditStickerModalCustomIds.NEW_FILE_INPUT;
   sticker = await db.sticker.update({
     where: { id: sticker.id },
     data: {
-      name: stickerName,
+      name: stickerName ?? sticker.name,
       description,
       url: stickerUrl,
+      deleteUrl: stickerDeleteUrl,
+      nsfwOverride,
     },
-    include: { pack: true },
+    include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
   });
+
+  if (fileReplaced) {
+    await deleteStickerFile(context, previousStickerFile);
+  }
 
   await interactionReply(context, interaction, {
     content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.edit-sticker.responses.updated', {
-      name: `\`${sticker.name}\``,
+      name: `\`${getFormattedStickerName(sticker)}\``,
     })}`,
     flags: MessageFlags.Ephemeral,
   });

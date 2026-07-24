@@ -1,10 +1,11 @@
 import { i18n } from 'i18next';
 import { PgBoss } from 'pg-boss';
-import { SendOptions } from 'pg-boss/dist/types.js';
+import { SendOptions, WorkHandler, WorkOptions } from 'pg-boss/dist/types.js';
 import { initI18next } from '../constants/locales.js';
 import { env } from '../env.js';
-import { NestableLogger } from '../types/logger-types.js';
+import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { QueueHandler, QueueReqData, QueueType } from '../types/queue.js';
+import { telegramImportQueueHandler } from './queue-handlers/telegram-import.queue-handler.js';
 import { updateMessageQueueHandler } from './queue-handlers/update-message.queue-handler.js';
 
 export class QueueManager {
@@ -14,11 +15,15 @@ export class QueueManager {
   protected readonly defaultOptions: Partial<{ [k in QueueType]: SendOptions }> = {
     [QueueType.UpdateMessage]: { group: { id: 'discord-api' } },
   };
+  protected readonly workOptions: Partial<{ [k in QueueType]: WorkOptions }> = {
+    [QueueType.UpdateMessage]: { batchSize: 1 },
+  };
 
   constructor(protected logger: NestableLogger) {
     this.boss = new PgBoss(env.DATABASE_URL);
     this.queueWorkers = {
       [QueueType.UpdateMessage]: updateMessageQueueHandler,
+      [QueueType.TelegramImport]: telegramImportQueueHandler,
     };
     this.i18next = initI18next(this.logger);
   }
@@ -50,12 +55,13 @@ export class QueueManager {
 
   public async work(): Promise<void> {
     await Promise.all(Object.keys(this.queueWorkers).map(queueType => {
-      this.logger.info(`Starting worker for queue ${queueType}…`);
-      return this.boss.work(
-        queueType,
-        { groupConcurrency: 1 },
-        this.queueWorkers[queueType as QueueType](this.logger),
-      );
+      const type = queueType as QueueType;
+      this.logger.info(`Starting worker for queue ${type}…`);
+      const handler = this.queueWorkers[type](this.logger) as unknown as WorkHandler<unknown, void>;
+      const options = this.workOptions[type];
+      return options
+        ? this.boss.work(type, options, handler)
+        : this.boss.work(type, handler);
     }));
   }
 }

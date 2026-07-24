@@ -1,0 +1,17 @@
+node_modules
+build
+coverage
+.git
+.github
+.husky
+tests
+fs/*
+!fs/.gitignore
+*.env
+.env*
+!.env.example
+pm2.json
+setup
+crowdin_report.json5
+*.md
+!README.md

@@ -11,11 +11,8 @@ import {
   TopLevelComponent,
   User,
 } from 'discord.js';
-import { DiscordUser } from '../generated/prisma/client.js';
+import { DiscordUser, PrismaClient } from '../generated/prisma/client.js';
 import { DiscordUserUpdateInput } from '../generated/prisma/models/DiscordUser.js';
-
-import { InteractionHandlerContext } from '../types/contexts/interaction-handler.context.js';
-import { InteractionContext } from '../types/contexts/interaction.context.js';
 
 type UserFriendCode = `@${string}` | `${string}#${string}`;
 export const getUserFriendCode = (user: User): UserFriendCode => {
@@ -117,11 +114,11 @@ export const findTextComponentContentsRecursively = (components: TopLevelCompone
     return contents;
   }, [] as string[]);
 
-export const emoji = (context: Pick<InteractionHandlerContext, 'emojiIdMap'>, name: string, animated = false): string => {
+export const emoji = (context: { emojiIdMap: Record<string, string> }, name: string, animated = false): string => {
   return `<${animated ? 'a' : ''}:${name}:${context.emojiIdMap[name]}>`;
 };
 
-export const updateOrCreateUser = (context: InteractionContext, interaction: Pick<ChatInputCommandInteraction, 'user'>): Promise<DiscordUser> => {
+export const updateOrCreateUser = (context: { db: PrismaClient }, interaction: Pick<ChatInputCommandInteraction, 'user'>): Promise<DiscordUser> => {
   const { db } = context;
 
   const id = BigInt(interaction.user.id);

@@ -1,7 +1,7 @@
 
-import { Logger } from './classes/logger.js';
+import { createAppLogger } from './utils/create-logger.js';
 import { initQueueManager } from './utils/init-queue-manager.js';
 
-const logger = new Logger('queue-worker');
+const logger = createAppLogger('queue-worker');
 initQueueManager(logger).then(qm => qm.work());
 

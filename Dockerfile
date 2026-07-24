@@ -1,0 +1,54 @@
+# syntax=docker/dockerfile:1
+
+FROM node:24-bookworm-slim AS build
+WORKDIR /app
+
+# Match the packageManager field in package.json exactly
+RUN corepack enable && corepack prepare pnpm@11.5.3 --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Full install (not --ignore-scripts): the `prepare` script runs `ts-patch install`,
+# which is required for the typia transform plugin declared in tsconfig.json to
+# actually run during `tsc`. This mirrors setup/post-receive.sh (the real
+# production deploy path), not node.yml's CI shortcut.
+RUN pnpm install --frozen-lockfile
+
+COPY tsconfig.json prisma.config.ts ./
+COPY prisma ./prisma
+RUN pnpm exec prisma generate
+
+COPY src ./src
+COPY utils ./utils
+RUN pnpm run build
+
+# Separate stage so `docker compose build`'s `migrate` service (target: build)
+# still has the full toolchain, including the prisma CLI, which is a
+# devDependency this prune removes.
+FROM build AS pruned
+# --ignore-scripts: pnpm reruns the root "prepare" script (ts-patch install)
+# during prune, but ts-patch is a devDependency being removed by this same
+# prune and is no longer needed now that the build is done.
+RUN pnpm prune --prod --ignore-scripts
+
+
+FROM node:24-bookworm-slim AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+
+# chromium: headless rendering of animated (.tgs/Lottie) stickers via puppeteer-core
+# ffmpeg: GIF encoding for both .tgs frame sequences and .webm (VP9+alpha) stickers
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends chromium ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+COPY --from=pruned --chown=node:node /app/node_modules ./node_modules
+COPY --from=pruned --chown=node:node /app/build ./build
+COPY --from=pruned --chown=node:node /app/package.json ./package.json
+# tsc does not copy JSON locale files into build/; i18next reads them from
+# disk at runtime relative to process.cwd() (see src/constants/locales.ts).
+COPY --chown=node:node src/locales ./src/locales
+
+USER node
+
+CMD ["node", "--enable-source-maps", "build/src/index.js"]

@@ -1,12 +1,12 @@
-import { ShardingManager } from 'discord.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { Logger } from './classes/logger.js';
+import { createShardManager } from '@wentthefox-org/discord-bot-framework/client';
+import { NestableLogger } from '@wentthefox-org/discord-bot-framework/logger';
 import { initI18next } from './constants/locales.js';
 import { env } from './env.js';
 import { InteractionHandlerContext } from './types/contexts/interaction-handler.context.js';
-import { NestableLogger } from './types/logger-types.js';
 import { createDb } from './utils/create-db.js';
+import { createAppLogger } from './utils/create-logger.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
 import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
 import { initQueueManager } from './utils/init-queue-manager.js';
@@ -35,36 +35,20 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
 }
 
 (async function createShards() {
-  const logger = new Logger('ShardingManager');
-  await startupCommandsUpdate(logger);
-
+  const logger = createAppLogger('ShardingManager');
   const currentFolder = dirname(fileURLToPath(import.meta.url));
-  const botScriptPath = `${currentFolder}/bot.js`;
+  // Running via `tsx` from source (e.g. `pnpm dev`) rather than the compiled build/ output.
+  const isTsDevMode = process.env.npm_lifecycle_script?.includes('.ts') ?? false;
+  const botScriptPath = `${currentFolder}/bot.${isTsDevMode ? 'ts' : 'js'}`;
 
-  logger.log(`Starting recommended number of shards with path ${botScriptPath}`);
-  const manager = new ShardingManager(botScriptPath, {
-    mode: process.env.npm_lifecycle_script?.includes('.ts') ? 'worker' : 'process',
+  await createShardManager({
     token: env.DISCORD_BOT_TOKEN,
+    botScriptPath,
+    logger,
+    mode: isTsDevMode ? 'worker' : 'process',
+    // Worker threads don't inherit CLI flags by default - forward tsx's own loader
+    // flags so shards spawned from `bot.ts` can be loaded without a separate build.
+    execArgv: isTsDevMode ? process.execArgv : undefined,
+    beforeSpawn: () => startupCommandsUpdate(logger),
   });
-
-  manager.on('shardCreate', shard => {
-    logger.log(`Shard ${shard.id} created`);
-
-    shard.on('spawn', () => {
-      logger.log(`Shard ${shard.id} spawned`);
-    });
-    shard.on('ready', () => {
-      logger.log(`Shard ${shard.id} ready`);
-    });
-    shard.on('disconnect', () => {
-      logger.log(`Shard ${shard.id} disconnected`);
-    });
-    shard.on('reconnecting', () => {
-      logger.log(`Shard ${shard.id} reconnecting`);
-    });
-    shard.on('death', () => {
-      logger.log(`Shard ${shard.id} died`);
-    });
-  });
-  await manager.spawn();
 })();

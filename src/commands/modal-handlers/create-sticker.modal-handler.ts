@@ -12,15 +12,11 @@ import { saveStickerFile } from '../../utils/filesystem.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { collectModalSubmittedData, updateOrCreateUser } from '../../utils/messaging.js';
 import { parseRatingOption } from '../../constants/edit-sticker-modal-fields.js';
-import {
-  normalizeStickerDescriptionInput,
-} from '../../utils/normalize-sticker-description-input.js';
 import { postStickerToFeed } from '../../utils/post-sticker-to-feed.js';
 
 export enum CreateStickerModalCustomIds {
   PACK_INPUT = 'packInput',
   NAME_INPUT = 'nameInput',
-  ALT_INPUT = 'altInput',
   FILE_INPUT = 'fileInput',
   URL_INPUT = 'urlInput',
   RATING_INPUT = 'ratingInput',
@@ -168,14 +164,13 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
     }
   }
   const order = await db.sticker.count({ where: { packId: userPack.id } });
-  const description = normalizeStickerDescriptionInput(data[CreateStickerModalCustomIds.ALT_INPUT]);
   const nsfwOverride = parseRatingOption(data[CreateStickerModalCustomIds.RATING_INPUT]);
   const sticker = await db.sticker.create({
     data: {
       id: stickerId,
       name: stickerName,
       packId: userPack.id,
-      description,
+      description: null,
       url: stickerUrl,
       deleteUrl: stickerDeleteUrl,
       createdBy: user.id,

@@ -49,7 +49,24 @@ export const getEditStickerModalContent = (t: TFunction, sticker: EditableSticke
             value: sticker.name || undefined,
           } as TextInputComponentData,
         },
+        {
+          type: ComponentType.Label as const,
+          label: t('commands.create-sticker.components.altLabel'),
+          description: t('commands.create-sticker.components.altDescription'),
+          component: {
+            type: ComponentType.TextInput,
+            customId: EditStickerModalCustomIds.NEW_ALT_INPUT,
+            style: TextInputStyle.Paragraph,
+            minLength: stickerAltOptionMeta.min_length,
+            maxLength: stickerAltOptionMeta.max_length,
+            required: false,
+            value: sticker.description ?? undefined,
+          } as TextInputComponentData,
+        },
       ] : [
+        // No separate description field here (Discord caps modals at 5 top-level fields,
+        // and this branch also needs the rating/file/URL fields) — description is only
+        // editable for imported stickers, whose branch has room for it
         {
           type: ComponentType.Label as const,
           label: t('commands.create-sticker.components.nameLabel'),
@@ -65,20 +82,6 @@ export const getEditStickerModalContent = (t: TFunction, sticker: EditableSticke
           } as TextInputComponentData,
         },
       ]),
-      {
-        type: ComponentType.Label as const,
-        label: t('commands.create-sticker.components.altLabel'),
-        description: t('commands.create-sticker.components.altDescription'),
-        component: {
-          type: ComponentType.TextInput,
-          customId: EditStickerModalCustomIds.NEW_ALT_INPUT,
-          style: TextInputStyle.Paragraph,
-          minLength: stickerAltOptionMeta.min_length,
-          maxLength: stickerAltOptionMeta.max_length,
-          required: false,
-          value: sticker.description ?? undefined,
-        } as TextInputComponentData,
-      },
       {
         type: ComponentType.Label as const,
         label: t('commands.edit-sticker.components.ratingChoiceLabel'),

@@ -1,13 +1,13 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
-import { applyStickerModalEdit } from '../../utils/apply-sticker-edit.js';
+import { applyStickerMetadataEdit } from '../../utils/apply-sticker-metadata-edit.js';
 import { getFormattedStickerName } from '../../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../../utils/messaging.js';
 import { postStickerToFeed } from '../../utils/post-sticker-to-feed.js';
 
-export const editStickerModalHandler: ModalHandler = async (interaction, context, resourceId) => {
+export const editStickerMetadataModalHandler: ModalHandler = async (interaction, context, resourceId) => {
   const { t, db } = context;
   const user = await updateOrCreateUser(context, interaction);
   if (user.readOnly) {
@@ -25,17 +25,17 @@ export const editStickerModalHandler: ModalHandler = async (interaction, context
 
   if (!sticker) {
     await interactionReply(context, interaction, {
-      content: t('commands.edit-sticker.responses.stickerNotFound'),
+      content: t('commands.edit-sticker-metadata.responses.stickerNotFound'),
       flags: MessageFlags.Ephemeral,
     });
     return;
   }
 
-  const result = await applyStickerModalEdit(interaction, context, sticker);
+  const result = await applyStickerMetadataEdit(interaction, context, sticker);
   if (!result) return;
 
   await interactionReply(context, interaction, {
-    content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.edit-sticker.responses.updated', {
+    content: `${EmojiCharacters.GREEN_CHECK} ${t('commands.edit-sticker-metadata.responses.updated', {
       name: `\`${getFormattedStickerName(result.sticker)}\``,
     })}`,
     flags: MessageFlags.Ephemeral,

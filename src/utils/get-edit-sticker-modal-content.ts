@@ -13,18 +13,22 @@ import { EditableSticker } from './apply-sticker-edit.js';
 import { getFormattedPackName } from './get-formatted-pack-name.js';
 import { getFormattedStickerName } from './get-formatted-sticker-name.js';
 
-// The full sticker-edit modal (name, alt text, rating, file, URL), shared between
-// /edit-sticker and the mass-edit stepping flow so both present the exact same fields
+// The full sticker-edit modal (name, alt text, rating, file, URL), used by the mass-edit
+// stepping flow's "Edit" button. /edit-sticker itself was split into /edit-sticker-metadata
+// and /replace-sticker to fit Discord's 5-top-level-component modal cap with room for a
+// description field; mass-edit keeps the combined modal (still without description on the
+// non-imported branch, for the same reason) since its own 5-field budget is unaffected by
+// that split.
 export const getEditStickerModalContent = (t: TFunction, sticker: EditableSticker) => {
   const isImportedSticker = sticker.telegramStickerId !== null;
   const formattedStickerName = getFormattedStickerName(sticker);
 
   return {
-    title: t('commands.edit-sticker.components.editStickerModalTitle', { name: formattedStickerName }),
+    title: t('commands.mass-edit-stickers.components.editStickerModalTitle', { name: formattedStickerName }),
     components: [
       {
         type: ComponentType.TextDisplay as const,
-        content: t('commands.edit-sticker.components.editingText', {
+        content: t('commands.mass-edit-stickers.components.editingText', {
           name: `\`${formattedStickerName}\``,
           pack: getFormattedPackName(sticker.pack),
         }),
@@ -34,12 +38,12 @@ export const getEditStickerModalContent = (t: TFunction, sticker: EditableSticke
       ...(isImportedSticker ? [
         {
           type: ComponentType.TextDisplay as const,
-          content: `${EmojiCharacters.INFO} ${t('commands.edit-sticker.components.importedStickerNote')}`,
+          content: `${EmojiCharacters.INFO} ${t('commands.mass-edit-stickers.components.importedStickerNote')}`,
         } as const,
         {
           type: ComponentType.Label as const,
-          label: t('commands.edit-sticker.components.importedNameLabel'),
-          description: t('commands.edit-sticker.components.importedNameDescription'),
+          label: t('commands.mass-edit-stickers.components.importedNameLabel'),
+          description: t('commands.mass-edit-stickers.components.importedNameDescription'),
           component: {
             type: ComponentType.TextInput,
             customId: EditStickerModalCustomIds.NEW_NAME_INPUT,
@@ -84,28 +88,28 @@ export const getEditStickerModalContent = (t: TFunction, sticker: EditableSticke
       ]),
       {
         type: ComponentType.Label as const,
-        label: t('commands.edit-sticker.components.ratingChoiceLabel'),
-        description: t('commands.edit-sticker.components.ratingChoiceDescription'),
+        label: t('commands.edit-sticker-metadata.components.ratingChoiceLabel'),
+        description: t('commands.edit-sticker-metadata.components.ratingChoiceDescription'),
         component: {
           type: ComponentType.RadioGroup,
           customId: EditStickerModalCustomIds.RATING_INPUT,
           options: [
             {
               value: EditStickerRatingOption.DEFAULT,
-              label: t('commands.edit-sticker.components.ratingDefaultLabel'),
-              description: t('commands.edit-sticker.components.ratingDefaultDescription'),
+              label: t('commands.edit-sticker-metadata.components.ratingDefaultLabel'),
+              description: t('commands.edit-sticker-metadata.components.ratingDefaultDescription'),
               default: sticker.nsfwOverride === null,
             },
             {
               value: EditStickerRatingOption.SFW,
-              label: t('commands.edit-sticker.components.ratingSfwLabel'),
-              description: t('commands.edit-sticker.components.ratingSfwDescription'),
+              label: t('commands.edit-sticker-metadata.components.ratingSfwLabel'),
+              description: t('commands.edit-sticker-metadata.components.ratingSfwDescription'),
               default: sticker.nsfwOverride === false,
             },
             {
               value: EditStickerRatingOption.NSFW,
-              label: t('commands.edit-sticker.components.ratingNsfwLabel'),
-              description: t('commands.edit-sticker.components.ratingNsfwDescription'),
+              label: t('commands.edit-sticker-metadata.components.ratingNsfwLabel'),
+              description: t('commands.edit-sticker-metadata.components.ratingNsfwDescription'),
               default: sticker.nsfwOverride === true,
             },
           ],
@@ -114,8 +118,8 @@ export const getEditStickerModalContent = (t: TFunction, sticker: EditableSticke
       ...(isImportedSticker ? [] : [
         {
           type: ComponentType.Label as const,
-          label: t('commands.edit-sticker.components.newFileLabel'),
-          description: t('commands.edit-sticker.components.newFileDescription'),
+          label: t('commands.mass-edit-stickers.components.newFileLabel'),
+          description: t('commands.mass-edit-stickers.components.newFileDescription'),
           component: {
             type: ComponentType.FileUpload as const,
             customId: EditStickerModalCustomIds.NEW_FILE_INPUT,
@@ -126,8 +130,8 @@ export const getEditStickerModalContent = (t: TFunction, sticker: EditableSticke
         },
         {
           type: ComponentType.Label as const,
-          label: t('commands.edit-sticker.components.newUrlLabel'),
-          description: t('commands.edit-sticker.components.newUrlDescription'),
+          label: t('commands.mass-edit-stickers.components.newUrlLabel'),
+          description: t('commands.mass-edit-stickers.components.newUrlDescription'),
           component: {
             type: ComponentType.TextInput,
             customId: EditStickerModalCustomIds.NEW_URL_INPUT,

@@ -22,7 +22,11 @@ export const enum PackCommandOptionName {
   NAME = 'name',
 }
 
-export const enum EditStickerCommandOptionName {
+export const enum EditStickerMetadataCommandOptionName {
+  NAME = 'name',
+}
+
+export const enum ReplaceStickerCommandOptionName {
   NAME = 'name',
 }
 
@@ -72,7 +76,8 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.IMPORT_TELEGRAM_PACK]: ImportCommandOptionName,
   [BotChatInputCommandName.PACK]: PackCommandOptionName,
   [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
-  [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandOptionName,
+  [BotChatInputCommandName.EDIT_STICKER_METADATA]: EditStickerMetadataCommandOptionName,
+  [BotChatInputCommandName.REPLACE_STICKER]: ReplaceStickerCommandOptionName,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandOptionName,
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
@@ -137,8 +142,20 @@ export const enum PackCommandResponse {
   invalidPack = 'invalidPack',
 }
 
-export const enum EditStickerCommandResponse {
+export const enum EditStickerMetadataCommandResponse {
   stickerNotFound = 'stickerNotFound',
+  nameTooShort = 'nameTooShort',
+  nameTooLong = 'nameTooLong',
+  invalidName = 'invalidName',
+  duplicateName = 'duplicateName',
+  updated = 'updated',
+}
+
+export const enum ReplaceStickerCommandResponse {
+  stickerNotFound = 'stickerNotFound',
+  importedSticker = 'importedSticker',
+  missingFile = 'missingFile',
+  updated = 'updated',
 }
 
 export const enum DeleteStickerCommandResponse {
@@ -208,7 +225,8 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.IMPORT_TELEGRAM_PACK]: ImportCommandResponse,
   [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
   [BotChatInputCommandName.PACK]: PackCommandResponse,
-  [BotChatInputCommandName.EDIT_STICKER]: EditStickerCommandResponse,
+  [BotChatInputCommandName.EDIT_STICKER_METADATA]: EditStickerMetadataCommandResponse,
+  [BotChatInputCommandName.REPLACE_STICKER]: ReplaceStickerCommandResponse,
   [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandResponse,
   [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
   [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
@@ -245,9 +263,8 @@ interface ComponentsMap {
     'lastPageButton',
     'pageIndicator',
   ],
-  [BotChatInputCommandName.EDIT_STICKER]: [
-    'editStickerModalTitle',
-    'editingText',
+  [BotChatInputCommandName.EDIT_STICKER_METADATA]: [
+    'editStickerMetadataModalTitle',
     'importedStickerNote',
     'importedNameLabel',
     'importedNameDescription',
@@ -259,6 +276,14 @@ interface ComponentsMap {
     'ratingSfwDescription',
     'ratingNsfwLabel',
     'ratingNsfwDescription',
+  ],
+  [BotChatInputCommandName.REPLACE_STICKER]: [
+    'replaceStickerModalTitle',
+    'fileLabel',
+    'fileDescription',
+    'urlLabel',
+    'urlDescription',
+    'urlPlaceholder',
   ],
   [BotChatInputCommandName.DELETE_STICKER]: [
     'deleteStickerModalTitle',
@@ -318,6 +343,15 @@ interface ComponentsMap {
     'previousButton',
     'nextButton',
     'allDoneText',
+    'editStickerModalTitle',
+    'editingText',
+    'importedStickerNote',
+    'importedNameLabel',
+    'importedNameDescription',
+    'newFileLabel',
+    'newFileDescription',
+    'newUrlLabel',
+    'newUrlDescription',
   ],
   [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: [
     'reviewingText',

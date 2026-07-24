@@ -91,28 +91,28 @@ export const createStickerCommand: BotChatInputCommand = {
         },
         {
           type: ComponentType.Label,
-          label: t('commands.edit-sticker.components.ratingChoiceLabel'),
-          description: t('commands.edit-sticker.components.ratingChoiceDescription'),
+          label: t('commands.edit-sticker-metadata.components.ratingChoiceLabel'),
+          description: t('commands.edit-sticker-metadata.components.ratingChoiceDescription'),
           component: {
             type: ComponentType.RadioGroup,
             customId: CreateStickerModalCustomIds.RATING_INPUT,
             options: [
               {
                 value: EditStickerRatingOption.DEFAULT,
-                label: t('commands.edit-sticker.components.ratingDefaultLabel'),
-                description: t('commands.edit-sticker.components.ratingDefaultDescription'),
+                label: t('commands.edit-sticker-metadata.components.ratingDefaultLabel'),
+                description: t('commands.edit-sticker-metadata.components.ratingDefaultDescription'),
                 default: true,
               },
               {
                 value: EditStickerRatingOption.SFW,
-                label: t('commands.edit-sticker.components.ratingSfwLabel'),
-                description: t('commands.edit-sticker.components.ratingSfwDescription'),
+                label: t('commands.edit-sticker-metadata.components.ratingSfwLabel'),
+                description: t('commands.edit-sticker-metadata.components.ratingSfwDescription'),
                 default: false,
               },
               {
                 value: EditStickerRatingOption.NSFW,
-                label: t('commands.edit-sticker.components.ratingNsfwLabel'),
-                description: t('commands.edit-sticker.components.ratingNsfwDescription'),
+                label: t('commands.edit-sticker-metadata.components.ratingNsfwLabel'),
+                description: t('commands.edit-sticker-metadata.components.ratingNsfwDescription'),
                 default: false,
               },
             ],

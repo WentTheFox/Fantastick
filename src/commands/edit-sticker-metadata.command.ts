@@ -1,28 +1,28 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { getEditStickerOptions } from '../options/edit-sticker.options.js';
+import { getEditStickerMetadataOptions } from '../options/edit-sticker-metadata.options.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
-import { EditStickerCommandOptionName } from '../types/localization.js';
+import { EditStickerMetadataCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
-import { getEditStickerModalContent } from '../utils/get-edit-sticker-modal-content.js';
+import { getEditStickerMetadataModalContent } from '../utils/get-edit-sticker-metadata-modal-content.js';
 import { getLocalizedObject } from '../utils/get-localized-object.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
-import { editStickerModalHandler } from './modal-handlers/edit-sticker.modal-handler.js';
+import { editStickerMetadataModalHandler } from './modal-handlers/edit-sticker-metadata.modal-handler.js';
 
-export const editStickerCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.EDIT_STICKER,
+export const editStickerMetadataCommand: BotChatInputCommand = {
+  name: BotChatInputCommandName.EDIT_STICKER_METADATA,
   getDefinition: (t) => {
     if (!t) throw new Error('Missing translation function');
     return {
-      ...getLocalizedObject('description', (lng) => t('commands.edit-sticker.description', { lng })),
-      ...getLocalizedObject('name', (lng) => t('commands.edit-sticker.name', { lng })),
-      options: getEditStickerOptions(t),
+      ...getLocalizedObject('description', (lng) => t('commands.edit-sticker-metadata.description', { lng })),
+      ...getLocalizedObject('name', (lng) => t('commands.edit-sticker-metadata.name', { lng })),
+      options: getEditStickerMetadataOptions(t),
     };
   },
   autocomplete: {
-    [EditStickerCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),
+    [EditStickerMetadataCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),
   },
   async handle(interaction, context) {
     const { t, db } = context;
@@ -35,7 +35,7 @@ export const editStickerCommand: BotChatInputCommand = {
       return;
     }
 
-    const id = interaction.options.getString(EditStickerCommandOptionName.NAME, true);
+    const id = interaction.options.getString(EditStickerMetadataCommandOptionName.NAME, true);
     const sticker = await db.sticker.findUnique({
       where: { id, deletedAt: null },
       include: { pack: { include: { telegramPack: true } }, telegramSticker: true },
@@ -43,20 +43,20 @@ export const editStickerCommand: BotChatInputCommand = {
 
     if (!sticker) {
       await interactionReply(context, interaction, {
-        content: t('commands.edit-sticker.responses.stickerNotFound'),
+        content: t('commands.edit-sticker-metadata.responses.stickerNotFound'),
         flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
-    const { title, components } = getEditStickerModalContent(t, sticker);
+    const { title, components } = getEditStickerMetadataModalContent(t, sticker);
     await interaction.showModal({
-      customId: `${BotModalId.EDIT_STICKER}:${sticker.id}`,
+      customId: `${BotModalId.EDIT_STICKER_METADATA}:${sticker.id}`,
       title,
       components,
     });
   },
   modal: {
-    [BotModalId.EDIT_STICKER]: editStickerModalHandler,
+    [BotModalId.EDIT_STICKER_METADATA]: editStickerMetadataModalHandler,
   },
 };

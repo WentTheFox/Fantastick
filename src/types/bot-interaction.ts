@@ -21,7 +21,8 @@ export const enum BotChatInputCommandName {
   CREATE_STICKER = 'create-sticker',
   PACK = 'pack',
   NSFW_PACK = 'nsfw-pack',
-  EDIT_STICKER = 'edit-sticker',
+  EDIT_STICKER_METADATA = 'edit-sticker-metadata',
+  REPLACE_STICKER = 'replace-sticker',
   DELETE_STICKER = 'delete-sticker',
   DELETE_PACK = 'delete-pack',
   EDIT_PACK = 'edit-pack',
@@ -38,7 +39,8 @@ export const enum BotMessageContextMenuCommandName {
 
 export const enum BotModalId {
   CREATE_STICKER = 'createStickerModal',
-  EDIT_STICKER = 'editStickerModal',
+  EDIT_STICKER_METADATA = 'editStickerMetadataModal',
+  REPLACE_STICKER = 'replaceStickerModal',
   DELETE_STICKER = 'deleteStickerModal',
   CREATE_PACK = 'createPackModal',
   DELETE_PACK = 'deletePackModal',

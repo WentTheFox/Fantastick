@@ -9,7 +9,7 @@ import { createStickerCommand } from '../commands/create-sticker.command.js';
 import { deletePackCommand } from '../commands/delete-pack.command.js';
 import { deleteStickerCommand } from '../commands/delete-sticker.command.js';
 import { editPackCommand } from '../commands/edit-pack.command.js';
-import { editStickerCommand } from '../commands/edit-sticker.command.js';
+import { editStickerMetadataCommand } from '../commands/edit-sticker-metadata.command.js';
 import { importTelegramPackCommand } from '../commands/import-telegram-pack.command.js';
 import { massEditStickersCommand } from '../commands/mass-edit-stickers.command.js';
 import { migrateToTelegramStickerCommand } from '../commands/migrate-to-telegram-sticker.command.js';
@@ -18,6 +18,7 @@ import { nsfwStickerCommand } from '../commands/nsfw-sticker.command.js';
 import { packCommand } from '../commands/pack.command.js';
 import { publishImportedPackCommand } from '../commands/publish-imported-pack.command.js';
 import { reorderStickerCommand } from '../commands/reorder-sticker.command.js';
+import { replaceStickerCommand } from '../commands/replace-sticker.command.js';
 import { stickerCommand } from '../commands/sticker.command.js';
 import { stickerDetailsCommand } from '../commands/sticker-details.command.js';
 import { updateMessageCommand } from '../commands/update-message.command.js';
@@ -44,7 +45,8 @@ export const chatInputCommandRegistry = createChatInputCommandRegistry([
   createStickerCommand,
   packCommand,
   nsfwPackCommand,
-  editStickerCommand,
+  editStickerMetadataCommand,
+  replaceStickerCommand,
   deleteStickerCommand,
   deletePackCommand,
   editPackCommand,

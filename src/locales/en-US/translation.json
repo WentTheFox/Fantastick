@@ -162,20 +162,19 @@
         }
       }
     },
-    "edit-sticker": {
-      "name": "edit-sticker",
-      "description": "Edit an existing sticker",
+    "edit-sticker-metadata": {
+      "name": "edit-sticker-metadata",
+      "description": "Edit a sticker's name, description and content rating",
       "responses": {
         "stickerNotFound": "The specified sticker could not be found",
+        "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker name contains the following invalid character(s): {{chars}}",
+        "duplicateName": "A sticker with the same name already exists in this pack, please choose a different one",
         "updated": "The sticker {{name}} has been updated successfully"
       },
       "components": {
-        "editStickerModalTitle": "Edit sticker {{name}}",
-        "editingText": "You are editing sticker {{name}} from pack {{pack}}. If you do not want to change the sticker image, do not enter an URL or upload a file.",
-        "newFileLabel": "Update sticker file",
-        "newFileDescription": "Upload a new file to change the sticker image. Leave blank to keep the image unchanged.",
-        "newUrlLabel": "Update sticker URL",
-        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged.",
+        "editStickerMetadataModalTitle": "Edit sticker {{name}}",
         "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
         "importedNameLabel": "Sticker name (optional)",
         "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position.",
@@ -192,6 +191,30 @@
         "name": {
           "name": "name",
           "description": "Name of the sticker you want to edit"
+        }
+      }
+    },
+    "replace-sticker": {
+      "name": "replace-sticker",
+      "description": "Replace a sticker's image with a new file or URL",
+      "responses": {
+        "stickerNotFound": "The specified sticker could not be found",
+        "importedSticker": "Imported stickers cannot have their image replaced individually. Their image is managed by the Telegram import.",
+        "missingFile": "You must upload a file or provide a URL for the new sticker image",
+        "updated": "The sticker {{name}} has been updated successfully"
+      },
+      "components": {
+        "replaceStickerModalTitle": "Replace sticker {{name}}",
+        "fileLabel": "New sticker file",
+        "fileDescription": "Upload a new file to replace the sticker image.",
+        "urlLabel": "New sticker URL",
+        "urlDescription": "Specify a new URL for the sticker image.",
+        "urlPlaceholder": "https://example.com/sticker.png"
+      },
+      "options": {
+        "name": {
+          "name": "name",
+          "description": "Name of the sticker whose image you want to replace"
         }
       }
     },
@@ -294,7 +317,16 @@
         "editButton": "Edit",
         "previousButton": "Previous",
         "nextButton": "Next",
-        "allDoneText": "All stickers in pack {{pack}} have been shown"
+        "allDoneText": "All stickers in pack {{pack}} have been shown",
+        "editStickerModalTitle": "Edit sticker {{name}}",
+        "editingText": "You are editing sticker {{name}} from pack {{pack}}. If you do not want to change the sticker image, do not enter an URL or upload a file.",
+        "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
+        "importedNameLabel": "Sticker name (optional)",
+        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position.",
+        "newFileLabel": "Update sticker file",
+        "newFileDescription": "Upload a new file to change the sticker image. Leave blank to keep the image unchanged.",
+        "newUrlLabel": "Update sticker URL",
+        "newUrlDescription": "Enter a new URL to change the sticker image. Leave blank to keep the image unchanged."
       },
       "options": {
         "pack": {

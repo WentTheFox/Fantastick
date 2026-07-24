@@ -5,7 +5,13 @@ import { getNonNsfwStickerFilter } from '../get-non-nsfw-sticker-filter.js';
 import { getFormattedStickerName } from '../get-formatted-sticker-name.js';
 import { truncateToMaximumLength } from '../messaging.js';
 
-export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHandler => async (interaction, context, optionName) => {
+interface StickerNameAutocompleteOptions {
+  nsfw?: boolean;
+  excludeImported?: boolean;
+}
+
+export const getStickerNameAutocompleteHandler = (nsfwOrOptions: boolean | StickerNameAutocompleteOptions = false): AutocompleteHandler => async (interaction, context, optionName) => {
+  const { nsfw = false, excludeImported = false } = typeof nsfwOrOptions === 'boolean' ? { nsfw: nsfwOrOptions } : nsfwOrOptions;
   const value = interaction.options.getString(optionName, true).trim().toLowerCase();
   const { db } = context;
   const availablePacks = await findAvailableStickerPacks(context, interaction, nsfw);
@@ -26,6 +32,7 @@ export const getStickerNameAutocompleteHandler = (nsfw = false): AutocompleteHan
         in: availablePacks.map(pack => pack.id),
       },
       ...getNonNsfwStickerFilter(nsfw),
+      ...(excludeImported ? { telegramStickerId: null } : {}),
     },
   });
 

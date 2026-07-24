@@ -162,20 +162,19 @@
         }
       }
     },
-    "edit-sticker": {
+    "edit-sticker-metadata": {
       "name": "matrica-szerkesztés",
-      "description": "Létező matrica szerkesztése",
+      "description": "Matrica nevének, leírásának és tartalmi besorolásának szerkesztése",
       "responses": {
         "stickerNotFound": "A megadott matrica nem található",
+        "nameTooShort": "The provided sticker name is too short (minimum {{min}} characters)",
+        "nameTooLong": "The provided sticker name is too long (maximum {{max}} characters)",
+        "invalidName": "The provided sticker name contains the following invalid character(s): {{chars}}",
+        "duplicateName": "A sticker with the same name already exists in this pack, please choose a different one",
         "updated": "A(z) {{name}} nevű matrica sikeresen szerkesztve"
       },
       "components": {
-        "editStickerModalTitle": "A(z) {{name}} matrica szerkesztése",
-        "editingText": "A(z) {{name}} matricát szerkeszted a(z) {{pack}} matricacsomagból. ha nem szeretnéd megváltoztatni a matrica képét, akkor ne adj meg URL-t és ne tölts fel fájlt.",
-        "newFileLabel": "Matricafájl frissítése",
-        "newFileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
-        "newUrlLabel": "Matrica URL frissítése",
-        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
+        "editStickerMetadataModalTitle": "A(z) {{name}} matrica szerkesztése",
         "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
         "importedNameLabel": "Sticker name (optional)",
         "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position.",
@@ -187,6 +186,30 @@
         "ratingSfwDescription": "Ez a matrica mindig biztonságosnak minősül, még korhatáros csomagban is",
         "ratingNsfwLabel": "Korhatáros (NSFW)",
         "ratingNsfwDescription": "Ez a matrica mindig korhatárosnak minősül, még mindenki számára biztonságos csomagban is"
+      },
+      "options": {
+        "name": {
+          "name": "név",
+          "description": "A szerkeszteni kívánt matrica neve"
+        }
+      }
+    },
+    "replace-sticker": {
+      "name": "replace-sticker",
+      "description": "Replace a sticker's image with a new file or URL",
+      "responses": {
+        "stickerNotFound": "A megadott matrica nem található",
+        "importedSticker": "Imported stickers cannot have their image replaced individually. Their image is managed by the Telegram import.",
+        "missingFile": "You must upload a file or provide a URL for the new sticker image",
+        "updated": "A(z) {{name}} nevű matrica sikeresen szerkesztve"
+      },
+      "components": {
+        "replaceStickerModalTitle": "Replace sticker {{name}}",
+        "fileLabel": "Matricafájl frissítése",
+        "fileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez.",
+        "urlLabel": "Matrica URL frissítése",
+        "urlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez.",
+        "urlPlaceholder": "https://example.com/matrica.png"
       },
       "options": {
         "name": {
@@ -294,7 +317,16 @@
         "editButton": "Edit",
         "previousButton": "Previous",
         "nextButton": "Next",
-        "allDoneText": "All stickers in pack {{pack}} have been shown"
+        "allDoneText": "All stickers in pack {{pack}} have been shown",
+        "editStickerModalTitle": "A(z) {{name}} matrica szerkesztése",
+        "editingText": "A(z) {{name}} matricát szerkeszted a(z) {{pack}} matricacsomagból. ha nem szeretnéd megváltoztatni a matrica képét, akkor ne adj meg URL-t és ne tölts fel fájlt.",
+        "importedStickerNote": "This sticker was imported from Telegram, so its emojis, position and image are managed by the import and cannot be changed here.",
+        "importedNameLabel": "Sticker name (optional)",
+        "importedNameDescription": "Optional name to make this sticker easier to find. Leave blank to search only by emoji and position.",
+        "newFileLabel": "Matricafájl frissítése",
+        "newFileDescription": "Tölts fel egy új fájlt a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen.",
+        "newUrlLabel": "Matrica URL frissítése",
+        "newUrlDescription": "Adj meg egy új URL-t a matrica kép lecseréléséhez. Ha nem szeretnéd megváltoztatni, hagyd üresen."
       },
       "options": {
         "pack": {

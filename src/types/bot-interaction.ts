@@ -28,6 +28,7 @@ export const enum BotChatInputCommandName {
   REORDER_STICKER = 'reorder-sticker',
   MASS_EDIT_STICKERS = 'mass-edit-stickers',
   PUBLISH_IMPORTED_PACK = 'publish-imported-pack',
+  MIGRATE_TO_TELEGRAM_STICKER = 'migrate-to-telegram-sticker',
 }
 
 export const enum BotMessageContextMenuCommandName {

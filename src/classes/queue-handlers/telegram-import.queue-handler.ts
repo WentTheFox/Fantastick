@@ -335,8 +335,9 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   logger.info('Creating sticker records and updating pack…');
 
   let initiatingPackStickerIds: string[];
+  let newlyUnpublishedPacks: { packId: string; ownerId: bigint; newStickerCount: number }[];
   try {
-    initiatingPackStickerIds = await db.$transaction(async (tx) => {
+    ({ newInitiatingPackStickerIds: initiatingPackStickerIds, newlyUnpublishedPacks } = await db.$transaction(async (tx) => {
       const createdTelegramStickers: TelegramSticker[] = [];
       for (const args of createTelegramStickerRecords) {
         createdTelegramStickers.push(await tx.telegramSticker.create(args));
@@ -381,12 +382,14 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         where: { telegramPackId: telegramPack.id, deletedAt: null },
       });
       const newInitiatingPackStickerIds: string[] = [];
+      const newlyUnpublishedPacks: { packId: string; ownerId: bigint; newStickerCount: number }[] = [];
       for (const subscriberPack of subscriberPacks) {
         const existingRows = await tx.sticker.findMany({
           where: { packId: subscriberPack.id, telegramStickerId: { not: null } },
         });
         const rowsByTelegramStickerId = new Map(existingRows.map(row => [row.telegramStickerId as string, row]));
 
+        let newStickerCount = 0;
         for (const telegramStickerId of liveTelegramStickerIds) {
           const row = rowsByTelegramStickerId.get(telegramStickerId);
           if (!row) {
@@ -401,6 +404,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
                 nsfwOverride: publishedSticker?.nsfwOverride ?? null,
               },
             });
+            newStickerCount++;
             if (subscriberPack.id === packId) {
               newInitiatingPackStickerIds.push(created.id);
             }
@@ -423,9 +427,18 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
             data: { deletedAt: new Date() },
           });
         }
+
+        // New stickers always land without a rating, which breaks the "every sticker
+        // in a published pack has an nsfwOverride" invariant enforced at publish time.
+        // Unpublish and make the owner re-review and re-publish instead of silently
+        // exposing an unrated sticker.
+        if (newStickerCount > 0 && subscriberPack.public) {
+          await tx.pack.update({ where: { id: subscriberPack.id }, data: { public: false } });
+          newlyUnpublishedPacks.push({ packId: subscriberPack.id, ownerId: subscriberPack.createdBy, newStickerCount });
+        }
       }
-      return newInitiatingPackStickerIds;
-    }, { timeout: 60_000 });
+      return { newInitiatingPackStickerIds, newlyUnpublishedPacks };
+    }, { timeout: 60_000 }));
   } catch (e) {
     logger.error('Failed to create sticker records', e);
 
@@ -460,17 +473,27 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   });
 
   const importedCount = createTelegramStickerRecords.length;
+  const initiatingPackUnpublished = newlyUnpublishedPacks.some(unpublished => unpublished.packId === packId);
   const summaryParts = [
     ...(importedCount > 0 ? [`${importedCount} new sticker${importedCount !== 1 ? 's' : ''} imported`] : []),
     ...(updateTelegramStickerRecords.length > 0 ? [`${updateTelegramStickerRecords.length} updated`] : []),
     ...(staleTelegramStickers.length > 0 ? [`${staleTelegramStickers.length} removed`] : []),
     ...(skippedAnimatedCount > 0 ? [`${skippedAnimatedCount} animated sticker${skippedAnimatedCount !== 1 ? 's' : ''} skipped (ffmpeg/Chromium unavailable)`] : []),
+    ...(initiatingPackUnpublished ? ['pack made private again — new stickers need a rating before you can publish it again'] : []),
   ];
   if (summaryParts.length === 0) {
     summaryParts.push('No stickers needed updating');
   }
   await updateDiscordProgress(`${EmojiCharacters.GREEN_CHECK} ${summaryParts.join(', ')}.`);
   logger.info(`Import job ${importJobId} completed: ${importedCount} created, ${updateTelegramStickerRecords.length} updated, ${staleTelegramStickers.length} removed, ${skippedAnimatedCount} animated skipped in Telegram pack ${telegramPack.id}`);
+
+  // Packs owned by someone other than whoever triggered this import can also get
+  // unpublished as a side effect (the Telegram pack is shared across subscribers);
+  // there's no in-progress message to edit for those, so just log it for now
+  for (const unpublished of newlyUnpublishedPacks) {
+    if (unpublished.packId === packId) continue;
+    logger.info(`Pack ${unpublished.packId} (owner ${unpublished.ownerId}) was made private again after gaining ${unpublished.newStickerCount} unrated sticker(s) from Telegram pack ${telegramPack.id}`);
+  }
 
   // Post the initiating user's new stickers to the feed
   if (env.DISCORD_FEED_WEBHOOK_URL !== null && initiatingPackStickerIds.length > 0) {
@@ -481,7 +504,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     await postImportedStickersToFeed({
       db,
       stickers: newStickers,
-      pack,
+      pack: initiatingPackUnpublished ? { ...pack, public: false } : pack,
       telegramPack: { ...telegramPack, title: packTitle },
       importedBy: String(importedBy),
       logger,

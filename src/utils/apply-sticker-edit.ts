@@ -153,7 +153,12 @@ export const applyStickerModalEdit = async (
     }
   }
 
-  const description = normalizeStickerDescriptionInput(data[EditStickerModalCustomIds.NEW_ALT_INPUT]);
+  // Non-imported stickers have no description field in this modal (Discord caps modals
+  // at 5 top-level fields, and this case also needs the rating/file/URL fields); their
+  // existing description, if any, is left untouched
+  const description = isImportedSticker
+    ? normalizeStickerDescriptionInput(data[EditStickerModalCustomIds.NEW_ALT_INPUT])
+    : sticker.description;
   const nsfwOverride = parseRatingOption(data[EditStickerModalCustomIds.RATING_INPUT]);
   const previousStickerFile = { url: sticker.url, deleteUrl: sticker.deleteUrl };
   const fileReplaced = source === EditStickerModalCustomIds.NEW_URL_INPUT || source === EditStickerModalCustomIds.NEW_FILE_INPUT;

@@ -1,6 +1,5 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
-import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
 import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
@@ -83,19 +82,6 @@ export const createStickerCommand: BotChatInputCommand = {
             minLength: stickerNameOptionMeta.min_length,
             maxLength: stickerNameOptionMeta.max_length,
             required: true,
-          } as TextInputComponentData,
-        },
-        {
-          type: ComponentType.Label,
-          label: t('commands.create-sticker.components.altLabel'),
-          description: t('commands.create-sticker.components.altDescription'),
-          component: {
-            type: ComponentType.TextInput,
-            customId: CreateStickerModalCustomIds.ALT_INPUT,
-            style: TextInputStyle.Paragraph,
-            minLength: stickerAltOptionMeta.min_length,
-            maxLength: stickerAltOptionMeta.max_length,
-            required: false,
           } as TextInputComponentData,
         },
         {

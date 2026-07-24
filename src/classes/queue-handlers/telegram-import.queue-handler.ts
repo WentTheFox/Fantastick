@@ -87,6 +87,21 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
     }
   };
 
+  // Editing the same webhook message once per sticker (as fast as every ~50-100ms for
+  // small, quickly-downloaded stickers) blows through Discord's per-message edit rate
+  // limit almost immediately; discord.js then blocks the whole import loop waiting out
+  // the reset, which is what makes imports feel like they've stalled. Throttling to at
+  // most one edit per interval keeps progress visible without fighting the rate limit;
+  // `force` bypasses it for state transitions that only happen once per import anyway.
+  const progressUpdateIntervalMs = 2000;
+  let lastProgressUpdateAt = 0;
+  const updateDiscordProgressThrottled = async (content: string, force = false) => {
+    const now = Date.now();
+    if (!force && now - lastProgressUpdateAt < progressUpdateIntervalMs) return;
+    lastProgressUpdateAt = now;
+    await updateDiscordProgress(content);
+  };
+
   // A pack freshly auto-created for this import (no live stickers yet) is removed again
   // when the job fails so a bad URL doesn't leave an orphan placeholder pack
   const cleanUpFreshlyCreatedPack = async () => {
@@ -173,7 +188,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         completed++;
         logger.info(`Skipping sticker ${sticker.file_id} (#${order}): animated sticker conversion unavailable`);
         await db.importJob.update({ where: { id: importJobId }, data: { completed } });
-        await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote());
+        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
         continue;
       }
 
@@ -195,7 +210,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         }
         completed++;
         await db.importJob.update({ where: { id: importJobId }, data: { completed } });
-        await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote());
+        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
         continue;
       }
 
@@ -212,7 +227,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         failedCount++;
         completed++;
         await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-        await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote());
+        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
         continue;
       }
 
@@ -252,7 +267,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         }
         completed++;
         await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-        await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote());
+        await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
         continue;
       }
 
@@ -278,7 +293,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
       completed++;
       logger.info(`Downloaded sticker ${sticker.file_id} (#${order}) → ${telegramStickerId}`);
       await db.importJob.update({ where: { id: importJobId }, data: { completed, failed: failedCount } });
-      await updateDiscordProgress(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote());
+      await updateDiscordProgressThrottled(buildProgressContent(emojiIdMap, total, completed) + buildAnimatedSkipNote(), completed === total);
     }
   } finally {
     await renderer?.close();

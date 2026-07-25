@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Ajv } from 'ajv';
 import { buildApplicationCommandsBody } from '@went.tf/discord-bot-framework/commands';
-import { parseCommandsFile, registerFrameworkSchemas, CommandFileEntry } from '@went.tf/discord-bot-framework/commands/schema';
+import { parseCommandsFile, registerFrameworkSchemas, resolveCommandsSchemaRefs, getCommandsFileEntries, CommandsFile } from '@went.tf/discord-bot-framework/commands/schema';
 import { createCommandLocalizer } from '@went.tf/discord-bot-framework/i18n';
-import commandsSchema from '../commands.schema.json' with { type: 'json' };
+import commandsSchemaRaw from '../commands.schema.json' with { type: 'json' };
 import commandsData from '../commands.json' with { type: 'json' };
 import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, initI18next } from '../constants/locales.js';
 import { chatInputCommandRegistry, contextMenuCommandRegistry } from './interactions.js';
@@ -16,12 +16,13 @@ const stubLogger = { log() {}, warn() {}, error() {}, nest: () => stubLogger } a
 
 describe('commands.json runtime smoke test', () => {
   it('validates, resolves descriptions via real locale files, and builds a full Discord body with no throws', async () => {
+    const commandsSchema = resolveCommandsSchemaRefs(commandsSchemaRaw);
     const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
     registerFrameworkSchemas(ajv);
     const validate = ajv.compile(commandsSchema);
 
-    const commandsFile = parseCommandsFile<CommandFileEntry[]>(commandsData, { validate });
-    expect(commandsFile).toHaveLength(18);
+    const commandsFile = parseCommandsFile<CommandsFile>(commandsData, { validate });
+    expect(getCommandsFileEntries(commandsFile)).toHaveLength(18);
 
     const i18next = await initI18next(stubLogger);
     const localizer = createCommandLocalizer({ locales: SUPPORTED_LANGUAGES, baseLocale: DEFAULT_LANGUAGE, t: i18next.t.bind(i18next) });

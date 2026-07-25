@@ -1,43 +1,55 @@
 {
-  "$id": "https://schema.went.tf/fantastick/commands-file.json",
-  "type": "array",
-  "items": {
-    "oneOf": [
-      {
-        "allOf": [
-          { "$ref": "https://schema.went.tf/discord-bot-framework/chat-input-command.json" },
-          {
-            "properties": {
-              "name": {
-                "enum": [
-                  "sticker",
-                  "nsfw-sticker",
-                  "create-pack",
-                  "import-telegram-pack",
-                  "create-sticker",
-                  "pack",
-                  "nsfw-pack",
-                  "edit-sticker-metadata",
-                  "replace-sticker",
-                  "delete-sticker",
-                  "delete-pack",
-                  "edit-pack",
-                  "reorder-sticker",
-                  "mass-edit-stickers",
-                  "publish-imported-pack",
-                  "migrate-to-telegram-sticker"
-                ]
+  "$defs": {
+    "entry": {
+      "oneOf": [
+        {
+          "allOf": [
+            { "$ref": "../node_modules/@went.tf/discord-bot-framework/build/commands/schema/chat-input-command.json" },
+            {
+              "properties": {
+                "name": {
+                  "enum": [
+                    "sticker",
+                    "nsfw-sticker",
+                    "create-pack",
+                    "import-telegram-pack",
+                    "create-sticker",
+                    "pack",
+                    "nsfw-pack",
+                    "edit-sticker-metadata",
+                    "replace-sticker",
+                    "delete-sticker",
+                    "delete-pack",
+                    "edit-pack",
+                    "reorder-sticker",
+                    "mass-edit-stickers",
+                    "publish-imported-pack",
+                    "migrate-to-telegram-sticker"
+                  ]
+                }
               }
             }
-          }
-        ]
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "../node_modules/@went.tf/discord-bot-framework/build/commands/schema/context-menu-command.json" },
+            { "properties": { "name": { "enum": ["Update Message", "Sticker Details"] } } }
+          ]
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    { "type": "array", "items": { "$ref": "#/$defs/entry" } },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": { "type": "string" },
+        "commands": { "type": "array", "items": { "$ref": "#/$defs/entry" } }
       },
-      {
-        "allOf": [
-          { "$ref": "https://schema.went.tf/discord-bot-framework/context-menu-command.json" },
-          { "properties": { "name": { "enum": ["Update Message", "Sticker Details"] } } }
-        ]
-      }
-    ]
-  }
+      "required": ["commands"],
+      "additionalProperties": false
+    }
+  ]
 }

@@ -48,7 +48,6 @@ export type CommandHandler = FrameworkCommandHandler<UserInteractionContext>;
 export type AutocompleteHandler = FrameworkAutocompleteHandler<UserInteractionContext>;
 export type AutocompleteHandlers = Record<string, AutocompleteHandler>;
 export type ModalHandler = FrameworkModalHandler<UserInteractionContext>;
-export type ModalHandlers = Record<string, ModalHandler>;
 export type BotMessageComponentHandler = FrameworkComponentHandler<UserInteractionContext>;
 
 // Name defaults to `string` for callers that don't care (e.g. the registries), but each

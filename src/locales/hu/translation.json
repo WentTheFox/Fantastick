@@ -13,12 +13,12 @@
       "description": "Matrica küldése (NSFW csomagokból is)",
       "options": {
         "name": {
-          "name": "név",
-          "description": "Matrica neve"
+          "name": "name",
+          "description": "Sticker name"
         },
         "preview": {
-          "name": "előnézet",
-          "description": "Ha True, akkor a matrica csak számodra lesz látható"
+          "name": "preview",
+          "description": "If True, the sticker will only be visible to you"
         }
       }
     },
@@ -150,8 +150,8 @@
       "description": "Megjeleníti a csomag matricáit (NSFW csomagokból is)",
       "options": {
         "name": {
-          "name": "név",
-          "description": "Csomag neve"
+          "name": "name",
+          "description": "Pack name"
         }
       }
     },

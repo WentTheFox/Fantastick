@@ -23,8 +23,7 @@
                     "edit-pack",
                     "reorder-sticker",
                     "mass-edit-stickers",
-                    "publish-imported-pack",
-                    "migrate-to-telegram-sticker"
+                    "publish-imported-pack"
                   ]
                 }
               }

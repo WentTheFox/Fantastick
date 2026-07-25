@@ -12,7 +12,6 @@ import { editPackCommand } from '../commands/edit-pack.command.js';
 import { editStickerMetadataCommand } from '../commands/edit-sticker-metadata.command.js';
 import { importTelegramPackCommand } from '../commands/import-telegram-pack.command.js';
 import { massEditStickersCommand } from '../commands/mass-edit-stickers.command.js';
-import { migrateToTelegramStickerCommand } from '../commands/migrate-to-telegram-sticker.command.js';
 import { nsfwPackCommand } from '../commands/nsfw-pack.command.js';
 import { nsfwStickerCommand } from '../commands/nsfw-sticker.command.js';
 import { packCommand } from '../commands/pack.command.js';
@@ -54,7 +53,6 @@ export const chatInputCommandRegistry = createChatInputCommandRegistry([
   reorderStickerCommand,
   massEditStickersCommand,
   publishImportedPackCommand,
-  migrateToTelegramStickerCommand,
 ]);
 
 export const contextMenuCommandRegistry = createContextMenuCommandRegistry([

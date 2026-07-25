@@ -1,6 +1,6 @@
 import { ComponentType, MessageFlags } from 'discord-api-types/v10';
 import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
-import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
 import { DeletePackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { getFormattedPackName, getPackDisplayName } from '../utils/get-formatted-pack-name.js';
@@ -9,7 +9,7 @@ import { truncateToMaximumLength, updateOrCreateUser } from '../utils/messaging.
 import { deletePackModalHandler } from './modal-handlers/delete-pack.modal-handler.js';
 
 export const deletePackCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.DELETE_PACK,
+  name: 'delete-pack',
   autocomplete: {
     [DeletePackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },

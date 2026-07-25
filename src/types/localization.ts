@@ -1,5 +1,4 @@
 import { APIApplicationCommand, APIApplicationCommandOption } from 'discord-api-types/v10';
-import { BotChatInputCommandName } from './bot-interaction.js';
 
 export const enum GlobalCommandOptionName {
 }
@@ -62,21 +61,21 @@ export const enum PublishImportedPackCommandOptionName {
 }
 
 interface CommandOptionsMap {
-  [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
-  [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
-  [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandOptionName,
-  [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandOptionName,
-  [BotChatInputCommandName.IMPORT_TELEGRAM_PACK]: ImportCommandOptionName,
-  [BotChatInputCommandName.PACK]: PackCommandOptionName,
-  [BotChatInputCommandName.NSFW_PACK]: PackCommandOptionName,
-  [BotChatInputCommandName.EDIT_STICKER_METADATA]: EditStickerMetadataCommandOptionName,
-  [BotChatInputCommandName.REPLACE_STICKER]: ReplaceStickerCommandOptionName,
-  [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandOptionName,
-  [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandOptionName,
-  [BotChatInputCommandName.EDIT_PACK]: EditPackCommandOptionName,
-  [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandOptionName,
-  [BotChatInputCommandName.MASS_EDIT_STICKERS]: MassEditStickersCommandOptionName,
-  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandOptionName,
+  sticker: StickerCommandOptionName,
+  'nsfw-sticker': StickerCommandOptionName,
+  'create-pack': CreatePackCommandOptionName,
+  'create-sticker': CreateStickerCommandOptionName,
+  'import-telegram-pack': ImportCommandOptionName,
+  pack: PackCommandOptionName,
+  'nsfw-pack': PackCommandOptionName,
+  'edit-sticker-metadata': EditStickerMetadataCommandOptionName,
+  'replace-sticker': ReplaceStickerCommandOptionName,
+  'delete-sticker': DeleteStickerCommandOptionName,
+  'delete-pack': DeletePackCommandOptionName,
+  'edit-pack': EditPackCommandOptionName,
+  'reorder-sticker': ReorderStickerCommandOptionName,
+  'mass-edit-stickers': MassEditStickersCommandOptionName,
+  'publish-imported-pack': PublishImportedPackCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -205,27 +204,27 @@ export const enum PublishImportedPackCommandResponse {
 
 interface CommandResponsesMap {
   global: GlobalCommandResponse,
-  [BotChatInputCommandName.STICKER]: StickerCommandResponse,
-  [BotChatInputCommandName.CREATE_PACK]: CreatePackCommandResponse,
-  [BotChatInputCommandName.IMPORT_TELEGRAM_PACK]: ImportCommandResponse,
-  [BotChatInputCommandName.CREATE_STICKER]: CreateStickerCommandResponse,
-  [BotChatInputCommandName.PACK]: PackCommandResponse,
-  [BotChatInputCommandName.EDIT_STICKER_METADATA]: EditStickerMetadataCommandResponse,
-  [BotChatInputCommandName.REPLACE_STICKER]: ReplaceStickerCommandResponse,
-  [BotChatInputCommandName.DELETE_STICKER]: DeleteStickerCommandResponse,
-  [BotChatInputCommandName.DELETE_PACK]: DeletePackCommandResponse,
-  [BotChatInputCommandName.EDIT_PACK]: EditPackCommandResponse,
-  [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandResponse,
-  [BotChatInputCommandName.MASS_EDIT_STICKERS]: MassEditStickersCommandResponse,
-  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandResponse,
+  sticker: StickerCommandResponse,
+  'create-pack': CreatePackCommandResponse,
+  'import-telegram-pack': ImportCommandResponse,
+  'create-sticker': CreateStickerCommandResponse,
+  pack: PackCommandResponse,
+  'edit-sticker-metadata': EditStickerMetadataCommandResponse,
+  'replace-sticker': ReplaceStickerCommandResponse,
+  'delete-sticker': DeleteStickerCommandResponse,
+  'delete-pack': DeletePackCommandResponse,
+  'edit-pack': EditPackCommandResponse,
+  'reorder-sticker': ReorderStickerCommandResponse,
+  'mass-edit-stickers': MassEditStickersCommandResponse,
+  'publish-imported-pack': PublishImportedPackCommandResponse,
 }
 
 interface ComponentsMap {
-  [BotChatInputCommandName.STICKER]: [
+  sticker: [
     'updateMessageButton',
     'deleteMessageButton',
   ],
-  [BotChatInputCommandName.CREATE_STICKER]: [
+  'create-sticker': [
     'createStickerModalTitle',
     'nameLabel',
     'nameDescription',
@@ -237,7 +236,7 @@ interface ComponentsMap {
     'urlDescription',
     'urlPlaceholder',
   ],
-  [BotChatInputCommandName.PACK]: [
+  pack: [
     'emptyPack',
     'packPreview',
     'importedFrom',
@@ -247,7 +246,7 @@ interface ComponentsMap {
     'lastPageButton',
     'pageIndicator',
   ],
-  [BotChatInputCommandName.EDIT_STICKER_METADATA]: [
+  'edit-sticker-metadata': [
     'editStickerMetadataModalTitle',
     'importedStickerNote',
     'importedNameLabel',
@@ -261,7 +260,7 @@ interface ComponentsMap {
     'ratingNsfwLabel',
     'ratingNsfwDescription',
   ],
-  [BotChatInputCommandName.REPLACE_STICKER]: [
+  'replace-sticker': [
     'replaceStickerModalTitle',
     'fileLabel',
     'fileDescription',
@@ -269,7 +268,7 @@ interface ComponentsMap {
     'urlDescription',
     'urlPlaceholder',
   ],
-  [BotChatInputCommandName.DELETE_STICKER]: [
+  'delete-sticker': [
     'deleteStickerModalTitle',
     'deletingText',
     'deletionMethodLabel',
@@ -279,11 +278,11 @@ interface ComponentsMap {
     'deleteMessagesMethodLabel',
     'deleteMessagesMethodDescription',
   ],
-  [BotChatInputCommandName.DELETE_PACK]: [
+  'delete-pack': [
     'deletePackModalTitle',
     'deletingText',
   ],
-  [BotChatInputCommandName.CREATE_PACK]: [
+  'create-pack': [
     'createPackModalTitle',
     'nameLabel',
     'nameDescription',
@@ -300,7 +299,7 @@ interface ComponentsMap {
     'nsfwFalseLabel',
     'nsfwFalseDescription',
   ],
-  [BotChatInputCommandName.EDIT_PACK]: [
+  'edit-pack': [
     'editPackModalTitle',
     'importedNameNote',
     'importedUnpublishedNote',
@@ -320,7 +319,7 @@ interface ComponentsMap {
     'nsfwFalseLabel',
     'nsfwFalseDescription',
   ],
-  [BotChatInputCommandName.MASS_EDIT_STICKERS]: [
+  'mass-edit-stickers': [
     'reviewingText',
     'currentNameText',
     'editMetadataButton',
@@ -329,7 +328,7 @@ interface ComponentsMap {
     'nextButton',
     'allDoneText',
   ],
-  [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: [
+  'publish-imported-pack': [
     'reviewingText',
     'currentNameText',
     'currentRatingText',

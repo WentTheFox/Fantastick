@@ -3,7 +3,7 @@ import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
 import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-meta.js';
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
-import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
 import { CreateStickerCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -15,7 +15,7 @@ import {
 } from './modal-handlers/create-sticker.modal-handler.js';
 
 export const createStickerCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.CREATE_STICKER,
+  name: 'create-sticker',
   autocomplete: {
     [CreateStickerCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true, excludeImported: true }),
   },

@@ -1,11 +1,11 @@
-import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
+import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { stickerCommandAutocomplete } from './autocomplete/sticker.command-autocomplete.js';
 import { stickerCommandHandler } from './command-handlers/sticker.command-handler.js';
 
 const nsfw = false;
 
 export const stickerCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.STICKER,
+  name: 'sticker',
   autocomplete: stickerCommandAutocomplete(nsfw),
   handle: stickerCommandHandler(nsfw),
 };

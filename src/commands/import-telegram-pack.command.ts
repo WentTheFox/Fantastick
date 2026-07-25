@@ -1,5 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
+import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { ImportCommandOptionName } from '../types/localization.js';
 import { QueueType } from '../types/queue.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -9,7 +9,7 @@ import { parseTelegramPackName } from '../utils/parse-telegram-pack-name.js';
 const activeImportJobStatuses = ['PENDING', 'FETCHING', 'IMPORTING', 'FINALIZING'] as const;
 
 export const importTelegramPackCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.IMPORT_TELEGRAM_PACK,
+  name: 'import-telegram-pack',
   async handle(interaction, context) {
     const { t, db } = context;
     const user = await updateOrCreateUser(context, interaction);

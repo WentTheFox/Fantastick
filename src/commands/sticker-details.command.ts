@@ -1,6 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { AttachmentBuilder, userMention } from 'discord.js';
-import { BotMessageContextMenuCommand, BotMessageContextMenuCommandName } from '../types/bot-interaction.js';
+import { BotMessageContextMenuCommand } from '../types/bot-interaction.js';
 import { getFormattedPackName } from '../utils/get-formatted-pack-name.js';
 import { getFormattedStickerName } from '../utils/get-formatted-sticker-name.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -8,7 +8,7 @@ import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-item
 import { resolveStickerNsfw } from '../utils/resolve-sticker-nsfw.js';
 
 export const stickerDetailsCommand: BotMessageContextMenuCommand = {
-  name: BotMessageContextMenuCommandName.STICKER_DETAILS,
+  name: 'Sticker Details',
   async handle(interaction, context) {
     if (!interaction.isMessageContextMenuCommand()) {
       throw new Error('Expected message context menu interaction');

@@ -1,6 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { userMention } from 'discord.js';
-import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
 import { PublishImportedPackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import {
@@ -15,7 +15,7 @@ import {
 } from './modal-handlers/publish-edit-sticker.modal-handler.js';
 
 export const publishImportedPackCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.PUBLISH_IMPORTED_PACK,
+  name: 'publish-imported-pack',
   autocomplete: {
     [PublishImportedPackCommandOptionName.PACK]: getPackNameAutocompleteHandler({
       nsfw: true,

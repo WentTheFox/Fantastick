@@ -3,7 +3,7 @@ import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
 import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
 import { EmojiCharacters } from '../constants/emoji-characters.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
-import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
 import { EditPackCommandOptionName } from '../types/localization.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { getPackDisplayName } from '../utils/get-formatted-pack-name.js';
@@ -18,7 +18,7 @@ import {
 } from './modal-handlers/edit-pack.modal-handler.js';
 
 export const editPackCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.EDIT_PACK,
+  name: 'edit-pack',
   autocomplete: {
     [EditPackCommandOptionName.NAME]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),
   },

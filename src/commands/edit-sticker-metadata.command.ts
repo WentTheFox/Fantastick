@@ -1,6 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
-import { EditStickerMetadataCommandOptionName } from '../types/localization.js';
+import { EditStickerMetadataCommandOptionName } from '../types/command-option-names.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
@@ -9,7 +9,7 @@ import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import { editStickerMetadataModalHandler } from './modal-handlers/edit-sticker-metadata.modal-handler.js';
 
-export const editStickerMetadataCommand: BotChatInputCommand = {
+export const editStickerMetadataCommand: BotChatInputCommand<'edit-sticker-metadata'> = {
   name: 'edit-sticker-metadata',
   autocomplete: {
     [EditStickerMetadataCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),

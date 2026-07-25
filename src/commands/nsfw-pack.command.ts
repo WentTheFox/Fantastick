@@ -4,7 +4,7 @@ import { packCommandHandler } from './command-handlers/pack.command-handler.js';
 
 const nsfw = true;
 
-export const nsfwPackCommand: BotChatInputCommand = {
+export const nsfwPackCommand: BotChatInputCommand<'nsfw-pack'> = {
   name: 'nsfw-pack',
   autocomplete: packCommandAutocomplete(nsfw),
   handle: packCommandHandler(nsfw),

@@ -1,64 +1,34 @@
 import { APIApplicationCommand, APIApplicationCommandOption } from 'discord-api-types/v10';
+import {
+  CreatePackCommandOptionName,
+  CreateStickerCommandOptionName,
+  DeletePackCommandOptionName,
+  DeleteStickerCommandOptionName,
+  EditPackCommandOptionName,
+  EditStickerMetadataCommandOptionName,
+  ImportCommandOptionName,
+  MassEditStickersCommandOptionName,
+  PackCommandOptionName,
+  PublishImportedPackCommandOptionName,
+  ReorderStickerCommandOptionName,
+  ReplaceStickerCommandOptionName,
+  StickerCommandOptionName,
+} from './command-option-names.js';
+import type { ChatInputCommandName } from '../utils/interactions.js';
 
-export const enum GlobalCommandOptionName {
-}
-
-export const enum StickerCommandOptionName {
-  NAME = 'name',
-  PREVIEW = 'preview',
-}
-
-export const enum CreatePackCommandOptionName {
-  NAME = 'name',
-}
-
-export const enum ImportCommandOptionName {
-  URL = 'url',
-  NSFW = 'nsfw',
-}
-
-export const enum PackCommandOptionName {
-  NAME = 'name',
-}
-
-export const enum EditStickerMetadataCommandOptionName {
-  NAME = 'name',
-}
-
-export const enum ReplaceStickerCommandOptionName {
-  NAME = 'name',
-}
-
-export const enum CreateStickerCommandOptionName {
-  PACK = 'pack',
-}
-
-export const enum DeleteStickerCommandOptionName {
-  NAME = 'name',
-}
-
-export const enum DeletePackCommandOptionName {
-  NAME = 'name',
-}
-
-export const enum EditPackCommandOptionName {
-  NAME = 'name',
-}
-
-export const enum ReorderStickerCommandOptionName {
-  STICKER = 'sticker',
-  BEFORE = 'before',
-  AFTER = 'after',
-}
-
-export const enum MassEditStickersCommandOptionName {
-  PACK = 'pack',
-  START = 'start',
-}
-
-export const enum PublishImportedPackCommandOptionName {
-  PACK = 'pack',
-}
+// Compile-time-only checks (never used at runtime) keeping the maps below in sync with
+// the real chat-input command registry - itself runtime-cross-checked against
+// commands.json by buildApplicationCommandsBody - instead of letting command names
+// silently drift as a third, hand-typed list. `Exact` requires every registry command
+// to appear (and nothing else); `Subset` only forbids keys outside the registry, since
+// CommandResponsesMap/ComponentsMap are legitimately partial (e.g. nsfw-sticker/nsfw-pack
+// alias sticker/pack's responses instead of declaring their own).
+type AssertKeysExact<Keys extends string, Expected extends string> =
+  [Exclude<Keys, Expected>] extends [never]
+    ? ([Exclude<Expected, Keys>] extends [never] ? true : { missingKeys: Exclude<Expected, Keys> })
+    : { unexpectedKeys: Exclude<Keys, Expected> };
+type AssertKeysSubset<Keys extends string, Allowed extends string> =
+  [Exclude<Keys, Allowed>] extends [never] ? true : { unexpectedKeys: Exclude<Keys, Allowed> };
 
 interface CommandOptionsMap {
   sticker: StickerCommandOptionName,
@@ -77,6 +47,8 @@ interface CommandOptionsMap {
   'mass-edit-stickers': MassEditStickersCommandOptionName,
   'publish-imported-pack': PublishImportedPackCommandOptionName,
 }
+const _commandOptionsMapKeys: AssertKeysExact<keyof CommandOptionsMap, ChatInputCommandName> = true;
+void _commandOptionsMapKeys;
 
 export const enum GlobalCommandResponse {
   unexpectedError = 'unexpectedError',
@@ -218,6 +190,8 @@ interface CommandResponsesMap {
   'mass-edit-stickers': MassEditStickersCommandResponse,
   'publish-imported-pack': PublishImportedPackCommandResponse,
 }
+const _commandResponsesMapKeys: AssertKeysSubset<Exclude<keyof CommandResponsesMap, 'global'>, ChatInputCommandName> = true;
+void _commandResponsesMapKeys;
 
 interface ComponentsMap {
   sticker: [
@@ -343,6 +317,8 @@ interface ComponentsMap {
     'allDoneText',
   ],
 }
+const _componentsMapKeys: AssertKeysSubset<keyof ComponentsMap, ChatInputCommandName> = true;
+void _componentsMapKeys;
 
 export type OptionLocalization =
   Pick<APIApplicationCommandOption, 'name' | 'description'>

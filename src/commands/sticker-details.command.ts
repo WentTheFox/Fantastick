@@ -7,7 +7,7 @@ import { interactionReply } from '../utils/interaction-reply.js';
 import { mapStickersToGalleryItems } from '../utils/map-stickers-to-gallery-items.js';
 import { resolveStickerNsfw } from '../utils/resolve-sticker-nsfw.js';
 
-export const stickerDetailsCommand: BotMessageContextMenuCommand = {
+export const stickerDetailsCommand: BotMessageContextMenuCommand<'Sticker Details'> = {
   name: 'Sticker Details',
   async handle(interaction, context) {
     if (!interaction.isMessageContextMenuCommand()) {

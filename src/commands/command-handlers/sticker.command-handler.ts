@@ -1,7 +1,7 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
 import { CommandHandler } from '../../types/bot-interaction.js';
-import { StickerCommandOptionName } from '../../types/localization.js';
+import { StickerCommandOptionName } from '../../types/command-option-names.js';
 import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
 import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter.js';
 import { getStickerMessageContent } from '../../utils/get-sticker-message-content.js';

@@ -6,6 +6,7 @@
           "allOf": [
             { "$ref": "../node_modules/@went.tf/discord-bot-framework/build/commands/schema/chat-input-command.json" },
             {
+              "type": "object",
               "properties": {
                 "name": {
                   "enum": [
@@ -33,7 +34,7 @@
         {
           "allOf": [
             { "$ref": "../node_modules/@went.tf/discord-bot-framework/build/commands/schema/context-menu-command.json" },
-            { "properties": { "name": { "enum": ["Update Message", "Sticker Details"] } } }
+            { "type": "object", "properties": { "name": { "enum": ["Update Message", "Sticker Details"] } } }
           ]
         }
       ]

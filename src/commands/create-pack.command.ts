@@ -1,7 +1,7 @@
 import { ComponentType, MessageFlags, TextInputStyle } from 'discord-api-types/v10';
 import { ComponentInLabelData, TextInputComponentData } from 'discord.js';
 import { packNameOptionMeta } from '../options/metadata/pack-name.option-meta.js';
-import { BotChatInputCommand, BotChatInputCommandName, BotModalId } from '../types/bot-interaction.js';
+import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
 import { getPackNsfwEmoji } from '../utils/get-pack-nsfw-emoji.js';
 import { getPackVisibilityEmoji } from '../utils/get-pack-visibility-emoji.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -13,7 +13,7 @@ import {
 } from './modal-handlers/create-pack.modal-handler.js';
 
 export const createPackCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.CREATE_PACK,
+  name: 'create-pack',
   async handle(interaction, context) {
     const { t } = context;
     const user = await updateOrCreateUser(context, interaction);

@@ -22,7 +22,7 @@ describe('commands.json runtime smoke test', () => {
     const validate = ajv.compile(commandsSchema);
 
     const commandsFile = parseCommandsFile<CommandsFile>(commandsData, { validate });
-    expect(getCommandsFileEntries(commandsFile)).toHaveLength(18);
+    expect(getCommandsFileEntries(commandsFile)).toHaveLength(17);
 
     const i18next = await initI18next(stubLogger);
     const localizer = createCommandLocalizer({ locales: SUPPORTED_LANGUAGES, baseLocale: DEFAULT_LANGUAGE, t: i18next.t.bind(i18next) });
@@ -37,7 +37,7 @@ describe('commands.json runtime smoke test', () => {
       },
     );
 
-    expect(body).toHaveLength(18);
+    expect(body).toHaveLength(17);
 
     const sticker = body.find(c => c.name === 'sticker') as { description?: string; description_localizations?: Record<string, string>; name_localizations?: Record<string, string> } | undefined;
     expect(sticker?.description).toBe('Sends a sticker');

@@ -1,5 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { BotChatInputCommand, BotChatInputCommandName } from '../types/bot-interaction.js';
+import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { ReorderStickerCommandOptionName } from '../types/localization.js';
 import {
   getStickerNameAutocompleteHandler,
@@ -15,7 +15,7 @@ import { updateOrCreateUser } from '../utils/messaging.js';
 class ReorderConflictError extends Error {}
 
 export const reorderStickerCommand: BotChatInputCommand = {
-  name: BotChatInputCommandName.REORDER_STICKER,
+  name: 'reorder-sticker',
   autocomplete: {
     [ReorderStickerCommandOptionName.STICKER]: getStickerNameAutocompleteHandler(true),
     [ReorderStickerCommandOptionName.BEFORE]: getReorderStickerTargetAutocompleteHandler(),

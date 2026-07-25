@@ -13,29 +13,6 @@ import type {
 
 import { UserInteractionContext } from './contexts/user-interaction.context.js';
 
-export const enum BotChatInputCommandName {
-  STICKER = 'sticker',
-  NSFW_STICKER = 'nsfw-sticker',
-  CREATE_PACK = 'create-pack',
-  IMPORT_TELEGRAM_PACK = 'import-telegram-pack',
-  CREATE_STICKER = 'create-sticker',
-  PACK = 'pack',
-  NSFW_PACK = 'nsfw-pack',
-  EDIT_STICKER_METADATA = 'edit-sticker-metadata',
-  REPLACE_STICKER = 'replace-sticker',
-  DELETE_STICKER = 'delete-sticker',
-  DELETE_PACK = 'delete-pack',
-  EDIT_PACK = 'edit-pack',
-  REORDER_STICKER = 'reorder-sticker',
-  MASS_EDIT_STICKERS = 'mass-edit-stickers',
-  PUBLISH_IMPORTED_PACK = 'publish-imported-pack',
-}
-
-export const enum BotMessageContextMenuCommandName {
-  UPDATE_MESSAGE = 'Update Message',
-  STICKER_DETAILS = 'Sticker Details',
-}
-
 export const enum BotModalId {
   CREATE_STICKER = 'createStickerModal',
   EDIT_STICKER_METADATA = 'editStickerMetadataModal',
@@ -74,9 +51,9 @@ export type ModalHandler = FrameworkModalHandler<UserInteractionContext>;
 export type ModalHandlers = Record<string, ModalHandler>;
 export type BotMessageComponentHandler = FrameworkComponentHandler<UserInteractionContext>;
 
-export type BotChatInputCommand = NamedChatInputCommand<UserInteractionContext, BotChatInputCommandName>;
+export type BotChatInputCommand = NamedChatInputCommand<UserInteractionContext>;
 
-export type BotMessageContextMenuCommand = NamedContextMenuCommand<UserInteractionContext, BotMessageContextMenuCommandName>;
+export type BotMessageContextMenuCommand = NamedContextMenuCommand<UserInteractionContext>;
 
 export type BotMessageComponentDefinitionGetter = (t: TFunction, emojiIdMap: Record<string, string>) => APIMessageComponent;
 

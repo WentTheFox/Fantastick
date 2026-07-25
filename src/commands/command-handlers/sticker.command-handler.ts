@@ -1,6 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
-import { BotChatInputCommandName, CommandHandler } from '../../types/bot-interaction.js';
+import { CommandHandler } from '../../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../../types/localization.js';
 import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
 import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter.js';
@@ -18,7 +18,7 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
   if (availablePacks.length === 0) {
     await interactionReply(context, interaction, {
       content: t('commands.sticker.responses.noPacks', {
-        createCommand: createCommandMention(BotChatInputCommandName.CREATE_PACK, context),
+        createCommand: createCommandMention('create-pack', context),
       }),
       flags: MessageFlags.Ephemeral,
     });

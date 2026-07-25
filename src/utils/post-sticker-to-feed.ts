@@ -67,7 +67,7 @@ export const postStickerToFeed = async ({
   const {
     items,
     files,
-  } = mapStickersToGalleryItems(urlChanged ? [snapshot, sticker] : [sticker], spoiler);
+  } = mapStickersToGalleryItems([sticker], spoiler);
 
   const nameChanged = snapshot && snapshot.name !== sticker.name;
   const descriptionChanged = snapshot && snapshot.description !== sticker.description;
@@ -87,8 +87,9 @@ export const postStickerToFeed = async ({
       `**Created by:** ${userMention(interaction.user.id)} (\`${interaction.user.id}\`)`,
       ...(sticker.deletedBy ? [`**Deleted by:** ${userMention(String(sticker.deletedBy))} (\`${sticker.deletedBy}\`)`] : []),
       `**Pack:** \`${userPack.telegramPack?.title ?? userPack.name}\` (\`${userPack.id}\`) ${getPackVisibilityEmoji(userPack)}${getPackNsfwEmoji(userPack)}`,
-      ...(urlChanged ? [`**Old URL:** ${snapshot.url || '_(none)_'}`, `**New URL:** \`${getStickerUrl(sticker)}\``] : []),
-      `**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => item.media.url).join(' ')}`,
+      ...(urlChanged
+        ? [`**Old URL:** ${snapshot.url || '_(none)_'}`, `**New URL:** ${getStickerUrl(sticker)}`]
+        : [`**Image:** ${items.filter(item => !item.media.url.startsWith('attachment://')).map(item => item.media.url).join(' ')}`]),
     ].join('\n'),
     files,
   });

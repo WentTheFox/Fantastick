@@ -12,7 +12,7 @@ import {
   createPackModalHandler,
 } from './modal-handlers/create-pack.modal-handler.js';
 
-export const createPackCommand: BotChatInputCommand = {
+export const createPackCommand: BotChatInputCommand<'create-pack'> = {
   name: 'create-pack',
   async handle(interaction, context) {
     const { t } = context;

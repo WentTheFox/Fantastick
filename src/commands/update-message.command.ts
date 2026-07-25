@@ -6,7 +6,7 @@ import { getStickerMessageContent } from '../utils/get-sticker-message-content.j
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 
-export const updateMessageCommand: BotMessageContextMenuCommand = {
+export const updateMessageCommand: BotMessageContextMenuCommand<'Update Message'> = {
   name: 'Update Message',
   async handle(interaction, context) {
     if (!interaction.isMessageContextMenuCommand()) {

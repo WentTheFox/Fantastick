@@ -2,7 +2,7 @@ import { ComponentType, MessageFlags } from 'discord-api-types/v10';
 import { ComponentInLabelData } from 'discord.js';
 import { MODAL_TITLE_MAX_LENGTH } from '../constants/discord-limits.js';
 import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
-import { DeleteStickerCommandOptionName } from '../types/localization.js';
+import { DeleteStickerCommandOptionName } from '../types/command-option-names.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
@@ -16,7 +16,7 @@ import {
   StickerDeletionMethods,
 } from './modal-handlers/delete-sticker.modal-handler.js';
 
-export const deleteStickerCommand: BotChatInputCommand = {
+export const deleteStickerCommand: BotChatInputCommand<'delete-sticker'> = {
   name: 'delete-sticker',
   autocomplete: {
     [DeleteStickerCommandOptionName.NAME]: getStickerNameAutocompleteHandler(true),

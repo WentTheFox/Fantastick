@@ -1,5 +1,5 @@
 import { AutocompleteHandlers } from '../../types/bot-interaction.js';
-import { PackCommandOptionName } from '../../types/localization.js';
+import { PackCommandOptionName } from '../../types/command-option-names.js';
 import { getPackNameAutocompleteHandler } from '../../utils/autocomplete/pack-name.autocomplete.js';
 
 export const packCommandAutocomplete = (nsfw: boolean): AutocompleteHandlers => ({

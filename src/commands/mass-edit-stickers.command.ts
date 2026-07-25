@@ -1,6 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
-import { MassEditStickersCommandOptionName } from '../types/localization.js';
+import { MassEditStickersCommandOptionName } from '../types/command-option-names.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { findOrderedPackStickers, getMassEditStickerContent } from '../utils/get-mass-edit-content.js';
 import { interactionReply } from '../utils/interaction-reply.js';
@@ -12,7 +12,7 @@ import {
   massEditReplaceStickerModalHandler,
 } from './modal-handlers/mass-edit-replace-sticker.modal-handler.js';
 
-export const massEditStickersCommand: BotChatInputCommand = {
+export const massEditStickersCommand: BotChatInputCommand<'mass-edit-stickers'> = {
   name: 'mass-edit-stickers',
   autocomplete: {
     [MassEditStickersCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true }),

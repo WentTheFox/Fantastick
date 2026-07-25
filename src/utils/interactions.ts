@@ -3,6 +3,7 @@ import {
   createComponentRegistry,
   createContextMenuCommandRegistry,
   flattenCommandModals,
+  RegistryName,
 } from '@went.tf/discord-bot-framework/interactions';
 import { createPackCommand } from '../commands/create-pack.command.js';
 import { createStickerCommand } from '../commands/create-sticker.command.js';
@@ -55,10 +56,14 @@ export const chatInputCommandRegistry = createChatInputCommandRegistry([
   publishImportedPackCommand,
 ]);
 
+export type ChatInputCommandName = RegistryName<typeof chatInputCommandRegistry>;
+
 export const contextMenuCommandRegistry = createContextMenuCommandRegistry([
   updateMessageCommand,
   stickerDetailsCommand,
 ]);
+
+export type ContextMenuCommandName = RegistryName<typeof contextMenuCommandRegistry>;
 
 export const componentRegistry = createComponentRegistry([
   updateMessageComponent,

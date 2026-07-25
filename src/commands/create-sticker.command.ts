@@ -4,7 +4,7 @@ import { stickerAltOptionMeta } from '../options/metadata/sticker-alt.option-met
 import { stickerNameOptionMeta } from '../options/metadata/sticker-name.option-meta.js';
 import { stickerUrlOptionMeta } from '../options/metadata/sticker-url.option-meta.js';
 import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
-import { CreateStickerCommandOptionName } from '../types/localization.js';
+import { CreateStickerCommandOptionName } from '../types/command-option-names.js';
 import { getPackNameAutocompleteHandler } from '../utils/autocomplete/pack-name.autocomplete.js';
 import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
@@ -14,7 +14,7 @@ import {
   createStickerModalHandler,
 } from './modal-handlers/create-sticker.modal-handler.js';
 
-export const createStickerCommand: BotChatInputCommand = {
+export const createStickerCommand: BotChatInputCommand<'create-sticker'> = {
   name: 'create-sticker',
   autocomplete: {
     [CreateStickerCommandOptionName.PACK]: getPackNameAutocompleteHandler({ nsfw: true, ownedOnly: true, excludeImported: true }),

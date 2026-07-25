@@ -51,9 +51,15 @@ export type ModalHandler = FrameworkModalHandler<UserInteractionContext>;
 export type ModalHandlers = Record<string, ModalHandler>;
 export type BotMessageComponentHandler = FrameworkComponentHandler<UserInteractionContext>;
 
-export type BotChatInputCommand = NamedChatInputCommand<UserInteractionContext>;
+// Name defaults to `string` for callers that don't care (e.g. the registries), but each
+// individual command file pins its own literal (`BotChatInputCommand<'sticker'>`) so the
+// name flows through as a literal type, not just `string` - `satisfies` alone doesn't do
+// this, since a mutable object literal's string property widens to `string` unless the
+// target type itself pins the exact literal (contextual typing), which is what a generic
+// parameter here (rather than a fixed `string`) provides.
+export type BotChatInputCommand<Name extends string = string> = NamedChatInputCommand<UserInteractionContext, Name>;
 
-export type BotMessageContextMenuCommand = NamedContextMenuCommand<UserInteractionContext>;
+export type BotMessageContextMenuCommand<Name extends string = string> = NamedContextMenuCommand<UserInteractionContext, Name>;
 
 export type BotMessageComponentDefinitionGetter = (t: TFunction, emojiIdMap: Record<string, string>) => APIMessageComponent;
 

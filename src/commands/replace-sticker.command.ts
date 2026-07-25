@@ -1,6 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { BotChatInputCommand, BotModalId } from '../types/bot-interaction.js';
-import { ReplaceStickerCommandOptionName } from '../types/localization.js';
+import { ReplaceStickerCommandOptionName } from '../types/command-option-names.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../utils/autocomplete/sticker-name.autocomplete.js';
@@ -9,7 +9,7 @@ import { interactionReply } from '../utils/interaction-reply.js';
 import { updateOrCreateUser } from '../utils/messaging.js';
 import { replaceStickerModalHandler } from './modal-handlers/replace-sticker.modal-handler.js';
 
-export const replaceStickerCommand: BotChatInputCommand = {
+export const replaceStickerCommand: BotChatInputCommand<'replace-sticker'> = {
   name: 'replace-sticker',
   autocomplete: {
     // Imported stickers' images are managed by the Telegram import, so they're excluded

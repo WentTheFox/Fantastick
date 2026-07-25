@@ -1,5 +1,5 @@
 import { AutocompleteHandlers } from '../../types/bot-interaction.js';
-import { StickerCommandOptionName } from '../../types/localization.js';
+import { StickerCommandOptionName } from '../../types/command-option-names.js';
 import {
   getStickerNameAutocompleteHandler,
 } from '../../utils/autocomplete/sticker-name.autocomplete.js';

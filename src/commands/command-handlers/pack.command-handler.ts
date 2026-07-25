@@ -1,6 +1,6 @@
 import { MessageFlags } from 'discord-api-types/v10';
 import { CommandHandler } from '../../types/bot-interaction.js';
-import { PackCommandOptionName } from '../../types/localization.js';
+import { PackCommandOptionName } from '../../types/command-option-names.js';
 import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter.js';
 import { getPackPreviewContent, packItemsPerPage } from '../../utils/get-pack-preview-content.js';
 import { interactionReply } from '../../utils/interaction-reply.js';

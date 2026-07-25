@@ -1,5 +1,5 @@
 import { AutocompleteHandler } from '../../types/bot-interaction.js';
-import { ReorderStickerCommandOptionName } from '../../types/localization.js';
+import { ReorderStickerCommandOptionName } from '../../types/command-option-names.js';
 import { getFormattedStickerName } from '../get-formatted-sticker-name.js';
 import { truncateToMaximumLength } from '../messaging.js';
 

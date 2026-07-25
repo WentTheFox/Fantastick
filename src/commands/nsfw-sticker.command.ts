@@ -4,7 +4,7 @@ import { stickerCommandHandler } from './command-handlers/sticker.command-handle
 
 const nsfw = true;
 
-export const nsfwStickerCommand: BotChatInputCommand = {
+export const nsfwStickerCommand: BotChatInputCommand<'nsfw-sticker'> = {
   name: 'nsfw-sticker',
   autocomplete: stickerCommandAutocomplete(nsfw),
   handle: stickerCommandHandler(nsfw),

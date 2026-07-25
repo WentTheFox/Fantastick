@@ -3,6 +3,7 @@ import { MessageEditOptions } from 'discord.js';
 import { Pack, Sticker, TelegramSticker } from '../generated/prisma/client.js';
 import { mapStickersToGalleryItems, StickerGalleryItems } from './map-stickers-to-gallery-items.js';
 import { resolveStickerNsfw } from './resolve-sticker-nsfw.js';
+import { getTransparentPixelAttachment, transparentPixelAttachmentName } from './transparent-pixel-attachment.js';
 
 interface GetStickerMessageContentParams {
   stickers: (Sticker & { telegramSticker?: TelegramSticker | null, pack: Pick<Pack, 'nsfw'> })[];
@@ -19,9 +20,12 @@ export const getStickerMessageContent = ({
     components: [
       {
         type: ComponentType.MediaGallery,
-        items,
+        items: [
+          ...items,
+          { media: { url: `attachment://${transparentPixelAttachmentName}` } },
+        ],
       },
     ],
-    files,
+    files: [...files, getTransparentPixelAttachment()],
   };
 };

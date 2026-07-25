@@ -67,7 +67,7 @@ export const postStickerToFeed = async ({
   const {
     items,
     files,
-  } = mapStickersToGalleryItems([sticker], spoiler);
+  } = mapStickersToGalleryItems(urlChanged ? [snapshot, sticker] : [sticker], spoiler);
 
   const nameChanged = snapshot && snapshot.name !== sticker.name;
   const descriptionChanged = snapshot && snapshot.description !== sticker.description;

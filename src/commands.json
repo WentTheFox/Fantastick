@@ -111,16 +111,6 @@
         { "type": "STRING", "name": "pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
       ]
     },
-    {
-      "type": "CHAT_INPUT",
-      "name": "migrate-to-telegram-sticker",
-      "options": [
-        { "type": "STRING", "name": "source-sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
-        { "type": "STRING", "name": "target-pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 },
-        { "type": "STRING", "name": "target-sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
-        { "type": "STRING", "name": "source-pack", "autocomplete": true, "min_length": 3, "max_length": 255 }
-      ]
-    },
     { "type": "MESSAGE", "name": "Update Message" },
     { "type": "MESSAGE", "name": "Sticker Details" }
   ]

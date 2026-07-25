@@ -61,13 +61,6 @@ export const enum PublishImportedPackCommandOptionName {
   PACK = 'pack',
 }
 
-export const enum MigrateToTelegramStickerCommandOptionName {
-  SOURCE_PACK = 'source-pack',
-  SOURCE_STICKER = 'source-sticker',
-  TARGET_PACK = 'target-pack',
-  TARGET_STICKER = 'target-sticker',
-}
-
 interface CommandOptionsMap {
   [BotChatInputCommandName.STICKER]: StickerCommandOptionName,
   [BotChatInputCommandName.NSFW_STICKER]: StickerCommandOptionName,
@@ -84,7 +77,6 @@ interface CommandOptionsMap {
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandOptionName,
   [BotChatInputCommandName.MASS_EDIT_STICKERS]: MassEditStickersCommandOptionName,
   [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandOptionName,
-  [BotChatInputCommandName.MIGRATE_TO_TELEGRAM_STICKER]: MigrateToTelegramStickerCommandOptionName,
 }
 
 export const enum GlobalCommandResponse {
@@ -198,13 +190,6 @@ export const enum MassEditStickersCommandResponse {
   stickerNotFound = 'stickerNotFound',
 }
 
-export const enum MigrateToTelegramStickerCommandResponse {
-  sourceStickerNotFound = 'sourceStickerNotFound',
-  targetStickerNotFound = 'targetStickerNotFound',
-  sameSticker = 'sameSticker',
-  migrated = 'migrated',
-}
-
 export const enum PublishImportedPackCommandResponse {
   packNotFound = 'packNotFound',
   emptyPack = 'emptyPack',
@@ -233,7 +218,6 @@ interface CommandResponsesMap {
   [BotChatInputCommandName.REORDER_STICKER]: ReorderStickerCommandResponse,
   [BotChatInputCommandName.MASS_EDIT_STICKERS]: MassEditStickersCommandResponse,
   [BotChatInputCommandName.PUBLISH_IMPORTED_PACK]: PublishImportedPackCommandResponse,
-  [BotChatInputCommandName.MIGRATE_TO_TELEGRAM_STICKER]: MigrateToTelegramStickerCommandResponse,
 }
 
 interface ComponentsMap {

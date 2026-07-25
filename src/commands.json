@@ -1,124 +1,127 @@
-[
-  {
-    "type": "CHAT_INPUT",
-    "name": "sticker",
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
-      { "type": "BOOLEAN", "name": "preview" }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "nsfw-sticker",
-    "nsfw": true,
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
-      { "type": "BOOLEAN", "name": "preview" }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "create-pack"
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "import-telegram-pack",
-    "options": [
-      { "type": "STRING", "name": "url", "required": true, "min_length": 26, "max_length": 255 },
-      { "type": "BOOLEAN", "name": "nsfw" }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "create-sticker",
-    "options": [
-      { "type": "STRING", "name": "pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "pack",
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "nsfw-pack",
-    "nsfw": true,
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "edit-sticker-metadata",
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "replace-sticker",
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "delete-sticker",
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "delete-pack",
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "edit-pack",
-    "options": [
-      { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "reorder-sticker",
-    "options": [
-      { "type": "STRING", "name": "sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
-      { "type": "STRING", "name": "before", "autocomplete": true, "min_length": 1, "max_length": 255 },
-      { "type": "STRING", "name": "after", "autocomplete": true, "min_length": 1, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "mass-edit-stickers",
-    "options": [
-      { "type": "STRING", "name": "pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 },
-      { "type": "INTEGER", "name": "start", "min_value": 1 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "publish-imported-pack",
-    "options": [
-      { "type": "STRING", "name": "pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
-    ]
-  },
-  {
-    "type": "CHAT_INPUT",
-    "name": "migrate-to-telegram-sticker",
-    "options": [
-      { "type": "STRING", "name": "source-sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
-      { "type": "STRING", "name": "target-pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 },
-      { "type": "STRING", "name": "target-sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
-      { "type": "STRING", "name": "source-pack", "autocomplete": true, "min_length": 3, "max_length": 255 }
-    ]
-  },
-  { "type": "MESSAGE", "name": "Update Message" },
-  { "type": "MESSAGE", "name": "Sticker Details" }
-]
+{
+  "$schema": "./commands.schema.json",
+  "commands": [
+    {
+      "type": "CHAT_INPUT",
+      "name": "sticker",
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
+        { "type": "BOOLEAN", "name": "preview" }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "nsfw-sticker",
+      "nsfw": true,
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
+        { "type": "BOOLEAN", "name": "preview" }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "create-pack"
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "import-telegram-pack",
+      "options": [
+        { "type": "STRING", "name": "url", "required": true, "min_length": 26, "max_length": 255 },
+        { "type": "BOOLEAN", "name": "nsfw" }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "create-sticker",
+      "options": [
+        { "type": "STRING", "name": "pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "pack",
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "nsfw-pack",
+      "nsfw": true,
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "edit-sticker-metadata",
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "replace-sticker",
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "delete-sticker",
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "delete-pack",
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "edit-pack",
+      "options": [
+        { "type": "STRING", "name": "name", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "reorder-sticker",
+      "options": [
+        { "type": "STRING", "name": "sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
+        { "type": "STRING", "name": "before", "autocomplete": true, "min_length": 1, "max_length": 255 },
+        { "type": "STRING", "name": "after", "autocomplete": true, "min_length": 1, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "mass-edit-stickers",
+      "options": [
+        { "type": "STRING", "name": "pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 },
+        { "type": "INTEGER", "name": "start", "min_value": 1 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "publish-imported-pack",
+      "options": [
+        { "type": "STRING", "name": "pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 }
+      ]
+    },
+    {
+      "type": "CHAT_INPUT",
+      "name": "migrate-to-telegram-sticker",
+      "options": [
+        { "type": "STRING", "name": "source-sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
+        { "type": "STRING", "name": "target-pack", "required": true, "autocomplete": true, "min_length": 3, "max_length": 255 },
+        { "type": "STRING", "name": "target-sticker", "required": true, "autocomplete": true, "min_length": 1, "max_length": 255 },
+        { "type": "STRING", "name": "source-pack", "autocomplete": true, "min_length": 3, "max_length": 255 }
+      ]
+    },
+    { "type": "MESSAGE", "name": "Update Message" },
+    { "type": "MESSAGE", "name": "Sticker Details" }
+  ]
+}

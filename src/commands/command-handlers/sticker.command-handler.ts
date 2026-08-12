@@ -3,6 +3,7 @@ import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
 import { CommandHandler } from '../../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../../types/command-option-names.js';
 import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
+import { findRankedStickers } from '../../utils/find-ranked-stickers.js';
 import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter.js';
 import { getStickerMessageContent } from '../../utils/get-sticker-message-content.js';
 import { createCommandMention, interactionReply } from '../../utils/interaction-reply.js';
@@ -32,6 +33,14 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
   ];
   if (isUuidV4(stickerQuery)) {
     searchConditions.push({ id: stickerQuery });
+  } else {
+    // Free-typed input that isn't a sticker ID (i.e. the user didn't pick an autocomplete
+    // suggestion) - resolve it the same way autocomplete would rank it, and take the top
+    // (most-used) match, so sending doesn't require waiting on autocomplete results.
+    const [topMatch] = await findRankedStickers(context, interaction, availablePacks, { nsfw, query: stickerQuery });
+    if (topMatch) {
+      searchConditions.push({ id: topMatch.id });
+    }
   }
 
   const stickers = await db.sticker.findMany({

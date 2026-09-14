@@ -388,7 +388,7 @@
       "description": "Létező matrica törlése",
       "responses": {
         "stickerNotFound": "A megadott matrica nem található",
-        "importedSticker": "Imported stickers cannot be deleted individually. They disappear when removed from the Telegram pack, or you can delete your copy of the whole pack.",
+        "importedSticker": "Az importált matricákat nem lehet egyenként törölni. Akkor tűnnek el, ha eltávolítod őket a Telegram-csomagból, vagy törölheted a teljes csomag másolatát.",
         "deleteFailed": "Váratlan hiba miatt nem sikerült törölni a matricát, kérjük, próbáld újra később.",
         "unsupportedMethod": "A megadott törlési módszer ({{method}}) nem támogatott (még).",
         "deleted": "A(z) {{name}} nevű matrica sikeresen törölve"

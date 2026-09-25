@@ -6,8 +6,9 @@
 # Gives you a button-triggered "Deploy" in GitHub's Actions tab WITHOUT a
 # self-hosted runner and without any secret stored in GitHub Actions:
 #
-#   1. This job (on an ordinary GitHub-hosted runner) creates a GitHub
-#      Deployment for the commit you ran it on, with task "git-deploy".
+#   1. A job on an ordinary GitHub-hosted runner creates a GitHub
+#      Deployment for the commit you ran it on, with task "git-deploy" —
+#      one per environment ticked in the Run workflow dialog.
 #   2. GitHub delivers a signed `deployment` webhook to the server's
 #      git-deploy-webhook listener (see README.md's "Triggering deploys
 #      from GitHub" for the one-time server + repo webhook setup).
@@ -30,23 +31,29 @@
 
 name: Deploy
 
+# One checkbox per environment this repo deploys to. Each name must match
+# GITHUB_ENVIRONMENT in the deploy.env of the bare repo it should land in
+# (a deploy.env without one counts as "production"). Most apps only have
+# production; one that also deploys a second worktree of the same repo
+# (e.g. a beta copy) adds a checkbox for it here AND lists it in
+# ENVIRONMENTS below, which also sets the order they deploy in.
 on:
   workflow_dispatch:
     inputs:
-      # Must match GITHUB_ENVIRONMENT in the target bare repo's deploy.env
-      # on the server (default "production"). Only needed when one repo
-      # deploys to several worktrees (e.g. a separate beta copy) — switch
-      # this to `type: choice` with those names as `options` if so.
-      environment:
-        description: Deployment environment
-        required: true
-        default: production
+      production:
+        description: Deploy to production
+        type: boolean
+        default: true
+      # beta:
+      #   description: Deploy to beta
+      #   type: boolean
+      #   default: false
 
-# Only one deploy of THIS app at a time — a second click while one is
+# Only one Deploy run of THIS app at a time — a second click while one is
 # still running waits for it rather than racing it. (The server also
-# serializes deploys per app, this just keeps the Actions view tidy.)
+# serializes deploys per bare repo, this just keeps the Actions view tidy.)
 concurrency:
-  group: deploy-${{ github.event.inputs.environment }}
+  group: deploy
   cancel-in-progress: false
 
 permissions:
@@ -54,9 +61,48 @@ permissions:
   deployments: write
 
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      environments: ${{ steps.pick.outputs.environments }}
+    steps:
+      - name: Pick the ticked environments
+        id: pick
+        env:
+          # Every environment with a checkbox above, in deploy order.
+          ENVIRONMENTS: production
+          INPUTS: ${{ toJSON(github.event.inputs) }}
+        run: |
+          picked=()
+          for env in $ENVIRONMENTS; do
+            value=$(jq -r --arg e "$env" 'if has($e) then .[$e] | tostring else "missing" end' <<< "$INPUTS")
+            case "$value" in
+              true) picked+=("$env") ;;
+              false) ;;
+              *) echo "::error::ENVIRONMENTS lists \"$env\" but there's no checkbox input for it"; exit 1 ;;
+            esac
+          done
+          if [ ${#picked[@]} -eq 0 ]; then
+            echo "::error::Nothing to do: tick at least one environment."
+            exit 1
+          fi
+          json=$(printf '%s\n' "${picked[@]}" | jq -Rnc '[inputs]')
+          echo "Deploying to: ${picked[*]}"
+          echo "environments=$json" >> "$GITHUB_OUTPUT"
+
   deploy:
+    needs: plan
+    name: deploy (${{ matrix.environment }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # One environment at a time, in ENVIRONMENTS order (two builds of the
+    # same app on one server at once would just compete for it), and stop
+    # at the first failure instead of carrying on to the next environment.
+    strategy:
+      matrix:
+        environment: ${{ fromJSON(needs.plan.outputs.environments) }}
+      max-parallel: 1
+      fail-fast: true
     # Optional approval gate: point this at an environment with required
     # reviewers (Settings -> Environments) to require someone's approval
     # before the deployment is created. Use a DIFFERENT name from the
@@ -71,7 +117,7 @@ jobs:
         id: create
         env:
           GH_TOKEN: ${{ github.token }}
-          ENVIRONMENT: ${{ github.event.inputs.environment }}
+          ENVIRONMENT: ${{ matrix.environment }}
         run: |
           id=$(jq -n --arg ref "$GITHUB_SHA" --arg env "$ENVIRONMENT" \
                  '{ref: $ref, environment: $env, task: "git-deploy",

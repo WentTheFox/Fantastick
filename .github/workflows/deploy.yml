@@ -33,9 +33,6 @@ name: Deploy
 on:
   workflow_dispatch:
     inputs:
-      confirm:
-        description: 'Type "deploy" to confirm.'
-        required: true
       # Must match GITHUB_ENVIRONMENT in the target bare repo's deploy.env
       # on the server (default "production"). Only needed when one repo
       # deploys to several worktrees (e.g. a separate beta copy) — switch
@@ -70,15 +67,6 @@ jobs:
     # real one.
     # environment: deploy-approval
     steps:
-      - name: Confirm
-        env:
-          CONFIRM: ${{ github.event.inputs.confirm }}
-        run: |
-          if [ "$CONFIRM" != "deploy" ]; then
-            echo 'Confirmation text didn'"'"'t match "deploy" — aborting.' >&2
-            exit 1
-          fi
-
       - name: Create deployment
         id: create
         env:

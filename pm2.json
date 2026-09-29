@@ -2,12 +2,18 @@
   "apps": [
     {
       "name": "Fantastick:App",
+      "out_file": "logs/app-out.log",
+      "error_file": "logs/app-error.log",
+      "merge_logs": true,
       "script": "build/src/index.js",
       "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
       "source_map_support": true
     },
     {
       "name": "Fantastick:QueueWorker",
+      "out_file": "logs/queue-worker-out.log",
+      "error_file": "logs/queue-worker-error.log",
+      "merge_logs": true,
       "script": "build/src/queue-worker.js",
       "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
       "source_map_support": true

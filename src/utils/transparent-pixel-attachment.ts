@@ -9,4 +9,4 @@ const transparentPixelPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAA
 export const transparentPixelAttachmentName = 'pixel.png';
 
 export const getTransparentPixelAttachment = (): AttachmentBuilder =>
-  new AttachmentBuilder(transparentPixelPng, { name: transparentPixelAttachmentName });
+  new AttachmentBuilder(transparentPixelPng, { name: transparentPixelAttachmentName }).setSpoiler(false);

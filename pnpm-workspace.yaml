@@ -2,6 +2,17 @@ minimumReleaseAge: 20160
 minimumReleaseAgeExclude:
   - '@went.tf/discord-bot-framework'
 
+# Security fixes that the parent packages' own version ranges don't yet reach. Each pin is
+# for a published patched release; drop an override once its parent depends on a fixed range.
+#   basic-ftp (pm2 > proxy-agent > get-uri), deepmerge-ts (prisma > @prisma/config),
+#   js-yaml (pm2), mysql2 (prisma > @prisma/dev), shell-quote (concurrently)
+overrides:
+  basic-ftp: ^6.2.1
+  deepmerge-ts: ^8.0.2
+  js-yaml@4: ^4.3.2
+  mysql2: ^3.24.1
+  shell-quote: ^1.11.0
+
 allowBuilds:
   '@prisma/engines': true
   bufferutil: true

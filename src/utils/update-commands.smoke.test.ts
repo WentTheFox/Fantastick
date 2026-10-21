@@ -45,7 +45,7 @@ describe('commands.json runtime smoke test', () => {
     expect(sticker?.name_localizations).toMatchObject({ hu: 'matrica' });
 
     const search = body.find(c => c.name === 'mass-edit-stickers');
-    const startOption = (search?.options as { name: string }[] | undefined)?.find(o => o.name === 'start');
+    const startOption = (search as { options?: { name: string }[] } | undefined)?.options?.find(o => o.name === 'start');
     expect(startOption).toMatchObject({ name: 'start', description: 'Position of the sticker to start from (defaults to 1, the first sticker)' });
 
     const updateMessage = body.find(c => c.name === 'Update Message');

@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../services/searchable-store.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { ReorderStickerCommandOptionName } from '../types/command-option-names.js';
 import {
@@ -86,7 +87,7 @@ export const reorderStickerCommand: BotChatInputCommand<'reorder-sticker'> = {
     }
 
     try {
-      await db.$transaction(async (tx) => {
+      await createSearchableStore(context).transaction(async (store, tx) => {
         const siblings = await tx.$queryRaw<{ id: string }[]>`
           SELECT "id" FROM "Sticker"
           WHERE "packId" = ${sticker.packId}::uuid AND "deletedAt" IS NULL
@@ -103,7 +104,7 @@ export const reorderStickerCommand: BotChatInputCommand<'reorder-sticker'> = {
         const targetIndex = reordered.indexOf(target.id);
         reordered.splice(moveBefore ? targetIndex : targetIndex + 1, 0, sticker.id);
 
-        await Promise.all(reordered.map((siblingId, index) => tx.sticker.update({
+        await Promise.all(reordered.map((siblingId, index) => store.sticker.update({
           where: { id: siblingId },
           data: { order: index },
         })));

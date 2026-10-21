@@ -68,6 +68,12 @@ $ pnpm exec prisma migrate deploy
 $ pm2 start pm2.json
 ```
 
+### Optional: OpenSearch-backed sticker search
+
+Sticker-name autocomplete can be served from an [OpenSearch](https://opensearch.org/) index instead of scanning Postgres on every keystroke. Set `OPENSEARCH_URL` (and optionally `OPENSEARCH_INDEX`, `OPENSEARCH_USERNAME`, `OPENSEARCH_PASSWORD`) in `.env`; leave it empty to keep searching in Postgres only. The queue worker builds the index on startup and reconciles it every 15 minutes.
+
+Postgres stays the source of truth: every query is filtered to the caller's own and public packs, and each result is re-checked against Postgres before it is shown, so a stale index can hide a sticker but never reveal a private one. Keep the cluster on a private network, since the bot is its only client. If OpenSearch is unreachable, autocomplete falls back to Postgres automatically.
+
 ## Development
 
 For local development against a bot account you control, follow the bare

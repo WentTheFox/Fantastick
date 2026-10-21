@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../../services/searchable-store.js';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
 import { QueueType } from '../../types/queue.js';
@@ -101,7 +102,7 @@ export const deleteStickerModalHandler: ModalHandler = async (interaction, conte
   }
 
   try {
-    sticker = await db.sticker.update({
+    sticker = await createSearchableStore(context).sticker.update({
       where: { id: sticker.id },
       data: {
         deletedBy: user.id,

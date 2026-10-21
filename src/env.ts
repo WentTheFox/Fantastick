@@ -23,6 +23,12 @@ export const env = defineEnv({
   UPLOAD_API_RESPONSE_FIELD: z.string().nullable().default(null),
   UPLOAD_API_FILE_FIELD: z.string().nullable().default(null),
   UPLOAD_API_DELETE_URL_FIELD: z.string().nullable().default(null),
+  // Optional OpenSearch-backed sticker autocomplete. Disabled (Postgres-only search) when
+  // OPENSEARCH_URL is unset. See src/utils/search/ for the visibility/privacy model.
+  OPENSEARCH_URL: z.string().nullable().default(null),
+  OPENSEARCH_INDEX: z.string().min(1).default('fantastick-stickers'),
+  OPENSEARCH_USERNAME: z.string().nullable().default(null),
+  OPENSEARCH_PASSWORD: z.string().nullable().default(null),
   // Hot-reloads command/component handler implementations while running via `pnpm dev`.
   DEV_WATCH: boolFromString(),
 });

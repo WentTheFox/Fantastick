@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../../services/searchable-store.js';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import {
   packNameInvalidPattern,
@@ -83,7 +84,7 @@ export const createPackModalHandler: ModalHandler = async (interaction, context)
     return;
   }
 
-  const pack = await db.pack.create({
+  const pack = await createSearchableStore(context).pack.create({
     data: {
       name: packName,
       nsfw: data[CreatePackModalCustomIds.NSFW_INPUT] === CreatePackModalBooleanOption.TRUE,

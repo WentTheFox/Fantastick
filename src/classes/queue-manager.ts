@@ -9,6 +9,7 @@ import { cleanupOrphanedTelegramPacksQueueHandler } from './queue-handlers/clean
 import { hardDeleteOldPacksQueueHandler } from './queue-handlers/hard-delete-old-packs.queue-handler.js';
 import { hardDeleteOldStickersQueueHandler } from './queue-handlers/hard-delete-old-stickers.queue-handler.js';
 import { hardDeleteStaleTelegramStickersQueueHandler } from './queue-handlers/hard-delete-stale-telegram-stickers.queue-handler.js';
+import { reconcileStickerSearchIndexQueueHandler } from './queue-handlers/reconcile-sticker-search-index.queue-handler.js';
 import { telegramImportQueueHandler } from './queue-handlers/telegram-import.queue-handler.js';
 import { updateMessageQueueHandler } from './queue-handlers/update-message.queue-handler.js';
 import { updateStickerUsageStatsQueueHandler } from './queue-handlers/update-sticker-usage-stats.queue-handler.js';
@@ -38,6 +39,13 @@ const hourlyMaintenanceQueues: QueueType[] = [
 ];
 const hourlyMaintenanceCron = '0 * * * *';
 
+// Safety net for the per-write index syncs (see syncPackToSearchIndex) and the initial
+// backfill of a fresh index; also runs once at startup. A no-op without OPENSEARCH_URL.
+const searchReconcileQueues: QueueType[] = [
+  QueueType.ReconcileStickerSearchIndex,
+];
+const searchReconcileCron = '*/15 * * * *';
+
 export class QueueManager {
   protected readonly boss: PgBoss;
   protected readonly i18next: Promise<i18n>;
@@ -63,6 +71,7 @@ export class QueueManager {
       [QueueType.HardDeleteOldPacks]: hardDeleteOldPacksQueueHandler,
       [QueueType.HardDeleteStaleTelegramStickers]: hardDeleteStaleTelegramStickersQueueHandler,
       [QueueType.UpdateStickerUsageStats]: updateStickerUsageStatsQueueHandler,
+      [QueueType.ReconcileStickerSearchIndex]: reconcileStickerSearchIndexQueueHandler,
     };
     this.i18next = initI18next(this.logger);
   }
@@ -96,6 +105,13 @@ export class QueueManager {
   async setupHourlyMaintenance(): Promise<void> {
     await Promise.all(hourlyMaintenanceQueues.map(async (queueType) => {
       await this.boss.schedule(queueType, hourlyMaintenanceCron, {}, this.defaultOptions[queueType]);
+      await this.send(queueType, {});
+    }));
+  }
+
+  async setupSearchReconcile(): Promise<void> {
+    await Promise.all(searchReconcileQueues.map(async (queueType) => {
+      await this.boss.schedule(queueType, searchReconcileCron, {}, this.defaultOptions[queueType]);
       await this.send(queueType, {});
     }));
   }

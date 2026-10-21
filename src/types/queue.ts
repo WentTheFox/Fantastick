@@ -8,6 +8,7 @@ export enum QueueType {
   HardDeleteOldPacks = 'hard-delete-old-packs',
   HardDeleteStaleTelegramStickers = 'hard-delete-stale-telegram-stickers',
   UpdateStickerUsageStats = 'update-sticker-usage-stats',
+  ReconcileStickerSearchIndex = 'reconcile-sticker-search-index',
 }
 
 export interface QueueReqData {
@@ -33,6 +34,8 @@ export interface QueueReqData {
   // Runs hourly (see QueueManager) and does a full recompute of aggregate counts, so it
   // needs no job data — it always operates over the entire StickerMessage table
   [QueueType.UpdateStickerUsageStats]: Record<string, never>;
+  // Full diff of the OpenSearch sticker index against Postgres; no job data needed
+  [QueueType.ReconcileStickerSearchIndex]: Record<string, never>;
 }
 
 export type QueueHandler<Type extends QueueType> = WorkHandler<QueueReqData[Type], void>;

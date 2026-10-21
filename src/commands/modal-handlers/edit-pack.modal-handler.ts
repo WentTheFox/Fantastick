@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../../services/searchable-store.js';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import {
   packNameInvalidPattern,
@@ -108,7 +109,7 @@ export const editPackModalHandler: ModalHandler = async (interaction, context, r
     }
   }
 
-  pack = await db.pack.update({
+  pack = await createSearchableStore(context).pack.update({
     where: { id: pack.id },
     data: {
       ...(!isImportedPack && packName !== null ? { name: packName } : undefined),

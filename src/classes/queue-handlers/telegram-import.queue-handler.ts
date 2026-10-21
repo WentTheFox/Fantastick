@@ -1,4 +1,5 @@
 import { Routes } from 'discord-api-types/v10';
+import { createSearchableStore } from '../../services/searchable-store.js';
 import { MessageFlags, userMention, WebhookClient } from 'discord.js';
 import * as fs from 'node:fs';
 import { Readable } from 'node:stream';
@@ -108,7 +109,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   const cleanUpFreshlyCreatedPack = async () => {
     const liveStickerCount = await db.sticker.count({ where: { packId, deletedAt: null } });
     if (liveStickerCount > 0) return;
-    await db.pack.update({
+    await createSearchableStore({ db, logger }).pack.update({
       where: { id: packId },
       data: { deletedAt: new Date(), deletedBy: importedBy },
     });
@@ -337,7 +338,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
   let initiatingPackStickerIds: string[];
   let newlyUnpublishedPacks: { packId: string; ownerId: bigint; newStickerCount: number }[];
   try {
-    ({ newInitiatingPackStickerIds: initiatingPackStickerIds, newlyUnpublishedPacks } = await db.$transaction(async (tx) => {
+    ({ newInitiatingPackStickerIds: initiatingPackStickerIds, newlyUnpublishedPacks } = await createSearchableStore({ db, logger }).transaction(async (store, tx) => {
       const createdTelegramStickers: TelegramSticker[] = [];
       for (const args of createTelegramStickerRecords) {
         createdTelegramStickers.push(await tx.telegramSticker.create(args));
@@ -394,7 +395,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
           const row = rowsByTelegramStickerId.get(telegramStickerId);
           if (!row) {
             const publishedSticker = publishedByTelegramStickerId.get(telegramStickerId);
-            const created = await tx.sticker.create({
+            const created = await store.sticker.create({
               data: {
                 name: publishedSticker?.name ?? '',
                 description: null,
@@ -410,7 +411,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
             }
           } else if (row.deletedAt !== null) {
             // Restored on Telegram: bring the user's row (and their label) back
-            await tx.sticker.update({
+            await store.sticker.update({
               where: { id: row.id },
               data: { deletedAt: null, deletedBy: null },
             });
@@ -418,7 +419,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         }
 
         if (staleTelegramStickerIds.length > 0) {
-          await tx.sticker.updateMany({
+          await store.sticker.updateMany({
             where: {
               packId: subscriberPack.id,
               telegramStickerId: { in: staleTelegramStickerIds },
@@ -433,7 +434,7 @@ export const telegramImportQueueHandler = (logger: NestableLogger): QueueHandler
         // Unpublish and make the owner re-review and re-publish instead of silently
         // exposing an unrated sticker.
         if (newStickerCount > 0 && subscriberPack.public) {
-          await tx.pack.update({ where: { id: subscriberPack.id }, data: { public: false } });
+          await store.pack.update({ where: { id: subscriberPack.id }, data: { public: false } });
           newlyUnpublishedPacks.push({ packId: subscriberPack.id, ownerId: subscriberPack.createdBy, newStickerCount });
         }
       }

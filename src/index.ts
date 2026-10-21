@@ -4,12 +4,14 @@ import { createShardManager } from '@went.tf/discord-bot-framework/client';
 import { NestableLogger } from '@went.tf/discord-bot-framework/logger';
 import { initI18next } from './constants/locales.js';
 import { env } from './env.js';
+import { QueueType } from './types/queue.js';
 import { InteractionHandlerContext } from './types/contexts/interaction-handler.context.js';
 import { createDb } from './utils/create-db.js';
 import { createAppLogger } from './utils/create-logger.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
 import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
 import { initQueueManager } from './utils/init-queue-manager.js';
+import { isSearchEnabled } from './utils/search/opensearch-client.js';
 import { updateCommands } from './utils/update-commands.js';
 
 // This file is the main entry point that starts the bot
@@ -30,6 +32,13 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
   await Promise.all([
     updateCommands(context),
   ]);
+
+  // Full reindex as a background job (picked up by the queue worker), in case the index
+  // drifted or was lost while the app was down. Idempotent, so overlapping with the queue
+  // worker's own startup run is harmless.
+  if (isSearchEnabled()) {
+    await context.qm.send(QueueType.ReconcileStickerSearchIndex, {});
+  }
 
   logger.log('Completed.');
 }

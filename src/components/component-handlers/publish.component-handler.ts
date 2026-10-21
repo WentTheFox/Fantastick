@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../../services/searchable-store.js';
 import { userMention } from 'discord.js';
 import { BotMessageComponentHandler, BotModalId } from '../../types/bot-interaction.js';
 import { getEditStickerMetadataModalContent } from '../../utils/get-edit-sticker-metadata-modal-content.js';
@@ -188,7 +189,7 @@ export const publishConfirmComponentHandler: BotMessageComponentHandler = async 
   // single sticker was explicitly marked NSFW; even one SFW sticker makes it SFW
   const nsfwStickerCount = stickers.filter(sticker => sticker.nsfwOverride === true).length;
   const packNsfw = nsfwStickerCount === stickers.length;
-  pack = await db.pack.update({
+  pack = await createSearchableStore(context).pack.update({
     where: { id: pack.id },
     data: { public: true, nsfw: packNsfw },
     include: { telegramPack: true },

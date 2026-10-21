@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../services/searchable-store.js';
 import {
   EditStickerMetadataModalCustomIds,
   parseRatingOption,
@@ -90,7 +91,7 @@ export const applyStickerMetadataEdit = async (
     url: sticker.url,
     nsfwOverride: sticker.nsfwOverride,
   };
-  const updatedSticker = await db.sticker.update({
+  const updatedSticker = await createSearchableStore(context).sticker.update({
     where: { id: sticker.id },
     data: {
       name: stickerName ?? sticker.name,

@@ -6,6 +6,7 @@ const logger = createAppLogger('queue-worker');
 initQueueManager(logger).then(async (qm) => {
   await qm.setupDailyMaintenance();
   await qm.setupHourlyMaintenance();
+  await qm.setupSearchReconcile();
   await qm.work();
 });
 

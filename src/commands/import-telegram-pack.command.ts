@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../services/searchable-store.js';
 import { BotChatInputCommand } from '../types/bot-interaction.js';
 import { ImportCommandOptionName } from '../types/command-option-names.js';
 import { QueueType } from '../types/queue.js';
@@ -81,7 +82,7 @@ export const importTelegramPackCommand: BotChatInputCommand<'import-telegram-pac
       // The placeholder title is replaced with the real one by the import job
       data: { telegramPackName, title: telegramPackName },
     });
-    const pack = userPack ?? await db.pack.create({
+    const pack = userPack ?? await createSearchableStore(context).pack.create({
       data: {
         name: '',
         nsfw: nsfw === true,

@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../../services/searchable-store.js';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { ModalHandler } from '../../types/bot-interaction.js';
 import { deleteStickerFile } from '../../utils/delete-sticker-file.js';
@@ -40,16 +41,16 @@ export const deletePackModalHandler: ModalHandler = async (interaction, context,
 
   try {
     const now = new Date();
-    await db.$transaction([
-      db.sticker.updateMany({
+    await createSearchableStore(context).transaction(async (store) => {
+      await store.sticker.updateMany({
         where: { packId: pack.id, deletedAt: null },
         data: { deletedBy: user.id, deletedAt: now },
-      }),
-      db.pack.update({
+      });
+      await store.pack.update({
         where: { id: pack.id },
         data: { deletedBy: user.id, deletedAt: now },
-      }),
-    ]);
+      });
+    });
   } catch (e) {
     context.logger.error('Failed to delete pack', e);
     await interactionReply(context, interaction, {

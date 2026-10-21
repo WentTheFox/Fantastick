@@ -1,9 +1,8 @@
 import { MessageFlags } from 'discord-api-types/v10';
-import { StickerWhereInput } from '../../generated/prisma/models/Sticker.js';
 import { CommandHandler } from '../../types/bot-interaction.js';
 import { StickerCommandOptionName } from '../../types/command-option-names.js';
-import { findAvailableStickerPacks } from '../../utils/find-available-sticker-packs.js';
-import { findRankedStickers } from '../../utils/find-ranked-stickers.js';
+import { getAvailablePackWhere } from '../../utils/find-available-sticker-packs.js';
+import { findStickers } from '../../utils/find-stickers.js';
 import { getNonNsfwStickerFilter } from '../../utils/get-non-nsfw-sticker-filter.js';
 import { getStickerMessageContent } from '../../utils/get-sticker-message-content.js';
 import { createCommandMention, interactionReply } from '../../utils/interaction-reply.js';
@@ -15,8 +14,8 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
   const { t, db } = context;
   const stickerQuery = interaction.options.getString(StickerCommandOptionName.NAME, true);
   const preview = interaction.options.getBoolean(StickerCommandOptionName.PREVIEW) ?? false;
-  const availablePacks = await findAvailableStickerPacks(context, interaction, nsfw);
-  if (availablePacks.length === 0) {
+  const availablePackWhere = getAvailablePackWhere(interaction.user.id, nsfw);
+  if (await db.pack.count({ where: availablePackWhere, take: 1 }) === 0) {
     await interactionReply(context, interaction, {
       content: t('commands.sticker.responses.noPacks', {
         createCommand: createCommandMention('create-pack', context),
@@ -28,31 +27,19 @@ export const stickerCommandHandler = (nsfw: boolean): CommandHandler => async fu
 
   const reply = await interaction.deferReply({ flags: preview ? MessageFlags.Ephemeral : undefined });
 
-  const searchConditions: StickerWhereInput[] = [
-    { name: stickerQuery },
-  ];
-  if (isUuidV4(stickerQuery)) {
-    searchConditions.push({ id: stickerQuery });
-  } else {
-    // Free-typed input that isn't a sticker ID (i.e. the user didn't pick an autocomplete
-    // suggestion) - resolve it the same way autocomplete would rank it, and take the top
-    // (most-used) match, so sending doesn't require waiting on autocomplete results.
-    const [topMatch] = await findRankedStickers(context, interaction, availablePacks, { nsfw, query: stickerQuery });
-    if (topMatch) {
-      searchConditions.push({ id: topMatch.id });
-    }
-  }
+  // The sticker is picked either by ID (an autocomplete suggestion) or, for free-typed text,
+  // as the top result of the exact same search the autocomplete runs (most-used first), so
+  // submitting what you typed always sends what autocomplete listed first.
+  const stickerId = isUuidV4(stickerQuery)
+    ? stickerQuery
+    : (await findStickers(context, interaction, { nsfw, query: stickerQuery, limit: 1 }))[0]?.id;
 
-  const stickers = await db.sticker.findMany({
+  const stickers = stickerId === undefined ? [] : await db.sticker.findMany({
     where: {
+      id: stickerId,
       deletedAt: null,
-      AND: [
-        { OR: searchConditions },
-        getNonNsfwStickerFilter(nsfw),
-      ],
-      packId: {
-        in: availablePacks.map(pack => pack.id),
-      },
+      ...getNonNsfwStickerFilter(nsfw),
+      pack: availablePackWhere,
     },
     include: { telegramSticker: true, pack: true },
     take: 1,

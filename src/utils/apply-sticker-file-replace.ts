@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../services/searchable-store.js';
 import { Readable } from 'node:stream';
 import { ReplaceStickerModalCustomIds } from '../constants/edit-sticker-modal-fields.js';
 import { env } from '../env.js';
@@ -25,7 +26,7 @@ export const applyStickerFileReplace = async (
   context: ModalContext,
   sticker: EditableSticker,
 ): Promise<ApplyStickerFileReplaceResult | null> => {
-  const { t, db } = context;
+  const { t } = context;
   const { indexedAttachments, data } = collectModalSubmittedData(interaction, ReplaceStickerModalCustomIds);
 
   let stickerUrl = data[ReplaceStickerModalCustomIds.URL_INPUT];
@@ -98,7 +99,7 @@ export const applyStickerFileReplace = async (
     url: sticker.url,
     nsfwOverride: sticker.nsfwOverride,
   };
-  const updatedSticker = await db.sticker.update({
+  const updatedSticker = await createSearchableStore(context).sticker.update({
     where: { id: sticker.id },
     data: {
       url: stickerUrl,

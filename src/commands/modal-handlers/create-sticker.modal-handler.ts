@@ -1,4 +1,5 @@
 import { MessageFlags } from 'discord-api-types/v10';
+import { createSearchableStore } from '../../services/searchable-store.js';
 import { Readable } from 'node:stream';
 import { EmojiCharacters } from '../../constants/emoji-characters.js';
 import { env } from '../../env.js';
@@ -158,7 +159,7 @@ export const createStickerModalHandler: ModalHandler = async (interaction, conte
   const order = await db.sticker.count({ where: { packId: userPack.id } });
   const nsfwOverride = parseRatingOption(data[CreateStickerModalCustomIds.RATING_INPUT]);
   const description = normalizeStickerDescriptionInput(data[CreateStickerModalCustomIds.ALT_INPUT]);
-  const sticker = await db.sticker.create({
+  const sticker = await createSearchableStore(context).sticker.create({
     data: {
       id: stickerId,
       name: stickerName,

@@ -13,7 +13,7 @@
 @WORKTREE@/logs/app-error.log
 @WORKTREE@/logs/queue-worker-out.log
 @WORKTREE@/logs/queue-worker-error.log {
-    su pwny pwny
+    su deploy deploy
     daily
     rotate 13
     missingok

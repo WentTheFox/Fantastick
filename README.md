@@ -68,6 +68,19 @@ $ pnpm exec prisma migrate deploy
 $ pm2 start pm2.json
 ```
 
+### Receiving interactions (webhook mode)
+
+By default the app runs in **webhook-only mode**: it holds no gateway connection, and Discord instead POSTs every interaction to an HTTP endpoint the app serves (`INTERACTIONS_MODE=webhook`).
+
+1. Copy the application's **Public Key** (developer portal → General Information) into `DISCORD_PUBLIC_KEY`.
+2. Generate a long random token for `WEBHOOK_PATH_SECRET` (e.g. `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`). The endpoint only answers `POST /<WEBHOOK_PATH_SECRET>`; anything else gets a 404.
+3. Put a TLS-terminating reverse proxy in front of `WEBHOOK_HOST:WEBHOOK_PORT` (default `127.0.0.1:3000`), passing the request body and `X-Signature-*` headers through untouched. `setup/nginx/fantastick-webhook.conf` is a ready-made nginx vhost.
+4. Set the application's **Interactions Endpoint URL** in the developer portal to `https://<your-domain>/<WEBHOOK_PATH_SECRET>`. Discord verifies it with a signed PING when you save.
+
+Every request's Ed25519 signature is verified against the public key before anything is processed. The bot no longer shows as online and has no activity status, since that requires a gateway connection.
+
+Prefer the previous behaviour (sharded gateway connection, no public endpoint needed)? Set `INTERACTIONS_MODE=gateway`. Remove the Interactions Endpoint URL in the portal first, as Discord stops delivering interactions over the gateway while one is set. `DEV_WATCH` hot-reloading only applies in gateway mode.
+
 ### Optional: OpenSearch-backed sticker search
 
 Sticker-name autocomplete can be served from an [OpenSearch](https://opensearch.org/) index instead of scanning Postgres on every keystroke. Set `OPENSEARCH_URL` (and optionally `OPENSEARCH_INDEX`, `OPENSEARCH_USERNAME`, `OPENSEARCH_PASSWORD`) in `.env`; leave it empty to keep searching in Postgres only. The queue worker builds the index on startup and reconciles it every 15 minutes.

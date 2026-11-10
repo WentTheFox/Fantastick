@@ -5,17 +5,18 @@ interface CreateTFunctionOptions {
   i18next: InteractionHandlerContext['i18next'];
   ephemeral: boolean | null;
   locale: string;
-  guild: { preferredLocale?: string } | undefined | null;
+  /** The server's preferred locale (`interaction.guildLocale`), available in both gateway and webhook mode */
+  guildLocale: string | undefined | null;
 }
 
-export const createTFunction = ({ i18next, ephemeral, locale, guild }: CreateTFunctionOptions) => {
+export const createTFunction = ({ i18next, ephemeral, locale, guildLocale }: CreateTFunctionOptions) => {
   return i18next.getFixedT(
     // Always use user's locale for ephemeral responses, otherwise use server's preferred locale when available
     ephemeral
       ? [locale, DEFAULT_LANGUAGE] :
       (
-        guild?.preferredLocale
-          ? [guild.preferredLocale, DEFAULT_LANGUAGE]
+        guildLocale
+          ? [guildLocale, DEFAULT_LANGUAGE]
           : DEFAULT_LANGUAGE
       ),
   );

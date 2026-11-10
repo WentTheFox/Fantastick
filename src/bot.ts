@@ -2,14 +2,10 @@ import { createHandlerWatcher, createSourceReloader } from '@went.tf/discord-bot
 import { Registry } from '@went.tf/discord-bot-framework/interactions';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { initI18next } from './constants/locales.js';
 import { env } from './env.js';
 import { createClient } from './utils/client.js';
-import { createDb } from './utils/create-db.js';
+import { createInteractionHandlerContext } from './utils/create-interaction-handler-context.js';
 import { createShardLogger } from './utils/create-logger.js';
-import { getCommandIdMap } from './utils/get-command-id-map.js';
-import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
-import { initQueueManager } from './utils/init-queue-manager.js';
 import {
   chatInputCommandRegistry,
   componentRegistry,
@@ -26,16 +22,9 @@ const mergeRegistry = <Name extends string, T>(target: Registry<Name, T>, source
 
 (async () => {
   const logger = createShardLogger(process.env.SHARDS);
-  const db = createDb();
-  const [i18next, emojiIdMap, commandIdMap, qm] = await Promise.all([
-    initI18next(logger),
-    getEmojiIdMap({ logger }),
-    getCommandIdMap({ logger }),
-    initQueueManager(logger),
-  ]);
 
   logger.log('Creating client');
-  await createClient({ i18next, emojiIdMap, commandIdMap, logger, db, qm });
+  await createClient(await createInteractionHandlerContext(logger));
 
   if (env.DEV_WATCH) {
     const currentFolder = dirname(fileURLToPath(import.meta.url));

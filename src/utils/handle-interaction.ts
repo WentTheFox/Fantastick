@@ -29,7 +29,7 @@ const buildUserInteractionContext = (
 ): UserInteractionContext => ({
   ...context,
   logger: context.logger.nest(`Interaction#${interaction.id}`),
-  t: createTFunction({ i18next, ephemeral, locale: interaction.locale, guild: interaction.guild }),
+  t: createTFunction({ i18next, ephemeral, locale: interaction.locale, guildLocale: interaction.guildLocale }),
 });
 
 const onDispatchError = (interaction: unknown, context: UserInteractionContext) =>

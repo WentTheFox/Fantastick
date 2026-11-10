@@ -7,12 +7,14 @@ import { env } from './env.js';
 import { QueueType } from './types/queue.js';
 import { InteractionHandlerContext } from './types/contexts/interaction-handler.context.js';
 import { createDb } from './utils/create-db.js';
+import { createInteractionHandlerContext } from './utils/create-interaction-handler-context.js';
 import { createAppLogger } from './utils/create-logger.js';
 import { getCommandIdMap } from './utils/get-command-id-map.js';
 import { getEmojiIdMap } from './utils/get-emoji-id-map.js';
 import { initQueueManager } from './utils/init-queue-manager.js';
 import { isSearchEnabled } from './utils/search/opensearch-client.js';
 import { updateCommands } from './utils/update-commands.js';
+import { startWebhookServer } from './utils/webhook-server.js';
 
 // This file is the main entry point that starts the bot
 
@@ -43,7 +45,32 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
   logger.log('Completed.');
 }
 
-(async function createShards() {
+async function startWebhookMode(): Promise<void> {
+  const logger = createAppLogger('Webhook');
+  if (env.DISCORD_PUBLIC_KEY === null || env.DISCORD_PUBLIC_KEY === '') {
+    throw new Error('DISCORD_PUBLIC_KEY must be set when INTERACTIONS_MODE=webhook (or set INTERACTIONS_MODE=gateway)');
+  }
+
+  if (env.WEBHOOK_PATH_SECRET === null || env.WEBHOOK_PATH_SECRET === '') {
+    throw new Error('WEBHOOK_PATH_SECRET must be set when INTERACTIONS_MODE=webhook');
+  }
+
+  // Slash commands must be registered before the command ID map is read back
+  await startupCommandsUpdate(logger);
+  const context = await createInteractionHandlerContext(logger);
+  const server = await startWebhookServer(context, logger);
+
+  const shutdown = () => {
+    logger.log('Shutting down…');
+    server.close(() => process.exit(0));
+    // Don't hang on keep-alive connections
+    server.closeAllConnections();
+  };
+  process.once('SIGINT', shutdown);
+  process.once('SIGTERM', shutdown);
+}
+
+async function startGatewayMode(): Promise<void> {
   const logger = createAppLogger('ShardingManager');
   const currentFolder = dirname(fileURLToPath(import.meta.url));
   // Running via `tsx` from source (e.g. `pnpm dev`) rather than the compiled build/ output.
@@ -60,4 +87,9 @@ async function startupCommandsUpdate(parentLogger: NestableLogger): Promise<void
     execArgv: isTsDevMode ? process.execArgv : undefined,
     beforeSpawn: () => startupCommandsUpdate(logger),
   });
-})();
+}
+
+(env.INTERACTIONS_MODE === 'webhook' ? startWebhookMode() : startGatewayMode()).catch((error: unknown) => {
+  console.error(error);
+  process.exit(1);
+});

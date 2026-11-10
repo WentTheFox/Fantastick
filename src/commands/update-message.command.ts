@@ -22,7 +22,8 @@ export const updateMessageCommand: BotMessageContextMenuCommand<'Update Message'
       return;
     }
 
-    if (interaction.targetMessage.channel?.isDMBased()) {
+    // `targetMessage.channel` is not cached in webhook mode, so rely on the payload instead
+    if (!interaction.inGuild()) {
       await interactionReply(context, interaction, {
         content: t('commands.global.responses.dmsUnsupported'),
         flags: MessageFlags.Ephemeral,

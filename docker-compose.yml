@@ -52,6 +52,12 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      # Must listen on all interfaces inside the container for the published port to work
+      WEBHOOK_HOST: 0.0.0.0
+    ports:
+      # Webhook mode only (the default): point your reverse proxy at this port. Bound to
+      # loopback so the endpoint is only reachable through the TLS-terminating proxy.
+      - "127.0.0.1:${WEBHOOK_PORT:-3000}:${WEBHOOK_PORT:-3000}"
     volumes:
       - fantastick-sticker-storage:/app/fs
 

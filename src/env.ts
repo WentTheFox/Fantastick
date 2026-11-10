@@ -7,6 +7,23 @@ import { z } from 'zod';
 export const env = defineEnv({
   DISCORD_BOT_TOKEN: z.string().min(1),
   DISCORD_CLIENT_ID: z.string().min(1),
+  // How the app receives interactions. "webhook" (default) runs an HTTP Interactions Endpoint
+  // and needs DISCORD_PUBLIC_KEY; "gateway" holds a (sharded) gateway connection instead.
+  INTERACTIONS_MODE: z.enum(['webhook', 'gateway']).default('webhook'),
+  // Application public key from the Discord developer portal (webhook mode only)
+  DISCORD_PUBLIC_KEY: z.string().nullable().default(null),
+  WEBHOOK_HOST: z.string().min(1).default('127.0.0.1'),
+  WEBHOOK_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  /**
+   * Long random URL-safe token the webhook server requires as the request path (`/<token>`);
+   * anything else 404s. Set the Interactions Endpoint URL to `https://<host>/<token>`. Purely
+   * obscurity, not a substitute for Ed25519 signature verification - it keeps scanner noise out
+   * of the "invalid signature" logs. Required in webhook mode. Generate with
+   * `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`.
+   */
+  WEBHOOK_PATH_SECRET: z.string().nullable().default(null),
+  // Logs signature/timestamp details of rejected requests, for debugging proxy issues
+  WEBHOOK_VERBOSE_DIAGNOSTICS: boolFromString(),
   DISCORD_FEED_WEBHOOK_URL: z.string().nullable().default(null),
   DISCORD_LOG_WEBHOOK_URL: z.string().nullable().default(null),
   LOCAL: boolFromString(),

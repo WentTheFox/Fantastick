@@ -25,7 +25,8 @@ export const stickerButtonComponentHandler = (deleteOnly: boolean): BotMessageCo
     });
     return;
   }
-  if (interaction.message.channel.isDMBased()) {
+  // `message.channel` is not cached in webhook mode, so rely on the payload instead
+  if (!interaction.inGuild()) {
     await interactionReply(context, interaction, {
       content: t('commands.global.responses.dmsUnsupported'),
       flags: MessageFlags.Ephemeral,

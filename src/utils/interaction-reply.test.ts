@@ -10,7 +10,7 @@ describe('reformatCommandNamesInContent', async () => {
     i18next: await initI18next(new DevNullLogger()),
     ephemeral: null,
     locale: Locale.EnglishUS,
-    guild: null,
+    guildLocale: null,
   });
   it('should replace command names that it knows about', () => {
     const commandIdMap = { test: '42' };

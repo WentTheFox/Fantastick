@@ -52,6 +52,13 @@ export const startWebhookServer = (context: InteractionHandlerContext, parentLog
       res.writeHead(status, { 'Content-Type': 'application/json' }).end(JSON.stringify(body));
     };
 
+    // Humans opening the bare root get sent to the landing page
+    const landingPage = env.LANDING_PAGE;
+    if ((req.method === 'GET' || req.method === 'HEAD') && req.url === '/' && landingPage !== null && landingPage !== '') {
+      res.writeHead(302, { Location: landingPage }).end();
+      return;
+    }
+
     // The secret path is the "is this actually Discord" check; everything else gets a bare 404
     if (req.method !== 'POST' || req.url !== webhookPath) {
       res.writeHead(404).end();

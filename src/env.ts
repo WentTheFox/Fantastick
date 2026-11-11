@@ -24,6 +24,8 @@ export const env = defineEnv({
   WEBHOOK_PATH_SECRET: z.string().nullable().default(null),
   // Logs signature/timestamp details of rejected requests, for debugging proxy issues
   WEBHOOK_VERBOSE_DIAGNOSTICS: boolFromString(),
+  // Where a GET/HEAD on the bare webhook root ("/") redirects to; unset = bare 404
+  LANDING_PAGE: z.string().nullable().default(null),
   DISCORD_FEED_WEBHOOK_URL: z.string().nullable().default(null),
   DISCORD_LOG_WEBHOOK_URL: z.string().nullable().default(null),
   LOCAL: boolFromString(),

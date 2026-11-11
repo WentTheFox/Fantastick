@@ -3,6 +3,12 @@
 FROM node:24-bookworm-slim AS build
 WORKDIR /app
 
+# bufferutil and utf-8-validate have no arm64 prebuilds and compile with node-gyp;
+# openssl lets Prisma detect the right engine.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 make g++ openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # Match the packageManager field in package.json exactly
 RUN corepack enable && corepack prepare pnpm@11.5.3 --activate
 
@@ -38,7 +44,7 @@ WORKDIR /app
 # chromium: headless rendering of animated (.tgs/Lottie) stickers via puppeteer-core
 # ffmpeg: GIF encoding for both .tgs frame sequences and .webm (VP9+alpha) stickers
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends chromium ffmpeg \
+    && apt-get install -y --no-install-recommends chromium ffmpeg openssl \
     && rm -rf /var/lib/apt/lists/*
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 

@@ -22,8 +22,8 @@ COPY utils ./utils
 RUN pnpm run build
 
 # Separate stage so `docker compose build`'s `migrate` service (target: build)
-# still has the full toolchain, including the prisma CLI, which is a
-# devDependency this prune removes.
+# still has the full toolchain. The prisma CLI is a regular dependency, so it
+# survives this prune and the runtime image can run `prisma migrate deploy`.
 FROM build AS pruned
 # --ignore-scripts: pnpm reruns the root "prepare" script (ts-patch install)
 # during prune, but ts-patch is a devDependency being removed by this same
@@ -48,6 +48,12 @@ COPY --from=pruned --chown=node:node /app/package.json ./package.json
 # tsc does not copy JSON locale files into build/; i18next reads them from
 # disk at runtime relative to process.cwd() (see src/constants/locales.ts).
 COPY --chown=node:node src/locales ./src/locales
+# Needed by the one-off `node_modules/.bin/prisma migrate deploy` job (same image).
+COPY --chown=node:node prisma ./prisma
+COPY --chown=node:node prisma.config.ts ./prisma.config.ts
+# Sticker files (when UPLOAD_API_ENABLED=false) are written below ./fs; it must be
+# writable by the non-root user, also when a volume is mounted over it.
+RUN mkdir -p /app/fs && chown node:node /app/fs
 
 USER node
 
